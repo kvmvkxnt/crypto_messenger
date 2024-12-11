@@ -1,3 +1,6 @@
+'''
+    Transaction module represents all of the thing with transactions
+'''
 import hashlib
 import json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
@@ -6,10 +9,26 @@ from typing import Dict
 
 
 class Transaction:
+    '''
+        Defines transaction and its content
+
+        :ivar sender: initiator of the transaction
+        :type sender: str
+        :ivar recipient: recipient of the transaction
+        :type recipient: str
+        :ivar amount: amount of coins recipient gets
+        :type amount: float
+        :ivar content: content (comment) sender sends !?
+        :type content: any
+        :ivar signature: encrypted signature to secure the transaction
+        :type signature: idk
+    '''
+
     def __init__(self, sender: str,
                  recipient: str,
                  amount: float,
                  content: any = ""):
+        '''Initializes transaction'''
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
@@ -17,7 +36,12 @@ class Transaction:
         self.signature = None
 
     def to_dict(self) -> Dict[str, str]:
-        """Возвращает словарь с данными транзакции."""
+        '''
+            Returns transaction content as a dictionary
+
+            :return: transaction content
+            :rtype: Dict[str, str]
+        '''
         return {
             "sender": self.sender,
             "recipient": self.recipient,
@@ -26,15 +50,28 @@ class Transaction:
         }
 
     def calculate_hash(self) -> str:
-        """Возвращает хеш транзакции."""
+        '''
+            Returns transaction hash
+
+            :return: transaction hash
+            :rtype: str
+        '''
+        # Calculating hash just like block's hash
         transaction_string = json.dumps(self.to_dict(), sort_keys=True)
         return hashlib.sha256(transaction_string.encode()).hexdigest()
 
     def sign_transaction(self, private_key: rsa.RSAPrivateKey) -> None:
-        """Подписывает транзакцию приватным ключом."""
+        '''
+            Signs transaction with private key
+
+            :param private_key: private_key needed to sign transaction
+            :type private_key: rsa.RSAPrivateKey
+        '''
+        # Raise error if no full info
         if not self.sender or not self.recipient:
             raise ValueError("Transaction must include sender and recipient")
 
+        # Signing using private_key and transaction's hash
         hash_bytes = self.calculate_hash().encode()
         self.signature = private_key.sign(
             hash_bytes,
@@ -46,7 +83,14 @@ class Transaction:
         )
 
     def is_valid(self, public_key: rsa.RSAPublicKey) -> bool:
-        """Проверяет подпись транзакции."""
+        '''
+            Checks transaction signature
+
+            :param public_key: key needed to validate signature
+            :type public_key: rsa.RSAPublicKey
+            :return: if signature is valid or not
+            :rtype: bool
+        '''
         if not self.signature:
             print("No signature in this transaction")
             return False
@@ -67,23 +111,23 @@ class Transaction:
             return False
 
 
-# Генерация ключей для примера
+# Example of generating keys
 if __name__ == "__main__":
-    # Создаем ключи
+    # Creating keys
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048
     )
     public_key = private_key.public_key()
 
-    # Создаем транзакцию
+    # Creating trasnaction
     transaction = Transaction(sender="Alice", recipient="Bob", amount=100)
     print("Transaction hash before signing:", transaction.calculate_hash())
 
-    # Подписываем транзакцию
+    # Signing transaction
     transaction.sign_transaction(private_key)
     print("Transaction signed.")
 
-    # Проверяем подпись
+    # Validating signature
     is_valid = transaction.is_valid(public_key)
     print("Is transaction valid?:", is_valid)

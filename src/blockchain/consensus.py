@@ -1,13 +1,35 @@
+'''
+    Consensus module
+
+    Base of PoW algorithm and validations
+'''
+
 from transaction import Transaction
 
 
 class ProofOfWork:
-    def __init__(self, difficulty: int):
+    '''
+        ProofOfWork class used to mine and find hash
+
+        :ivar difficulty: difficulty of finding hash
+        :type difficulty: float
+    '''
+
+    def __init__(self, difficulty: float):
+        '''Initializes the PoW class'''
         self.difficulty = difficulty
 
     def mine(self, block) -> str:
-        """Реализует процесс майнинга для блока."""
+        '''
+            Proccesses block mining.
+
+            :param block: block that should be mined
+            :type block: Block
+            :return: found hash of the block
+            :rtype: str
+        '''
         target = "0" * self.difficulty
+        # Mining block
         while not block.hash.startswith(target):
             block.nonce += 1
             block.hash = block.calculate_hash()
@@ -15,14 +37,32 @@ class ProofOfWork:
         return block.hash
 
     def validate(self, block) -> bool:
-        """Проверяет, что блок удовлетворяет условиям сложности."""
+        '''
+            Validates that block corresponds to difficulty
+
+            :param block: block that should be validated
+            :type block: Block
+            :return: if correct hash was found or not
+            :rtype: bool
+        '''
         target = "0" * self.difficulty
         return block.hash.startswith(target)
 
 
 class Validator:
+    '''
+        Validator class checks the chain and validates its integrity
+    '''
+
     def validate_blockchain(self, blockchain) -> bool:
-        """Проверяет целостность всей цепочки блоков."""
+        '''
+            Checks integrity of the whole chain
+
+            :param blockchain: chain that should be checked
+            :type blockchain: Blockchain or List[Block]
+            :return: if blockchain is corrupted or not
+            :rtype: bool
+        '''
         for i in range(1, len(blockchain.chain)):
             current_block = blockchain.chain[i]
             previous_block = blockchain.chain[i - 1]
@@ -41,11 +81,11 @@ class Validator:
 if __name__ == "__main__":
     from blockchain import Blockchain, Block
 
-    # Инициализация блокчейна и ProofOfWork
+    # Blockchain initialization and PoW
     blockchain = Blockchain(difficulty=4)
     pow = ProofOfWork(difficulty=4)
 
-    # Создание и майнинг блока
+    # Creating and mining block
     blockchain.add_transaction(Transaction("Alice", "Bob", 10, "Hi"))
     blockchain.add_transaction(Transaction("Charlie", "Dave", 20, "Hello"))
 
@@ -58,9 +98,9 @@ if __name__ == "__main__":
 
     pow.mine(new_block)
 
-    # Добавление блока в цепочку
+    # Adding block to the chain
     blockchain.chain.append(new_block)
 
-    # Валидация цепочки
+    # Validating chain
     validator = Validator()
     print("Blockchain valid:", validator.validate_blockchain(blockchain))

@@ -28,7 +28,7 @@
       
       <div class="navlinks">
         <span class="navbar-brand">
-          consensus/blockchain <a href="index.html">API Documentation</a>
+          transaction/consensus/blockchain <a href="index.html">API Documentation</a>
         </span>
 
         <a href="moduleIndex.html">
@@ -115,7 +115,103 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Consensus module</div>
+          </li><li id="transaction">
+            
+            <div class="fullName">transaction</div>
+            <div class="url">transaction.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Transaction module represents all of the thing with transactions</div>
+          </li><li id="transaction.Transaction">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction</div>
+            <div class="url">transaction.Transaction.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Defines transaction and its content</div>
+          </li><li id="transaction.Transaction.sender">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.sender</div>
+            <div class="url">transaction.Transaction.html#sender</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">initiator of the transaction</div>
+          </li><li id="transaction.Transaction.recipient">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.recipient</div>
+            <div class="url">transaction.Transaction.html#recipient</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">recipient of the transaction</div>
+          </li><li id="transaction.Transaction.amount">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.amount</div>
+            <div class="url">transaction.Transaction.html#amount</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">amount of coins recipient gets</div>
+          </li><li id="transaction.Transaction.content">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.content</div>
+            <div class="url">transaction.Transaction.html#content</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">content (comment) sender sends !?</div>
+          </li><li id="transaction.Transaction.signature">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.signature</div>
+            <div class="url">transaction.Transaction.html#signature</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">encrypted signature to secure the transaction</div>
+          </li><li id="transaction.Transaction.__init__">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.__init__</div>
+            <div class="url">transaction.Transaction.html#__init__</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Initializes transaction</div>
+          </li><li id="transaction.Transaction.to_dict">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.to<wbr></wbr>_dict</div>
+            <div class="url">transaction.Transaction.html#to_dict</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Returns transaction content as a dictionary</div>
+          </li><li id="transaction.Transaction.calculate_hash">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.calculate<wbr></wbr>_hash</div>
+            <div class="url">transaction.Transaction.html#calculate_hash</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Returns transaction hash</div>
+          </li><li id="transaction.Transaction.sign_transaction">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.sign<wbr></wbr>_transaction</div>
+            <div class="url">transaction.Transaction.html#sign_transaction</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Signs transaction with private key</div>
+          </li><li id="transaction.Transaction.is_valid">
+            
+            <div class="fullName">transaction<wbr></wbr>.<wbr></wbr>Transaction<wbr></wbr>.is<wbr></wbr>_valid</div>
+            <div class="url">transaction.Transaction.html#is_valid</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Checks transaction signature</div>
           </li><li id="consensus.ProofOfWork">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work</div>
@@ -123,15 +219,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No class docstring; 0/1 instance variable, 2/3 methods documented</span></div>
-          </li><li id="consensus.ProofOfWork.__init__">
-            
-            <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work<wbr></wbr>.__init__</div>
-            <div class="url">consensus.ProofOfWork.html#__init__</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">ProofOfWork class used to mine and find hash</div>
           </li><li id="consensus.ProofOfWork.difficulty">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work<wbr></wbr>.difficulty</div>
@@ -139,7 +227,15 @@
             <div class="type">Attribute</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">difficulty of finding hash</div>
+          </li><li id="consensus.ProofOfWork.__init__">
+            
+            <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work<wbr></wbr>.__init__</div>
+            <div class="url">consensus.ProofOfWork.html#__init__</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Initializes the PoW class</div>
           </li><li id="consensus.ProofOfWork.mine">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work<wbr></wbr>.mine</div>
@@ -147,7 +243,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Реализует процесс майнинга для блока.</div>
+            <div class="summary">Proccesses block mining.</div>
           </li><li id="consensus.ProofOfWork.validate">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work<wbr></wbr>.validate</div>
@@ -155,7 +251,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Проверяет, что блок удовлетворяет условиям сложности.</div>
+            <div class="summary">Validates that block corresponds to difficulty</div>
           </li><li id="consensus.Validator">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Validator</div>
@@ -163,7 +259,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No class docstring; 1/1 method documented</span></div>
+            <div class="summary">Validator class checks the chain and validates its integrity</div>
           </li><li id="consensus.Validator.validate_blockchain">
             
             <div class="fullName">consensus<wbr></wbr>.<wbr></wbr>Validator<wbr></wbr>.validate<wbr></wbr>_blockchain</div>
@@ -171,7 +267,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Проверяет целостность всей цепочки блоков.</div>
+            <div class="summary">Checks integrity of the whole chain</div>
           </li><li id="blockchain.Block">
             
             <div class="fullName">blockchain<wbr></wbr>.<wbr></wbr>Block</div>

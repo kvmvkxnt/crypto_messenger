@@ -159,21 +159,21 @@ class Blockchain:
 
 
 if __name__ == "__main__":
-    # Пример работы
+    # Usage example
     blockchain = Blockchain(difficulty=4)
 
-    # Добавление транзакций
+    # Adding transactions
     blockchain.add_transaction(Transaction("Alice", "Bob", 50))
     blockchain.add_transaction(Transaction("Bob", "Alice", 25))
 
-    # Майнинг
+    # Mining
     blockchain.mine_pending_transactions(miner_address="Miner1")
     blockchain.mine_pending_transactions(miner_address="Miner1")
 
-    # Проверка цепочки
+    # Chain validation
     print(Block(0, "123", 14.23423, []).calculate_hash())
     print("Blockchain valid:", Validator().validate_blockchain(blockchain))
 
-    # Печать цепочки
+    # Printing chain
     for block in blockchain.chain:
         print(block)
