@@ -1,3 +1,6 @@
+from transaction import Transaction
+
+
 class ProofOfWork:
     def __init__(self, difficulty: int):
         self.difficulty = difficulty
@@ -43,8 +46,8 @@ if __name__ == "__main__":
     pow = ProofOfWork(difficulty=4)
 
     # Создание и майнинг блока
-    blockchain.add_transaction({"from": "Alice", "to": "Bob", "amount": 10})
-    blockchain.add_transaction({"from": "Charlie", "to": "Dave", "amount": 20})
+    blockchain.add_transaction(Transaction("Alice", "Bob", 10, "Hi"))
+    blockchain.add_transaction(Transaction("Charlie", "Dave", 20, "Hello"))
 
     new_block = Block(
         index=len(blockchain.chain),

@@ -6,10 +6,14 @@ from typing import Dict
 
 
 class Transaction:
-    def __init__(self, sender: str, recipient: str, amount: float):
+    def __init__(self, sender: str,
+                 recipient: str,
+                 amount: float,
+                 content: any = ""):
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
+        self.content = content
         self.signature = None
 
     def to_dict(self) -> Dict[str, str]:
@@ -18,6 +22,7 @@ class Transaction:
             "sender": self.sender,
             "recipient": self.recipient,
             "amount": self.amount,
+            "conent": str(self.content)
         }
 
     def calculate_hash(self) -> str:
