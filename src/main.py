@@ -23,25 +23,26 @@ def get_ip():
         # doesn't even have to be reachable
         s.connect(('10.254.254.254', 1))
         IP = s.getsockname()[0]
+        PORT = s.getsockname()[1]
     except Exception:
         IP = '127.0.0.1'
     finally:
         s.close()
-    return IP
+    return (IP, PORT)
 
 
-host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
+host = input(f"Enter your host(default={get_ip()}): ") or get_ip()[0]
 log.debug(f"Got host: {host}")
 
 port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
-    cfg.DEFAULT_PORT
+    get_ip()[1]
 log.debug(f"Selected port: {port}")
 
 broadcast_port = input(f"Enter your broadcast \
 port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
 log.debug(f"Selected broadcast port: {broadcast_port}")
 
-network = P2PNetwork(P2PSocket(host, port))
+network = P2PNetwork(P2PSocket(host, port), broadcast_port)
 sync_manager = SyncManager(network, blockchain)
 
 network.start()
@@ -49,6 +50,7 @@ network.discover_peers(discover_peers)
 sync_manager.start_sync_loop()
 
 print("""
+    If you're using any vpn or proxy, please turn it off
     1. Connect to peer
     2. Broadcast message (public, manual)
     3. Sync with other peers (manual)
@@ -73,3 +75,7 @@ while True:
                 print(i)
         else:
             print("No peers")
+    elif user_input == 1:
+        peer_host = input("Enter peer's ip: ")
+        peer_port = input("Enter peer's port: ")
+        network.connect_to_peer()

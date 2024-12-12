@@ -7,7 +7,7 @@ log = logger.Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
-                   broadcast_port: int = 5000):
+                   broadcast_port: int):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
 
