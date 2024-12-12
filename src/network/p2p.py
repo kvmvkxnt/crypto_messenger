@@ -31,34 +31,52 @@ class P2PNetwork:
             except Exception as e:
                 print(f"Error broadcasting message: {e}")
 
-    def discover_peers(self):
+    def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
         # Заглушка: этот метод будет доработан в файле discovery.py
-        print("Discovering peers...")
-        time.sleep(2)
-        # Имитация обнаружения нового узла
-        new_peer = ("127.0.0.1", 54321)
-        self.peers.add(new_peer)
-        print(f"Discovered new peer: {new_peer}")
+        #print("Discovering peers...")
+        #time.sleep(2)
+        ## Имитация обнаружения нового узла
+        #new_peer = ("127.0.0.1", 54321)
+        #self.peers.add(new_peer)
+        #print(f"Discovered new peer: {new_peer}")
+        #for item in discoverer(self.host, self.port):
+        #    if item not in self.peers:
+        #        self.peers.add(item)
+        self.peers = discoverer(self.host, self.port)
 
-    def sync_with_peers(self):
+    def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""
         # Заглушка: функциональность будет доработана в файле sync.py
-        print("Synchronizing with peers...")
-        time.sleep(1)
-        print("Synchronization complete.")
+        #print("Synchronizing with peers...")
+        #time.sleep(1)
+        #print("Synchronization complete.")
+        return sync_manager(self, blockchain)
 
 
 if __name__ == "__main__":
+    from discovery import discover_peers
+    from sync import SyncManager
+    import os
+    import sys
+
+    parent_dir = os.path.dirname(os.path.realpath(__file__)) + "/.."
+    sys.path.append(parent_dir)
+    from blockchain.blockchain import Blockchain, Block
+
     host = "10.255.196.200"
     port = 12345
+
+    blockchain = Blockchain()
+    new_block = Block(1, "ahfjdlasf", 0.2, [])
+    blockchain.chain.append(new_block)
 
     p2p = P2PNetwork(host, port)
     p2p.start()
 
     while True:
         command = input("Enter command \
-        (connect, broadcast, discover, sync, exit): ")
+        (connect, broadcast, discover, sync, list peers, exit): ")
         if command == "connect":
             peer_host = input("Enter peer host: ")
             peer_port = int(input("Enter peer port: "))
@@ -67,9 +85,13 @@ if __name__ == "__main__":
             message = input("Enter message to broadcast: ")
             p2p.broadcast_message(message)
         elif command == "discover":
-            p2p.discover_peers()
+            p2p.discover_peers(discover_peers)
         elif command == "sync":
-            p2p.sync_with_peers()
+            sm = p2p.sync_with_peers(SyncManager, blockchain)
+            sm.start_sync_loop()
+            sm.broadcast_block(new_block.__repr__())
+        elif command == "list peers":
+            print(f"known peers: {list(p2p.peers)}")
         elif command == "exit":
             print("Exiting...")
             break

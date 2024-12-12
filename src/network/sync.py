@@ -49,7 +49,7 @@ class SyncManager:
 
         :param block: Новый блок для добавления в цепочку
         """
-        block_data = json.dumps(block.__repr__()).encode()
+        block_data = json.dumps(block).encode()
         print("Broadcasting new block...")
         for conn in self.p2p_network.node.connections:
             try:
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         command = input("Enter command (broadcast, request, exit): ")
         if command == "broadcast":
             new_block = Block(1, "hfjasklfashfjaslf", 0.2, [])
-            sync_manager.broadcast_block(new_block)
+            sync_manager.broadcast_block(new_block.__repr__())
         elif command == "request":
             peer_host = input("Enter peer host: ")
             peer_port = int(input("Enter peer port: "))
