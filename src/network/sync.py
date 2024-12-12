@@ -49,7 +49,7 @@ class SyncManager:
 
         :param block: Новый блок для добавления в цепочку
         """
-        block_data = json.dumps(block).encode()
+        block_data = json.dumps(block.__repr__()).encode()
         print("Broadcasting new block...")
         for conn in self.p2p_network.node.connections:
             try:
