@@ -32,7 +32,7 @@ class Block:
     '''
 
     def __init__(self, index: int, previous_hash: str, timestamp: float,
-                 transactions: List[Transaction], nonce: int = 0) -> None:
+                 transactions, nonce: int = 0) -> None:
         '''Initiates the block class'''
         self.index = index
         self.previous_hash = previous_hash

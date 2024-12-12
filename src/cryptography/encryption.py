@@ -1,3 +1,8 @@
+'''
+    This module represents message encryption / decryption.\
+    In project dh shared key will be used with this module \
+    to encrypt / decrypt messages.
+'''
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -7,47 +12,73 @@ import os
 
 
 class SymmetricEncryption:
+    '''
+        Encryption class
+
+        :ivar key: key that will be used to encrypt message
+        :type key: bytes
+    '''
+
     def __init__(self, key: bytes):
-        """Инициализация с заданным ключом."""
+        '''
+            Initiates with the given key
+
+            :param key: key that will be used to encrypt message
+            :type key: bytes
+        '''
         self.key = key
 
     def encrypt(self, plaintext: str) -> bytes:
-        """Шифрует сообщение."""
-        iv = os.urandom(16)  # Случайный вектор инициализации
+        '''
+            Encrypts the message
+
+            :param plaintext: message to be encrypted
+            :type plaintext: str
+            :return: encrypted message
+            :rtype: bytes
+        '''
+        iv = os.urandom(16)  # Random initialization vector
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv),
                         backend=default_backend())
         encryptor = cipher.encryptor()
 
-        # Паддинг данных перед шифрованием
+        # Padding data before ciphering
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
         padded_data = padder.update(plaintext.encode()) + padder.finalize()
 
-        # Шифрование данных
+        # Encrypting data
         ciphertext = encryptor.update(padded_data) + encryptor.finalize()
         return iv + ciphertext
 
     def decrypt(self, ciphertext: bytes) -> str:
-        """Расшифровывает сообщение."""
-        iv = ciphertext[:16]  # Извлечение вектора инициализации
+        '''
+            Decrypts the message
+
+            :param ciphertext: the message to be decrypted
+            :type ciphertext: bytes
+            :return: the decrypted message
+            :rtype: str
+        '''
+        iv = ciphertext[:16]  # Extrcating intialization vector
         actual_ciphertext = ciphertext[16:]
 
         cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv),
                         backend=default_backend())
         decryptor = cipher.decryptor()
 
-        # Расшифровка данных
+        # Decrypting data
         padded_data = decryptor.update(actual_ciphertext) + \
             decryptor.finalize()
 
-        # Удаление паддинга
+        # Deleting padding
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
         plaintext = unpadder.update(padded_data) + unpadder.finalize()
         return plaintext.decode()
 
 
-# Пример использования
+# Usage example
 if __name__ == "__main__":
-    # Генерация ключа (обычно берется из KDF на основе общего секрета)
+    # Generating key (usually KDF is taken from shared key)
     password = b"my_secret_password"
     salt = os.urandom(16)
     kdf = PBKDF2HMAC(
@@ -59,7 +90,7 @@ if __name__ == "__main__":
     )
     key = kdf.derive(password)
 
-    # Шифрование и расшифровка
+    # Encryption and decryption
     encryptor = SymmetricEncryption(key)
     plaintext = "This is a secret message."
 

@@ -1,3 +1,6 @@
+'''
+    This module represents digital signatures and handles message signing.
+'''
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import (
@@ -10,8 +13,17 @@ from cryptography.hazmat.primitives.serialization import (
 
 
 class DigitalSignature:
+    '''
+        Class that handles all signature methods
+
+        :ivar private_key: private key of the signature
+        :type private_key: RSAPrivateKey
+        :ivar public_key: public key of the signature based on its private key
+        :type public_key: RSAPublicKey
+    '''
+
     def __init__(self):
-        """Генерация пары ключей RSA."""
+        '''Generating RSA key pair'''
         self.private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048
@@ -19,7 +31,12 @@ class DigitalSignature:
         self.public_key = self.private_key.public_key()
 
     def get_private_key(self) -> bytes:
-        """Возвращает приватный ключ в PEM формате."""
+        '''
+            Returns private key in PEM format
+
+            :return: private key as PEM
+            :rtype: bytes
+        '''
         return self.private_key.private_bytes(
             encoding=Encoding.PEM,
             format=PrivateFormat.PKCS8,
@@ -27,14 +44,24 @@ class DigitalSignature:
         )
 
     def get_public_key(self) -> bytes:
-        """Возвращает публичный ключ в PEM формате."""
+        '''
+            Returns public key in PEM format
+
+            :return: public key as PEM
+            :rtype: bytes
+        '''
         return self.public_key.public_bytes(
             encoding=Encoding.PEM,
             format=PublicFormat.SubjectPublicKeyInfo
         )
 
     def sign(self, message: str) -> bytes:
-        """Создает цифровую подпись сообщения."""
+        '''
+            Creates digital signature of a message
+
+            :return: signature
+            :rtype: bytes
+        '''
         return self.private_key.sign(
             message.encode(),
             padding.PSS(
@@ -46,7 +73,18 @@ class DigitalSignature:
 
     @staticmethod
     def verify(public_key_pem: bytes, message: str, signature: bytes) -> bool:
-        """Проверяет цифровую подпись."""
+        '''
+            Verifys digital signature
+
+            :param public_key_pem: signer's public key
+            :type public_key_pem: bytes
+            :param message: message's sign to be checked
+            :type message: str
+            :param signature: the actual signature of message
+            :type signature: bytes
+            :return: if signature is valid or not
+            :rtype: bool
+        '''
         public_key = load_pem_public_key(public_key_pem)
         try:
             public_key.verify(
@@ -64,20 +102,20 @@ class DigitalSignature:
             return False
 
 
-# Пример использования
+# Example usage
 if __name__ == "__main__":
-    # Создание экземпляра для подписи
+    # Creating example for signature
     signer = DigitalSignature()
 
-    # Генерация ключей
+    # Generating keys
     private_key_pem = signer.get_private_key()
     public_key_pem = signer.get_public_key()
 
-    # Подписываем сообщение
+    # Signing message
     message = "This is a secure message."
     signature = signer.sign(message)
     print("Signature:", signature.hex())
 
-    # Проверяем подпись
+    # Validating sign
     is_valid = DigitalSignature.verify(public_key_pem, message, signature)
     print("Is signature valid?:", is_valid)

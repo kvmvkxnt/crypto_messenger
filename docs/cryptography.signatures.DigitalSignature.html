@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+    
+    <title>cryptography.signatures.DigitalSignature</title>
+    <meta name="generator" content="pydoctor 24.11.1"> 
+        
+    </meta>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="apidocs.css" />
+    <link rel="stylesheet" type="text/css" href="extra.css" />
+    
+</head>
+
+  <body>
+
+    
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          cryptography/blockchain <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="cryptography.signatures.DigitalSignature.html" class="internal-link" title="This class"><wbr></wbr>Digital<wbr></wbr>Signature</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#verify" class="internal-link" title="cryptography.signatures.DigitalSignature.verify">verify</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="cryptography.signatures.DigitalSignature.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get_private_key" class="internal-link" title="cryptography.signatures.DigitalSignature.get_private_key">get<wbr></wbr>_private<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get_public_key" class="internal-link" title="cryptography.signatures.DigitalSignature.get_public_key">get<wbr></wbr>_public<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#sign" class="internal-link" title="cryptography.signatures.DigitalSignature.sign">sign</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#private_key" class="internal-link" title="cryptography.signatures.DigitalSignature.private_key">private<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#public_key" class="internal-link" title="cryptography.signatures.DigitalSignature.public_key">public<wbr></wbr>_key</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="cryptography.signatures.html" class="internal-link" title="The parent of this class">signatures</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="cryptography.signatures.DigitalSignature.html" class="internal-link" title="cryptography.signatures.DigitalSignature"><wbr></wbr>Digital<wbr></wbr>Signature</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapseSideBar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <div id="main" class="">
+        
+
+        
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="cryptography.html" class="internal-link">cryptography</a></code><wbr></wbr>.<code><a href="cryptography.signatures.html" class="internal-link" title="cryptography.signatures">signatures</a></code><wbr></wbr>.<code><a href="cryptography.signatures.DigitalSignature.html" class="internal-link" title="cryptography.signatures.DigitalSignature">DigitalSignature</a></code></code></h1>
+          <div id="showPrivate">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">DigitalSignature</span>:</code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="cryptography.signatures.DigitalSignature.__init__">DigitalSignature()</a></code></p>
+          <p><a href="classIndex.html#cryptography.signatures.DigitalSignature">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Class that handles all signature methods</p></div>
+        </div>
+
+        <div id="splitTables">
+          <table class="children sortable" id="id16">
+  
+  
+  <tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#verify" class="internal-link" title="cryptography.signatures.DigitalSignature.verify">verify</a></code></td>
+    <td>Verifys digital signature</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="cryptography.signatures.DigitalSignature.__init__">__init__</a></code></td>
+    <td>Generating RSA key pair</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#get_private_key" class="internal-link" title="cryptography.signatures.DigitalSignature.get_private_key">get<wbr></wbr>_private<wbr></wbr>_key</a></code></td>
+    <td>Returns private key in PEM format</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#get_public_key" class="internal-link" title="cryptography.signatures.DigitalSignature.get_public_key">get<wbr></wbr>_public<wbr></wbr>_key</a></code></td>
+    <td>Returns public key in PEM format</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#sign" class="internal-link" title="cryptography.signatures.DigitalSignature.sign">sign</a></code></td>
+    <td>Creates digital signature of a message</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#private_key" class="internal-link" title="cryptography.signatures.DigitalSignature.private_key">private<wbr></wbr>_key</a></code></td>
+    <td>private key of the signature</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#public_key" class="internal-link" title="cryptography.signatures.DigitalSignature.public_key">public<wbr></wbr>_key</a></code></td>
+    <td>public key of the signature based on its private key</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="childList">
+          <div class="basestaticmethod">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.verify">
+    
+  </a>
+  <a name="verify">
+    
+  </a>
+  <div class="functionHeader">
+    
+    @staticmethod<br />
+    <span class="py-keyword">def</span> <span class="py-defname">verify</span><span class="function-signature">(public_key_pem: <code>bytes</code>, message: <code>str</code>, signature: <code>bytes</code>) -&gt; <code>bool</code></span>:
+    
+    <a class="headerLink" href="#verify" title="cryptography.signatures.DigitalSignature.verify">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Verifys digital signature</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">public<wbr></wbr>_key<wbr></wbr>_pem:</span>bytes</td><td class="fieldArgDesc">signer's public key</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span>str</td><td class="fieldArgDesc">message's sign to be checked</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">signature:</span>bytes</td><td class="fieldArgDesc">the actual signature of message</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bool</td><td class="fieldArgDesc">if signature is valid or not</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">__init__</span><span class="function-signature">(self)</span>:
+    
+    <a class="headerLink" href="#__init__" title="cryptography.signatures.DigitalSignature.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Generating RSA key pair</p></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.get_private_key">
+    
+  </a>
+  <a name="get_private_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">get_private_key</span><span class="function-signature">(self) -&gt; <code>bytes</code></span>:
+    
+    <a class="headerLink" href="#get_private_key" title="cryptography.signatures.DigitalSignature.get_private_key">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Returns private key in PEM format</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bytes</td><td class="fieldArgDesc">private key as PEM</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.get_public_key">
+    
+  </a>
+  <a name="get_public_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">get_public_key</span><span class="function-signature">(self) -&gt; <code>bytes</code></span>:
+    
+    <a class="headerLink" href="#get_public_key" title="cryptography.signatures.DigitalSignature.get_public_key">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Returns public key in PEM format</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bytes</td><td class="fieldArgDesc">public key as PEM</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.sign">
+    
+  </a>
+  <a name="sign">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">sign</span><span class="function-signature">(self, message: <code>str</code>) -&gt; <code>bytes</code></span>:
+    
+    <a class="headerLink" href="#sign" title="cryptography.signatures.DigitalSignature.sign">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Creates digital signature of a message</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bytes</td><td class="fieldArgDesc">signature</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.private_key">
+    
+  </a>
+  <a name="private_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">private_key</span>: RSAPrivateKey =
+    
+    <a class="headerLink" href="#private_key" title="cryptography.signatures.DigitalSignature.private_key">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>private key of the signature</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="cryptography.signatures.DigitalSignature.public_key">
+    
+  </a>
+  <a name="public_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">public_key</span>: RSAPublicKey =
+    
+    <a class="headerLink" href="#public_key" title="cryptography.signatures.DigitalSignature.public_key">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>public key of the signature based on its private key</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </div>
+    </div>
+
+    <footer class="navbar navbar-default">
+
+  
+  <div class="container-fluid">
+    <a href="index.html">API Documentation</a> for cryptography/blockchain,
+  generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
+    24.11.1 at 2024-12-12 18:30:56.
+  </div>
+
+  <!-- Search related scripts needs to be loaded at the end of HTML 
+    parsing not to introduce overhead and display HTML data asap -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -6,7 +6,7 @@
 
   <head>
     
-    <title>consensus.ProofOfWork</title>
+    <title>cryptography.encryption.SymmetricEncryption</title>
     <meta name="generator" content="pydoctor 24.11.1"> 
         
     </meta>
@@ -32,7 +32,7 @@
       
       <div class="navlinks">
         <span class="navbar-brand">
-          blockchain/diffie_hellman/consensus/transaction/encryption <a href="index.html">API Documentation</a>
+          cryptography/blockchain <a href="index.html">API Documentation</a>
         </span>
 
         <a href="moduleIndex.html">
@@ -110,7 +110,7 @@
 
       <div class="thingTitle">
         <span>Class</span>
-        <code class="thisobject"><a href="consensus.ProofOfWork.html" class="internal-link" title="This class"><wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work</a></code> 
+        <code class="thisobject"><a href="cryptography.encryption.SymmetricEncryption.html" class="internal-link" title="This class"><wbr></wbr>Symmetric<wbr></wbr>Encryption</a></code> 
       </div>
       
       <div>
@@ -131,7 +131,7 @@
         
 
         
-            <div class="itemName"><code><a href="#__init__" class="internal-link" title="consensus.ProofOfWork.__init__">__init__</a></code>
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="cryptography.encryption.SymmetricEncryption.__init__">__init__</a></code>
             </div>
         
 
@@ -141,7 +141,7 @@
         
 
         
-            <div class="itemName"><code><a href="#mine" class="internal-link" title="consensus.ProofOfWork.mine">mine</a></code>
+            <div class="itemName"><code><a href="#decrypt" class="internal-link" title="cryptography.encryption.SymmetricEncryption.decrypt">decrypt</a></code>
             </div>
         
 
@@ -151,7 +151,7 @@
         
 
         
-            <div class="itemName"><code><a href="#validate" class="internal-link" title="consensus.ProofOfWork.validate">validate</a></code>
+            <div class="itemName"><code><a href="#encrypt" class="internal-link" title="cryptography.encryption.SymmetricEncryption.encrypt">encrypt</a></code>
             </div>
         
 
@@ -170,7 +170,7 @@
         
 
         
-            <div class="itemName"><code><a href="#difficulty" class="internal-link" title="consensus.ProofOfWork.difficulty">difficulty</a></code>
+            <div class="itemName"><code><a href="#key" class="internal-link" title="cryptography.encryption.SymmetricEncryption.key">key</a></code>
             </div>
         
 
@@ -185,7 +185,7 @@
 
       <div class="thingTitle">
         <span>Module</span>
-        <code><a href="consensus.html" class="internal-link" title="The parent of this class">consensus</a></code> 
+        <code><a href="cryptography.encryption.html" class="internal-link" title="The parent of this class">encryption</a></code> 
       </div>
       
       <div>
@@ -203,17 +203,7 @@
         
 
         
-            <div class="itemName"><code><a href="consensus.ProofOfWork.html" class="internal-link" title="consensus.ProofOfWork"><wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="consensus.Validator.html" class="internal-link" title="consensus.Validator"><wbr></wbr>Validator</a></code>
+            <div class="itemName"><code><a href="cryptography.encryption.SymmetricEncryption.html" class="internal-link" title="cryptography.encryption.SymmetricEncryption"><wbr></wbr>Symmetric<wbr></wbr>Encryption</a></code>
             </div>
         
 
@@ -251,7 +241,7 @@
         
 
         <div class="page-header">
-          <h1 class="class"><code><code><a href="consensus.html" class="internal-link">consensus</a></code><wbr></wbr>.<code><a href="consensus.ProofOfWork.html" class="internal-link" title="consensus.ProofOfWork">ProofOfWork</a></code></code></h1>
+          <h1 class="class"><code><code><a href="cryptography.html" class="internal-link">cryptography</a></code><wbr></wbr>.<code><a href="cryptography.encryption.html" class="internal-link" title="cryptography.encryption">encryption</a></code><wbr></wbr>.<code><a href="cryptography.encryption.SymmetricEncryption.html" class="internal-link" title="cryptography.encryption.SymmetricEncryption">SymmetricEncryption</a></code></code></h1>
           <div id="showPrivate">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -262,38 +252,38 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ProofOfWork</span>:</code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="consensus.ProofOfWork.__init__">ProofOfWork(difficulty)</a></code></p>
-          <p><a href="classIndex.html#consensus.ProofOfWork">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">SymmetricEncryption</span>:</code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="cryptography.encryption.SymmetricEncryption.__init__">SymmetricEncryption(key)</a></code></p>
+          <p><a href="classIndex.html#cryptography.encryption.SymmetricEncryption">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>ProofOfWork class used to mine and find hash</p></div>
+          <div><p>Encryption class</p></div>
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id5">
+          <table class="children sortable" id="id14">
   
   
   <tr class="method">
     
     <td>Method</td>
-    <td><code><a href="#__init__" class="internal-link" title="consensus.ProofOfWork.__init__">__init__</a></code></td>
-    <td>Initializes the PoW class</td>
+    <td><code><a href="#__init__" class="internal-link" title="cryptography.encryption.SymmetricEncryption.__init__">__init__</a></code></td>
+    <td>Initiates with the given key</td>
   </tr><tr class="method">
     
     <td>Method</td>
-    <td><code><a href="#mine" class="internal-link" title="consensus.ProofOfWork.mine">mine</a></code></td>
-    <td>Proccesses block mining.</td>
+    <td><code><a href="#decrypt" class="internal-link" title="cryptography.encryption.SymmetricEncryption.decrypt">decrypt</a></code></td>
+    <td>Decrypts the message</td>
   </tr><tr class="method">
     
     <td>Method</td>
-    <td><code><a href="#validate" class="internal-link" title="consensus.ProofOfWork.validate">validate</a></code></td>
-    <td>Validates that block corresponds to difficulty</td>
+    <td><code><a href="#encrypt" class="internal-link" title="cryptography.encryption.SymmetricEncryption.encrypt">encrypt</a></code></td>
+    <td>Encrypts the message</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
-    <td><code><a href="#difficulty" class="internal-link" title="consensus.ProofOfWork.difficulty">difficulty</a></code></td>
-    <td>difficulty of finding hash</td>
+    <td><code><a href="#key" class="internal-link" title="cryptography.encryption.SymmetricEncryption.key">key</a></code></td>
+    <td>key that will be used to encrypt message</td>
   </tr>
 </table>
           
@@ -305,7 +295,7 @@
           <div class="basemethod">
   
   
-  <a name="consensus.ProofOfWork.__init__">
+  <a name="cryptography.encryption.SymmetricEncryption.__init__">
     
   </a>
   <a name="__init__">
@@ -314,9 +304,9 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span> <span class="py-defname">__init__</span><span class="function-signature">(self, difficulty: <code>float</code>)</span>:
+    <span class="py-keyword">def</span> <span class="py-defname">__init__</span><span class="function-signature">(self, key: <code>bytes</code>)</span>:
     
-    <a class="headerLink" href="#__init__" title="consensus.ProofOfWork.__init__">
+    <a class="headerLink" href="#__init__" title="cryptography.encryption.SymmetricEncryption.__init__">
       
       
       ¶
@@ -324,23 +314,23 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initializes the PoW class</p></div>
+    <div><p>Initiates with the given key</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span>bytes</td><td class="fieldArgDesc">key that will be used to encrypt message</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
   
-  <a name="consensus.ProofOfWork.mine">
+  <a name="cryptography.encryption.SymmetricEncryption.decrypt">
     
   </a>
-  <a name="mine">
+  <a name="decrypt">
     
   </a>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span> <span class="py-defname">mine</span><span class="function-signature">(self, block) -&gt; <code>str</code></span>:
+    <span class="py-keyword">def</span> <span class="py-defname">decrypt</span><span class="function-signature">(self, ciphertext: <code>bytes</code>) -&gt; <code>str</code></span>:
     
-    <a class="headerLink" href="#mine" title="consensus.ProofOfWork.mine">
+    <a class="headerLink" href="#decrypt" title="cryptography.encryption.SymmetricEncryption.decrypt">
       
       
       ¶
@@ -348,23 +338,23 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Proccesses block mining.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">block:</span>Block</td><td class="fieldArgDesc">block that should be mined</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">str</td><td class="fieldArgDesc">found hash of the block</td></tr></table></div>
+    <div><p>Decrypts the message</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ciphertext:</span>bytes</td><td class="fieldArgDesc">the message to be decrypted</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">str</td><td class="fieldArgDesc">the decrypted message</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
   
-  <a name="consensus.ProofOfWork.validate">
+  <a name="cryptography.encryption.SymmetricEncryption.encrypt">
     
   </a>
-  <a name="validate">
+  <a name="encrypt">
     
   </a>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span> <span class="py-defname">validate</span><span class="function-signature">(self, block) -&gt; <code>bool</code></span>:
+    <span class="py-keyword">def</span> <span class="py-defname">encrypt</span><span class="function-signature">(self, plaintext: <code>str</code>) -&gt; <code>bytes</code></span>:
     
-    <a class="headerLink" href="#validate" title="consensus.ProofOfWork.validate">
+    <a class="headerLink" href="#encrypt" title="cryptography.encryption.SymmetricEncryption.encrypt">
       
       
       ¶
@@ -372,22 +362,22 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validates that block corresponds to difficulty</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">block:</span>Block</td><td class="fieldArgDesc">block that should be validated</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bool</td><td class="fieldArgDesc">if correct hash was found or not</td></tr></table></div>
+    <div><p>Encrypts the message</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">plaintext:</span>str</td><td class="fieldArgDesc">message to be encrypted</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bytes</td><td class="fieldArgDesc">encrypted message</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
   
   
-  <a name="consensus.ProofOfWork.difficulty">
+  <a name="cryptography.encryption.SymmetricEncryption.key">
     
   </a>
-  <a name="difficulty">
+  <a name="key">
     
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">difficulty</span>: float =
+    <span class="py-defname">key</span>: bytes =
     
-    <a class="headerLink" href="#difficulty" title="consensus.ProofOfWork.difficulty">
+    <a class="headerLink" href="#key" title="cryptography.encryption.SymmetricEncryption.key">
       
       
       ¶
@@ -395,7 +385,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p>difficulty of finding hash</p></div>
+    <div><p>key that will be used to encrypt message</p></div>
     
   </div>
 </div>
@@ -408,9 +398,9 @@
 
   
   <div class="container-fluid">
-    <a href="index.html">API Documentation</a> for blockchain/diffie_hellman/consensus/transaction/encryption,
+    <a href="index.html">API Documentation</a> for cryptography/blockchain,
   generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-    24.11.1 at 2024-12-12 18:05:26.
+    24.11.1 at 2024-12-12 18:30:56.
   </div>
 
   <!-- Search related scripts needs to be loaded at the end of HTML 

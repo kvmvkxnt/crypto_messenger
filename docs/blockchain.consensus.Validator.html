@@ -6,7 +6,7 @@
 
   <head>
     
-    <title>blockchain</title>
+    <title>blockchain.consensus.Validator</title>
     <meta name="generator" content="pydoctor 24.11.1"> 
         
     </meta>
@@ -109,14 +109,20 @@
   <div>
 
       <div class="thingTitle">
-        <span>Package</span>
-        <code class="thisobject"><a href="blockchain.html" class="internal-link" title="This package">blockchain</a></code> 
+        <span>Class</span>
+        <code class="thisobject"><a href="blockchain.consensus.Validator.html" class="internal-link" title="This class"><wbr></wbr>Validator</a></code> 
       </div>
       
       <div>
         
 
-        <div class="childrenKindTitle">Modules</div>
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
         <ul>
     
     <li class="">
@@ -125,27 +131,7 @@
         
 
         
-            <div class="itemName"><code><a href="blockchain.blockchain.html" class="internal-link" title="blockchain.blockchain">blockchain</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="blockchain.consensus.html" class="internal-link" title="blockchain.consensus">consensus</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="blockchain.transaction.html" class="internal-link" title="blockchain.transaction">transaction</a></code>
+            <div class="itemName"><code><a href="#validate_blockchain" class="internal-link" title="blockchain.consensus.Validator.validate_blockchain">validate<wbr></wbr>_blockchain</a></code>
             </div>
         
 
@@ -153,7 +139,53 @@
 </ul> 
 
         
+         
+
         
+         
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="blockchain.consensus.html" class="internal-link" title="The parent of this class">consensus</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="blockchain.consensus.ProofOfWork.html" class="internal-link" title="blockchain.consensus.ProofOfWork"><wbr></wbr>Proof<wbr></wbr>Of<wbr></wbr>Work</a></code>
+            </div>
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="blockchain.consensus.Validator.html" class="internal-link" title="blockchain.consensus.Validator"><wbr></wbr>Validator</a></code>
+            </div>
+        
+
+    </li>
+</ul>
 
         
          
@@ -186,44 +218,34 @@
         
 
         <div class="page-header">
-          <h1 class="package"><code><code><a href="blockchain.html" class="internal-link">blockchain</a></code></code></h1>
+          <h1 class="class"><code><code><a href="blockchain.html" class="internal-link">blockchain</a></code><wbr></wbr>.<code><a href="blockchain.consensus.html" class="internal-link" title="blockchain.consensus">consensus</a></code><wbr></wbr>.<code><a href="blockchain.consensus.Validator.html" class="internal-link" title="blockchain.consensus.Validator">Validator</a></code></code></h1>
           <div id="showPrivate">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
         </div>
 
         <div class="categoryHeader">
-          package documentation
+          class documentation
         </div>
 
         <div class="extrasDocstring">
-          
-          <p></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Validator</span>:</code></p>
+          <p><a href="classIndex.html#blockchain.consensus.Validator">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Blockhain modules that handle every blockchain operation and define     transactions and Proof of work</p></div>
+          <div><p>Validator class checks the chain and validates its integrity</p></div>
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id1">
+          <table class="children sortable" id="id7">
   
   
-  <tr class="module">
+  <tr class="method">
     
-    <td>Module</td>
-    <td><code><a href="blockchain.blockchain.html" class="internal-link" title="blockchain.blockchain">blockchain</a></code></td>
-    <td>Blockchain module</td>
-  </tr><tr class="module">
-    
-    <td>Module</td>
-    <td><code><a href="blockchain.consensus.html" class="internal-link" title="blockchain.consensus">consensus</a></code></td>
-    <td>Consensus module</td>
-  </tr><tr class="module">
-    
-    <td>Module</td>
-    <td><code><a href="blockchain.transaction.html" class="internal-link" title="blockchain.transaction">transaction</a></code></td>
-    <td>Transaction module represents all of the thing with transactions</td>
+    <td>Method</td>
+    <td><code><a href="#validate_blockchain" class="internal-link" title="blockchain.consensus.Validator.validate_blockchain">validate<wbr></wbr>_blockchain</a></code></td>
+    <td>Checks integrity of the whole chain</td>
   </tr>
 </table>
           
@@ -232,7 +254,31 @@
         </div>
 
         <div id="childList">
-          
+          <div class="basemethod">
+  
+  
+  <a name="blockchain.consensus.Validator.validate_blockchain">
+    
+  </a>
+  <a name="validate_blockchain">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">validate_blockchain</span><span class="function-signature">(self, blockchain) -&gt; <code>bool</code></span>:
+    
+    <a class="headerLink" href="#validate_blockchain" title="blockchain.consensus.Validator.validate_blockchain">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Checks integrity of the whole chain</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">blockchain:</span>Blockchain or List[Block]</td><td class="fieldArgDesc">chain that should be checked</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bool</td><td class="fieldArgDesc">if blockchain is corrupted or not</td></tr></table></div>
+  </div>
+</div>
         </div>
       
       </div>
