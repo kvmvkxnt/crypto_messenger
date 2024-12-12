@@ -1,6 +1,8 @@
 import socket
 import threading
+from utils import logger
 
+log = logger.Logger("sockets")
 
 class P2PSocket:
     def __init__(self, host: str, port: int):
@@ -14,7 +16,7 @@ class P2PSocket:
         """Запуск сервера для приема подключений."""
         self.socket.bind((self.host, self.port))
         self.socket.listen(5)
-        print(f"Server started at {self.host}:{self.port}")
+        log.debug(f"Server started at {self.host}:{self.port}")
 
         while True:
             conn, addr = self.socket.accept()

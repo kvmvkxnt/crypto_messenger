@@ -1,6 +1,9 @@
 import json
 import threading
 import time
+from utils.logger import Logger
+
+log = Logger("sync")
 
 
 class SyncManager:
@@ -63,7 +66,7 @@ class SyncManager:
         """
         def sync_loop():
             while True:
-                print("Starting synchronization loop...")
+                log.debug("Starting synchronization loop...")
                 for peer in self.p2p_network.peers:
                     try:
                         self.request_chain(peer[0], peer[1])

@@ -1,6 +1,9 @@
 import socket
 import threading
 import time
+import utils.logger as logger
+
+log = logger.Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
@@ -20,7 +23,7 @@ def discover_peers(local_host: str, local_port: int,
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
-            print(f"Listening for broadcasts on {local_host}:{broadcast_port}")
+            log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
@@ -46,11 +49,11 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    print(f"Broadcasting: {message}")
+                    log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     print(f"Error in sending broadcast: {e}")
                 finally:
-                    time.sleep(5)  # Повторение каждые 5 секунд
+                    time.sleep(1)  # Повторение каждые 5 секунд
 
     threading.Thread(target=listen_for_broadcast, daemon=True).start()
     threading.Thread(target=send_broadcast, daemon=True).start()

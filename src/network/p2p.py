@@ -1,26 +1,28 @@
 import threading
 import time
-from sockets import P2PSocket
+import utils.logger as logger
+
+log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, host: str, port: int):
+    def __init__(self, node):
         """Инициализация P2P сети."""
-        self.host = host
-        self.port = port
-        self.node = P2PSocket(host, port)
+        self.host = node.host
+        self.port = node.port
+        self.node = node
         self.peers = set()  # Список известных узлов
 
     def start(self):
         """Запуск узла в режиме сервера."""
         threading.Thread(target=self.node.start_server, daemon=True).start()
-        print(f"Node started at {self.host}:{self.port}")
+        log.debug(f"Node started at {self.host}:{self.port}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
         self.node.connect_to_peer(peer_host, peer_port)
         self.peers.add((peer_host, peer_port))
-        print(f"Connected to peer: {peer_host}:{peer_port}")
+        log.info(f"Connected to peer: {peer_host}:{peer_port}")
 
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""
@@ -29,7 +31,7 @@ class P2PNetwork:
             try:
                 conn.send(message.encode())
             except Exception as e:
-                print(f"Error broadcasting message: {e}")
+                log.error(f"Error broadcasting message: {e}")
 
     def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
