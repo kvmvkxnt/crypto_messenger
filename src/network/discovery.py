@@ -3,7 +3,7 @@ import threading
 import time
 
 
-def discover_peers(local_host: str, local_port: int,
+def discover_peers(node_socket, local_host: str, local_port: int,
                    broadcast_port: int = 5000):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
@@ -16,7 +16,7 @@ def discover_peers(local_host: str, local_port: int,
 
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with node_socket as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
@@ -37,7 +37,7 @@ def discover_peers(local_host: str, local_port: int,
             Отправляет широковещательное сообщение
             для оповещения о своем узле.
         """
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with node_socket as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = f"Node at {local_host}:{local_port}"
@@ -58,19 +58,19 @@ def discover_peers(local_host: str, local_port: int,
     return peers
 
 
-if __name__ == "__main__":
-    local_host = "127.0.0.1"
-    local_port = 12345
-    broadcast_port = 5000
-
-    discovered_peers = discover_peers(local_host, local_port, broadcast_port)
-
-    while True:
-        command = input("Enter command (list, exit): ")
-        if command == "list":
-            print(f"Known peers: {list(discovered_peers)}")
-        elif command == "exit":
-            print("Exiting...")
-            break
-        else:
-            print("Unknown command.")
+#if __name__ == "__main__":
+#    local_host = "127.0.0.1"
+#    local_port = 12345
+#    broadcast_port = 5000
+#
+#    discovered_peers = discover_peers(local_host, local_port, broadcast_port)
+#
+#    while True:
+#        command = input("Enter command (list, exit): ")
+#        if command == "list":
+#            print(f"Known peers: {list(discovered_peers)}")
+#        elif command == "exit":
+#            print("Exiting...")
+#            break
+#        else:
+#            print("Unknown command.")

@@ -43,7 +43,7 @@ class P2PNetwork:
         #for item in discoverer(self.host, self.port):
         #    if item not in self.peers:
         #        self.peers.add(item)
-        self.peers = discoverer(self.host, self.port)
+        self.peers = discoverer(self.node, self.host, self.port)
 
     def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""
