@@ -1,0 +1,95 @@
+QPushButton#close_button {
+    border: none;           
+    background: transparent;
+    border-radius: 8px;    
+    width: 32px;            
+    height: 32px;         
+    qproperty-icon: url("./icons/icon_close.png");
+    icon-size: 16px 16px;
+}
+
+QPushButton#close_button:hover {
+    background-color: rgb(91, 21, 95);  
+}
+
+QPushButton#close_button:pressed {
+    background-color: rgb(212, 16, 176); 
+}
+QPushButton#sendMessage_button {
+    border: none;           
+    background: transparent;
+    border-radius: 16px;    
+    width: 38px;            
+    height: 27px;         
+    qproperty-icon: url("./icons/sendMessage_Button.png");
+    icon-size: 38px 27px;
+}
+
+QPushButton#sendMessage_button:hover {
+    background-color: rgb(229, 161, 232);  
+}
+
+QPushButton#sendMessage_button:pressed {
+    background-color: rgb(241, 94, 217); 
+}
+
+QPushButton {
+    border: none;           
+    background: transparent;
+    border-radius: 8px;    
+    width: 32px;            
+    height: 32px;         
+    icon-size: 16px 16px;
+}
+QPushButton#minimize_button{
+    qproperty-icon: url("./icons/icon_minimize.png");
+}
+
+QPushButton#maximize_button{
+    qproperty-icon: url("./icons/icon_maximize.png");
+}
+
+QPushButton#options_Button{
+    width: 40px;            
+    height: 40px;         
+    icon-size: 20px 20px;
+    qproperty-icon: url("./icons/icon_settings.png");
+}
+
+
+
+
+QPushButton:hover {
+    background-color: rgb(229, 161, 232);  
+}
+
+QPushButton:pressed {
+    background-color: rgb(241, 94, 217); 
+}
+
+QFrame#up_stroke {
+    margin: 0;
+    background-color: rgb(54, 42, 64);
+}
+
+QMainWindow{
+    background-color: rgb(36, 18, 54);
+}
+QLineEdit{
+    color: rgb(255, 255, 255);
+    background-color: rgb(42, 33, 49);
+    border: none;
+    border-radius: 16px;
+}
+
+QTextBrowser{
+    background-color: rgb(59, 18, 63);
+    border: none;
+}
+QListWidget{
+    background-color: rgb(59,18,63);
+    border: none;
+}
+QMainWindow {
+    border: 1px solid white;
+}
