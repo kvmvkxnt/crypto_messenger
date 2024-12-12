@@ -1,6 +1,6 @@
 import threading
 import time
-from .sockets import P2PSocket
+from sockets import P2PSocket
 
 
 class P2PNetwork:

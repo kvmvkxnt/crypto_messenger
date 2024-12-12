@@ -8,9 +8,6 @@
 import hashlib
 import time
 from typing import List
-from consensus import ProofOfWork, Validator
-from transaction import Transaction
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 class Block:
@@ -32,7 +29,7 @@ class Block:
     '''
 
     def __init__(self, index: int, previous_hash: str, timestamp: float,
-                 transactions, nonce: int = 0) -> None:
+                 transactions: List, nonce: int = 0) -> None:
         '''Initiates the block class'''
         self.index = index
         self.previous_hash = previous_hash
@@ -89,7 +86,7 @@ class Blockchain:
         '''
         self.chain: List[Block] = [self.create_genesis_block()]
         self.difficulty = difficulty
-        self.pending_transactions: List[Transaction] = []
+        self.pending_transactions: List = []
 
     def create_genesis_block(self) -> Block:
         '''
@@ -109,29 +106,21 @@ class Blockchain:
         '''
         return self.chain[-1]
 
-    def add_transaction(self, transaction: Transaction) -> None:
+    def add_transaction(self, transaction) -> None:
         '''
             Adds transaction to pending list, previously signing it
 
             :param transaction: transaction that needs to be added to list
             :type transaction: Transaction
         '''
-        # Creating private and public rsa-keys for transactions to be safe
-        private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048
-        )
-        public_key = private_key.public_key()
-        # Signing transaction with private_key
-        transaction.sign_transaction(private_key)
-        # Validating the transaction with public_key
-        if transaction.is_valid(public_key):
-            self.pending_transactions.append(transaction)
+        self.pending_transactions.append(transaction)
 
-    def mine_pending_transactions(self, miner_address: str) -> None:
+    def mine_pending_transactions(self, miner, miner_address: str) -> None:
         '''
             Creates new block using pending transactions and adds it to chain
 
+            :param miner: miner that will mine the block
+            :type miner: ProofOfWork
             :param miner_address: miner's adderss
             :type miner_address: str
             :return: only if there are no pending transactions
@@ -150,15 +139,31 @@ class Blockchain:
         )
 
         # Mining and validating new block
-        ProofOfWork(self.difficulty).mine(new_block)
-        ProofOfWork(self.difficulty).validate(new_block)
+        miner(self.difficulty).mine(new_block)
+        miner(self.difficulty).validate(new_block)
         self.chain.append(new_block)
 
         # Clearing pending transactions list after successful mining
-        self.pending_transactions = [Transaction(None, miner_address, 1)]
+        self.pending_transactions = [{"sender": None,
+                                      "recipient": miner_address,
+                                      "amount": 1}]
+
+    def is_chain_valid(self, validator):
+        '''
+            Validates the blockchain using given validator
+
+            :param validator: validator which vill used to validate chain
+            :type validator: Validator
+            :return: return's chain state
+            :rtype: bool
+        '''
+        return validator(self)
 
 
 if __name__ == "__main__":
+    from consensus import ProofOfWork, Validator
+    from transaction import Transaction
+
     # Usage example
     blockchain = Blockchain(difficulty=4)
 
@@ -167,8 +172,10 @@ if __name__ == "__main__":
     blockchain.add_transaction(Transaction("Bob", "Alice", 25))
 
     # Mining
-    blockchain.mine_pending_transactions(miner_address="Miner1")
-    blockchain.mine_pending_transactions(miner_address="Miner1")
+    blockchain.mine_pending_transactions(ProofOfWork,
+                                         miner_address="Miner1")
+    blockchain.mine_pending_transactions(ProofOfWork,
+                                         miner_address="Miner1")
 
     # Chain validation
     print(Block(0, "123", 14.23423, []).calculate_hash())

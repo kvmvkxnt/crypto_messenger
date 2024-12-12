@@ -4,8 +4,6 @@
     Base of PoW algorithm and validations
 '''
 
-from transaction import Transaction
-
 
 class ProofOfWork:
     '''
@@ -79,6 +77,7 @@ class Validator:
 
 
 if __name__ == "__main__":
+    from transaction import Transaction
     from blockchain import Blockchain, Block
 
     # Blockchain initialization and PoW

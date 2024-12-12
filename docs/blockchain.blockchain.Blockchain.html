@@ -32,7 +32,7 @@
       
       <div class="navlinks">
         <span class="navbar-brand">
-          cryptography/blockchain <a href="index.html">API Documentation</a>
+          blockchain/cryptography <a href="index.html">API Documentation</a>
         </span>
 
         <a href="moduleIndex.html">
@@ -162,6 +162,16 @@
 
         
             <div class="itemName"><code><a href="#get_latest_block" class="internal-link" title="blockchain.blockchain.Blockchain.get_latest_block">get<wbr></wbr>_latest<wbr></wbr>_block</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#is_chain_valid" class="internal-link" title="blockchain.blockchain.Blockchain.is_chain_valid">is<wbr></wbr>_chain<wbr></wbr>_valid</a></code>
             </div>
         
 
@@ -337,6 +347,11 @@
   </tr><tr class="method">
     
     <td>Method</td>
+    <td><code><a href="#is_chain_valid" class="internal-link" title="blockchain.blockchain.Blockchain.is_chain_valid">is<wbr></wbr>_chain<wbr></wbr>_valid</a></code></td>
+    <td>Validates the blockchain using given validator</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
     <td><code><a href="#mine_pending_transactions" class="internal-link" title="blockchain.blockchain.Blockchain.mine_pending_transactions">mine<wbr></wbr>_pending<wbr></wbr>_transactions</a></code></td>
     <td>Creates new block using pending transactions and adds it to chain</td>
   </tr><tr class="instancevariable">
@@ -398,7 +413,7 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span> <span class="py-defname">add_transaction</span><span class="function-signature">(self, transaction: <code>Transaction</code>)</span>:
+    <span class="py-keyword">def</span> <span class="py-defname">add_transaction</span><span class="function-signature">(self, transaction)</span>:
     
     <a class="headerLink" href="#add_transaction" title="blockchain.blockchain.Blockchain.add_transaction">
       
@@ -461,6 +476,30 @@
 </div><div class="basemethod">
   
   
+  <a name="blockchain.blockchain.Blockchain.is_chain_valid">
+    
+  </a>
+  <a name="is_chain_valid">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">is_chain_valid</span><span class="function-signature">(self, validator)</span>:
+    
+    <a class="headerLink" href="#is_chain_valid" title="blockchain.blockchain.Blockchain.is_chain_valid">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validates the blockchain using given validator</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">validator:</span>Validator</td><td class="fieldArgDesc">validator which vill used to validate chain</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">bool</td><td class="fieldArgDesc">return's chain state</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="blockchain.blockchain.Blockchain.mine_pending_transactions">
     
   </a>
@@ -470,7 +509,7 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span> <span class="py-defname">mine_pending_transactions</span><span class="function-signature">(self, miner_address: <code>str</code>)</span>:
+    <span class="py-keyword">def</span> <span class="py-defname">mine_pending_transactions</span><span class="function-signature">(self, miner, miner_address: <code>str</code>)</span>:
     
     <a class="headerLink" href="#mine_pending_transactions" title="blockchain.blockchain.Blockchain.mine_pending_transactions">
       
@@ -480,7 +519,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Creates new block using pending transactions and adds it to chain</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">miner<wbr></wbr>_address:</span>str</td><td class="fieldArgDesc">miner's adderss</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">None</td><td class="fieldArgDesc">only if there are no pending transactions</td></tr></table></div>
+    <div><p>Creates new block using pending transactions and adds it to chain</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">miner:</span>ProofOfWork</td><td class="fieldArgDesc">miner that will mine the block</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">miner<wbr></wbr>_address:</span>str</td><td class="fieldArgDesc">miner's adderss</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">None</td><td class="fieldArgDesc">only if there are no pending transactions</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
   
@@ -564,9 +603,9 @@
 
   
   <div class="container-fluid">
-    <a href="index.html">API Documentation</a> for cryptography/blockchain,
+    <a href="index.html">API Documentation</a> for blockchain/cryptography,
   generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-    24.11.1 at 2024-12-12 18:30:56.
+    24.11.1 at 2024-12-12 19:22:32.
   </div>
 
   <!-- Search related scripts needs to be loaded at the end of HTML 
