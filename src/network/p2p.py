@@ -50,7 +50,7 @@ class P2PNetwork:
 
 
 if __name__ == "__main__":
-    host = "127.0.0.1"
+    host = "10.255.196.200"
     port = 12345
 
     p2p = P2PNetwork(host, port)

@@ -4,14 +4,14 @@ import time
 
 
 class SyncManager:
-    def __init__(self, p2p_network):
+    def __init__(self, p2p_network, blockchain):
         """
         Инициализация менеджера синхронизации.
 
         :param p2p_network: Экземпляр P2PNetwork для взаимодействия с узлами
         """
         self.p2p_network = p2p_network
-        self.blockchain = []  # Локальная копия блокчейна
+        self.blockchain = blockchain  # Локальная копия блокчейна
 
     def request_chain(self, peer_host: str, peer_port: int):
         """
@@ -75,13 +75,20 @@ class SyncManager:
 
 
 if __name__ == "__main__":
-    from p2p import P2PNetwork
+    import os
+    import sys
 
-    host = "127.0.0.1"
+    parent_dir = os.path.dirname(os.path.realpath(__file__)) + "/.."
+    sys.path.append(parent_dir)
+    from p2p import P2PNetwork
+    from blockchain import blockchain
+
+    host = "10.255.196.200"
     port = 12345
 
+    blockchain = blockchain.Blockchain()
     p2p_network = P2PNetwork(host, port)
-    sync_manager = SyncManager(p2p_network)
+    sync_manager = SyncManager(p2p_network, blockchain)
 
     p2p_network.start()
     sync_manager.start_sync_loop()
