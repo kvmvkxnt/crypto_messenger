@@ -58,9 +58,9 @@ class Block:
         '''
         return (
             f"Block(index={self.index},\
-            previous_hash={self.previous_hash[:10]}...,\
-            hash={self.hash[:10]}..., \
-            transactions={len(self.transactions)},\
+            previous_hash={self.previous_hash},\
+            hash={self.hash}, \
+            transactions={self.transactions},\
             nonce={self.nonce})"
         )
 
