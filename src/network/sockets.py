@@ -63,7 +63,7 @@ class P2PSocket:
 if __name__ == "__main__":
     # Пример запуска сервера или клиента
     choice = input("Start as (s)erver or (c)lient? ")
-    host = "127.0.0.1"
+    host = "10.255.196.200"
     port = 12345
 
     if choice.lower() == 's':
