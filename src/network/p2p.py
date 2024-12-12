@@ -37,23 +37,11 @@ class P2PNetwork:
     def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
         # Заглушка: этот метод будет доработан в файле discovery.py
-        #print("Discovering peers...")
-        #time.sleep(2)
-        ## Имитация обнаружения нового узла
-        #new_peer = ("127.0.0.1", 54321)
-        #self.peers.add(new_peer)
-        #print(f"Discovered new peer: {new_peer}")
-        #for item in discoverer(self.host, self.port):
-        #    if item not in self.peers:
-        #        self.peers.add(item)
         self.peers = discoverer(self.host, self.port, self.broadcast_port)
 
     def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""
         # Заглушка: функциональность будет доработана в файле sync.py
-        #print("Synchronizing with peers...")
-        #time.sleep(1)
-        #print("Synchronization complete.")
         return sync_manager(self, blockchain)
 
 

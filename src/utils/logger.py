@@ -15,7 +15,7 @@ class Logger:
         :param name: Имя логгера, обычно имя модуля или класса.
         """
         self.logger = logging.getLogger(name)
-        self.logger.setLevel("INFO")
+        self.logger.setLevel(LOG_LEVEL)
 
         # Формат вывода логов
         log_format = logging.Formatter(

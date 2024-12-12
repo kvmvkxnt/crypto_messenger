@@ -23,19 +23,18 @@ def get_ip():
         # doesn't even have to be reachable
         s.connect(('10.254.254.254', 1))
         IP = s.getsockname()[0]
-        PORT = s.getsockname()[1]
     except Exception:
         IP = '127.0.0.1'
     finally:
         s.close()
-    return (IP, PORT)
+    return IP
 
 
-host = input(f"Enter your host(default={get_ip()}): ") or get_ip()[0]
+host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
 log.debug(f"Got host: {host}")
 
 port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
-    get_ip()[1]
+    cfg.DEFAULT_PORT
 log.debug(f"Selected port: {port}")
 
 broadcast_port = input(f"Enter your broadcast \

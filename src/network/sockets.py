@@ -4,6 +4,7 @@ from utils import logger
 
 log = logger.Logger("sockets")
 
+
 class P2PSocket:
     def __init__(self, host: str, port: int):
         """Инициализация сокета для P2P соединений."""

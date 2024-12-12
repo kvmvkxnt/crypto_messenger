@@ -16,7 +16,7 @@ SIGNATURE_ALGORITHM = "ECDSA"  # Алгоритм подписей
 
 # Логирование
 LOG_DIR = os.path.join(os.getcwd(), "logs")
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 # Уровень логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # Время между синхронизациями
