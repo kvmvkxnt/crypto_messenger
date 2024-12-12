@@ -88,6 +88,9 @@ class Blockchain:
         self.difficulty = difficulty
         self.pending_transactions: List = []
 
+    def __len__(self):
+        return len(self.chain)
+
     def create_genesis_block(self) -> Block:
         '''
             Creates genesis-block (blockchain's first block)
