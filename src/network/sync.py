@@ -96,8 +96,7 @@ if __name__ == "__main__":
     while True:
         command = input("Enter command (broadcast, request, exit): ")
         if command == "broadcast":
-            new_block = {"index": len(sync_manager.blockchain) + 1,
-                         "data": "New Block Data"}
+            new_block = blockchain.Block(1, "hfjasklfashfjaslf", 0.2, [])
             sync_manager.broadcast_block(new_block)
         elif command == "request":
             peer_host = input("Enter peer host: ")
