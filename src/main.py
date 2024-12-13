@@ -46,6 +46,7 @@ sync_manager = SyncManager(network, blockchain)
 
 network.start()
 network.discover_peers(discover_peers)
+sync_manager.start_sync_loop()
 
 print("""
     If you're using any vpn or proxy, please turn it off

@@ -25,7 +25,8 @@ class SyncManager:
         """
         print(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
-            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            if (peer_host, peer_port) not in self.p2p_network.node.connections:
+                conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096).decode()
             received_chain = json.loads(response)
