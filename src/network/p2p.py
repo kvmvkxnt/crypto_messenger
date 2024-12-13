@@ -16,7 +16,8 @@ class P2PNetwork:
 
     def start(self):
         """Запуск узла в режиме сервера."""
-        threading.Thread(target=self.node.start_server, daemon=True).start()
+        # threading.Thread(target=self.node.start_server, daemon=True).start()
+        self.node.start_server()
         log.debug(f"Node started at {self.host}:{self.port}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
@@ -24,7 +25,6 @@ class P2PNetwork:
         self.node.connect_to_peer(peer_host, peer_port)
         if (peer_host, peer_port) not in self.peers:
             self.peers.add((peer_host, peer_port))
-        log.info(f"Connected to peer: {peer_host}:{peer_port}")
 
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""

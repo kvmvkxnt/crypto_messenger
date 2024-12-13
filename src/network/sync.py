@@ -25,7 +25,6 @@ class SyncManager:
         """
         print(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
-            print((peer_host, peer_port), self.p2p_network.node.connections)
             if (peer_host, peer_port) not in self.p2p_network.node.connections:
                 conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
