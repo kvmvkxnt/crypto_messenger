@@ -1,10 +1,13 @@
 import socket
 import threading
 import time
+import utils.logger as logger
+
+log = logger.Logger("discovery")
 
 
-def discover_peers(node_socket, local_host: str, local_port: int,
-                   broadcast_port: int = 5000):
+def discover_peers(local_host: str, local_port: int,
+                   broadcast_port: int):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
 
@@ -16,18 +19,22 @@ def discover_peers(node_socket, local_host: str, local_port: int,
 
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
-        with node_socket as udp_socket:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
-            print(f"Listening for broadcasts on {local_host}:{broadcast_port}")
+            log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
-                    if addr not in peers:
-                        peers.add(addr)
+                    actual_port = peer_info.split(":")[-1]
+                    address = list(addr)[:-1]
+                    address.append(int(actual_port))
+                    address_with_port = tuple(address)
+                    if address_with_port not in peers:
+                        peers.add(address_with_port)
                         print(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
                     print(f"Error in receiving broadcast: {e}")
@@ -37,7 +44,7 @@ def discover_peers(node_socket, local_host: str, local_port: int,
             Отправляет широковещательное сообщение
             для оповещения о своем узле.
         """
-        with node_socket as udp_socket:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = f"Node at {local_host}:{local_port}"
@@ -46,11 +53,11 @@ def discover_peers(node_socket, local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    print(f"Broadcasting: {message}")
+                    log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     print(f"Error in sending broadcast: {e}")
                 finally:
-                    time.sleep(1)  # Повторение каждые 5 секунд
+                    time.sleep(5)  # Повторение каждые 5 секунд
 
     threading.Thread(target=listen_for_broadcast, daemon=True).start()
     threading.Thread(target=send_broadcast, daemon=True).start()
