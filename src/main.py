@@ -78,4 +78,5 @@ while True:
     elif user_input == 1:
         peer_host = input("Enter peer's ip: ")
         peer_port = input("Enter peer's port: ")
-        network.connect_to_peer(peer_host, peer_port)
+        while True:
+            network.connect_to_peer(peer_host, peer_port)
