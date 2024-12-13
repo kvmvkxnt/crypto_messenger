@@ -41,7 +41,7 @@ broadcast_port = input(f"Enter your broadcast \
 port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
 log.debug(f"Selected broadcast port: {broadcast_port}")
 
-network = P2PNetwork(P2PSocket(host, port), broadcast_port)
+network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 sync_manager = SyncManager(network, blockchain)
 
 network.start()

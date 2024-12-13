@@ -22,8 +22,7 @@ class P2PSocket:
         while True:
             conn, addr = self.socket.accept()
             print(f"Connection established with {addr}")
-            print(conn.raddr)
-            self.connections.append(conn.raddr)
+            self.connections.append(addr)
             threading.Thread(target=self.handle_client,
                              args=(conn, addr)).start()
 
