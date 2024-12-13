@@ -50,7 +50,7 @@ class P2PNetwork:
     def broadcast(self, message: bytes):
         for conn in self.connections:
             try:
-                conn.send(message.encode())
+                conn.send(message)
             except Exception as e:
                 log.error(f"Error broadcasting message: {e}")
 
