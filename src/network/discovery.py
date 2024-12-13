@@ -28,16 +28,11 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
-                    print(addr, type(addr))
                     peer_info = data.decode()
-                    print("peer_info", peer_info)
                     actual_port = peer_info.split(":")[-1]
-                    print("actual_port", actual_port)
                     address = list(addr)[:-1]
-                    print("address", address)
                     address.append(int(actual_port))
                     address_with_port = tuple(address)
-                    print(address_with_port)
                     if address_with_port not in peers:
                         peers.add(address_with_port)
                         print(f"Discovered new peer: {peer_info} at {addr}")
