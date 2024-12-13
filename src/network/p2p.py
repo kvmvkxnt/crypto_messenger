@@ -6,10 +6,11 @@ log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, node, broadcast_port):
+    def __init__(self, node, broadcast_host, broadcast_port):
         """Инициализация P2P сети."""
         self.host = node.host
         self.port = node.port
+        self.broadcast_host = broadcast_host
         self.broadcast_port = broadcast_port
         self.node = node
         self.peers = set()  # Список известных узлов
@@ -37,7 +38,7 @@ class P2PNetwork:
     def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
         # Заглушка: этот метод будет доработан в файле discovery.py
-        self.peers = discoverer(self.host, self.port, self.broadcast_port)
+        self.peers = discoverer(self.host, self.port, self.broadcast_host, self.broadcast_port)
 
     def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""

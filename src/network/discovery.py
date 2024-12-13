@@ -6,7 +6,7 @@ import utils.logger as logger
 log = logger.Logger("discovery")
 
 
-def discover_peers(local_host: str, local_port: int,
+def discover_peers(local_host: str, local_port: int, broadcast_host,
                    broadcast_port: int):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
@@ -21,7 +21,7 @@ def discover_peers(local_host: str, local_port: int,
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            udp_socket.bind((local_host, broadcast_port))
+            udp_socket.bind((broadcast_host, broadcast_port))
 
             log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
