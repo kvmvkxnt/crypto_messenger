@@ -66,7 +66,7 @@ class P2PNetwork:
                                  args=(conn, (peer_host, peer_port))).start()
                 print(f"Connected to peer(addr={addr}): \
 {peer_host}:{peer_port}")
-            elif [conn for conn in self.connections if peer_host == conn[1].split(":")[0]][0]:
+            elif len(self.connections) and [conn for conn in self.connections if peer_host == conn[1].split(":")[0]][0]:
                 return
             else:
                 conn, addr = socket.create_connection((peer_host, peer_port))
