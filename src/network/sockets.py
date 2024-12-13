@@ -22,7 +22,7 @@ class P2PSocket:
         while True:
             conn, addr = self.socket.accept()
             print(f"Connection established with {addr}")
-            self.connections.append(conn)
+            self.connections.append((conn, addr))
             threading.Thread(target=self.handle_client,
                              args=(conn, addr)).start()
 
@@ -39,13 +39,13 @@ class P2PSocket:
             print(f"Error with client {addr}: {e}")
         finally:
             print(f"Connection closed with {addr}")
-            self.connections.remove(conn)
+            self.connections.remove((conn, addr))
             conn.close()
 
     def broadcast(self, message: bytes, sender_conn):
         """Отправка сообщения всем подключенным клиентам, кроме отправителя."""
         for conn in self.connections:
-            if conn != sender_conn:
+            if list(conn)[0] != sender_conn:
                 try:
                     conn.send(message)
                 except Exception as e:
@@ -54,8 +54,8 @@ class P2PSocket:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к другому узлу."""
         try:
-            conn = socket.create_connection((peer_host, peer_port))
-            self.connections.append(conn)
+            conn, addr = socket.create_connection((peer_host, peer_port))
+            self.connections.append((conn, addr))
             threading.Thread(target=self.handle_client,
                              args=(conn, (peer_host, peer_port))).start()
             print(f"Connected to peer {peer_host}:{peer_port}")

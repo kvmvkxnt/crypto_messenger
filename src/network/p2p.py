@@ -1,44 +1,84 @@
 import threading
-import time
+import socket
 import utils.logger as logger
 
 log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, node, broadcast_host, broadcast_port):
+    def __init__(self, host, port, broadcast_port):
         """Инициализация P2P сети."""
-        self.host = node.host
-        self.port = node.port
-        self.broadcast_host = broadcast_host
+        self.host = host
+        self.port = port
         self.broadcast_port = broadcast_port
-        self.node = node
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connections = []  # Acrive connections list
         self.peers = set()  # Список известных узлов
 
     def start(self):
+        print(f"Node started at {self.host}:{self.port}")
+        threading.Thread(target=self.start_server, daemon=True).start()
+
+    def start_server(self):
         """Запуск узла в режиме сервера."""
-        threading.Thread(target=self.node.start_server, daemon=True).start()
-        log.debug(f"Node started at {self.host}:{self.port}")
+        self.socket.bind((self.host, self.port))
+        self.socket.listen(5)
+        log.debug(f"Server started at {self.host}:{self.port}")
+
+        while True:
+            conn, addr = self.socket.accept()
+            print(f"Connection estabilished with {addr}")
+            self.connections.append((conn, addr))
+            threading.Thread(target=self.handle_client, args=(conn, addr)) \
+                     .start()
+
+    def handle_client(self, conn, addr):
+        try:
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                print(f"Recieved from {addr}: {data.encode()}")
+                self.broadcast(data, conn)
+        except Exception as e:
+            print(f"Error with client {addr}: {e}")
+        finally:
+            print(f"Connection closed with {addr}")
+            self.connection.remove((conn, addr))
+            conn.close()
+
+    def broadcast(self, message: bytes, sender_conn):
+        for conn in self.connections:
+            if list(conn)[0] != sender_conn:
+                try:
+                    conn.send(message)
+                except Exception as e:
+                    print(f"Error broadcasting to a connection: {e}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
-        self.node.connect_to_peer(peer_host, peer_port)
-        if (peer_host, peer_port) not in self.peers:
-            self.peers.add((peer_host, peer_port))
-
-    def broadcast_message(self, message: str):
-        """Рассылка сообщения всем подключенным узлам."""
-        print(f"Broadcasting message: {message}")
-        for conn in self.node.connections:
-            try:
-                conn.send(message.encode())
-            except Exception as e:
-                log.error(f"Error broadcasting message: {e}")
+        try:
+            if (peer_host, peer_port) not in self.peers:
+                conn, addr = socket.create_connection((peer_host, peer_port))
+                self.connections.append((conn, addr))
+                self.peers.add((peer_host, peer_port))
+                threading.Thread(target=self.handle_client,
+                                 args=(conn, (peer_host, peer_port))).start()
+                print(f"Connected to peer(addr={addr}): \
+{peer_host}:{peer_port}")
+            elif len(self.connections) and len(self.peers):
+                conn = [conn for conn in self.connections if peer_host ==
+                        conn[1].split(":")[0]][0]
+                if conn == peer_host:
+                    return
+        except Exception as e:
+            print(f"Error connecting to peer(addr={addr}) \
+{peer_host}:{peer_port}: {e}")
 
     def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
         # Заглушка: этот метод будет доработан в файле discovery.py
-        self.peers = discoverer(self.host, self.port, self.broadcast_host, self.broadcast_port)
+        self.peers = discoverer(self.host, self.port, self.broadcast_port)
 
     def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""

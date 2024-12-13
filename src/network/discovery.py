@@ -6,7 +6,7 @@ import utils.logger as logger
 log = logger.Logger("discovery")
 
 
-def discover_peers(local_host: str, local_port: int, broadcast_host,
+def discover_peers(local_host: str, local_port: int,
                    broadcast_port: int):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
@@ -21,13 +21,12 @@ def discover_peers(local_host: str, local_port: int, broadcast_host,
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            udp_socket.bind((broadcast_host, broadcast_port))
+            udp_socket.bind((local_host, broadcast_port))
 
             log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
-                    print("breakpoint 2")
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
                     actual_port = peer_info.split(":")[-1]
@@ -54,7 +53,6 @@ def discover_peers(local_host: str, local_port: int, broadcast_host,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    print("breakpoint 1")
                     log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     print(f"Error in sending broadcast: {e}")

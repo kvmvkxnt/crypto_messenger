@@ -5,7 +5,6 @@ from crypto.diffie_hellman import DiffieHellmanKeyExchange
 from crypto.encryption import SymmetricEncryption
 from crypto.signatures import DigitalSignature
 from network.p2p import P2PNetwork
-from network.sockets import P2PSocket
 from network.discovery import discover_peers
 from network.sync import SyncManager
 from utils import config as cfg
@@ -41,12 +40,14 @@ broadcast_port = input(f"Enter your broadcast \
 port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
 log.debug(f"Selected broadcast port: {broadcast_port}")
 
-broadcast_host = input("Broadcast: ")
-network = P2PNetwork(P2PSocket(host, int(port)), broadcast_host,
-                     int(broadcast_port))
+network = P2PNetwork(host, port, broadcast_port)
 sync_manager = SyncManager(network, blockchain)
 
 network.start()
+network.peers.add(('10.255.196.46', 12345))
+
+# sync_manager.start_sync_loop()
+
 
 print("""
     If you're using any vpn or proxy, please turn it off

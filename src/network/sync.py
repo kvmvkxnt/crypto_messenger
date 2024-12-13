@@ -16,7 +16,7 @@ class SyncManager:
         self.p2p_network = p2p_network
         self.blockchain = blockchain  # Локальная копия блокчейна
 
-    def request_chain(self, peer_host: str, peer_port: int):
+    def request_chain(self, peer_host: str, peer_port: int, conn=None):
         """
         Запрашивает копию блокчейна у указанного узла.
 
@@ -25,10 +25,11 @@ class SyncManager:
         """
         print(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
-            if (peer_host, peer_port) not in self.p2p_network.node.connections:
-                conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-            conn.send(b"REQUEST_CHAIN")
-            response = conn.recv(4096).decode()
+            if conn not in self.p2p_network.node.connections:
+                new_conn = self.p2p_network.node.connect_to_peer(peer_host,
+                                                                 peer_port)
+            new_conn.send(b"REQUEST_CHAIN")
+            response = new_conn.recv(4096).decode()
             received_chain = json.loads(response)
             print(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(received_chain)
@@ -70,7 +71,14 @@ class SyncManager:
                 log.debug("Starting synchronization loop...")
                 for peer in self.p2p_network.peers:
                     try:
-                        self.request_chain(peer[0], peer[1])
+                        self.request_chain(peer[0], peer[1],
+                                           [conn for conn in
+                                           self.p2p_network.node.connections
+                                           if list(conn)[-1] == peer[0]][0])
+                        if len(self.p2p_network.node.connections):
+                            self.request_chain(peer[0], peer[1], [conn for conn
+                                        in self.p2p_network.node.connections if
+                                        list(conn)[-1] == peer[0]][0])
                     except Exception as e:
                         print(f"Error syncing with peer {peer}: {e}")
                 time.sleep(10)  # Интервал синхронизации
