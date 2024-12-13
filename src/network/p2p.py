@@ -16,8 +16,7 @@ class P2PNetwork:
 
     def start(self):
         """Запуск узла в режиме сервера."""
-        # threading.Thread(target=self.node.start_server, daemon=True).start()
-        self.node.start_server()
+        threading.Thread(target=self.node.start_server, daemon=True).start()
         log.debug(f"Node started at {self.host}:{self.port}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):

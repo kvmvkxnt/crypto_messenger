@@ -45,16 +45,15 @@ network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 sync_manager = SyncManager(network, blockchain)
 
 network.start()
-network.discover_peers(discover_peers)
-sync_manager.start_sync_loop()
 
 print("""
     If you're using any vpn or proxy, please turn it off
     1. Connect to peer
     2. Broadcast message (public, manual)
     3. Sync with other peers (manual)
-    4. List peers
-    5. Exit
+    4. Discover other peers (manual)
+    5. List peers
+    6. Exit
 """)
 
 while True:
@@ -64,11 +63,11 @@ while True:
         print("Not an option. Please, choose another")
         continue
 
-    if user_input > 5 or user_input < 1:
+    if user_input > 6 or user_input < 1:
         print("Not an option. Please, choose another")
-    elif user_input == 5:
+    elif user_input == 6:
         break
-    elif user_input == 4:
+    elif user_input == 5:
         print(network.peers)
         if len(network.peers):
             for i in network.peers:
