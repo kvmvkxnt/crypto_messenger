@@ -62,12 +62,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
     
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            # Проверяем, перетаскивает ли пользователь окно
             if self.up_stroke.geometry().contains(event.pos()):
                 self.is_dragging = True
                 self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
             else:
-                # Проверяем, находится ли мышь в зоне изменения размеров
                 self.is_resizing = True
                 self.resize_direction = self.get_resize_direction(event.pos())
             event.accept()
@@ -78,12 +76,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
             self.move(event.globalPos() - self.drag_position)
             event.accept()
 
-        # Если изменение размеров
         elif getattr(self, "is_resizing", False):
             self.resize_window(event.globalPos())
             event.accept()
         else:
-            # Меняем курсор в зависимости от области
             direction = self.get_resize_direction(event.pos())
             cursor = self.get_cursor_shape(direction)
             if cursor:
@@ -99,7 +95,6 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
 
     
     def get_resize_direction(self, pos):
-        """Определяет, в каком направлении пользователь изменяет размер окна"""
         rect = self.rect()
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
         mx, my = pos.x(), pos.y()
@@ -111,10 +106,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
             "right": w - self.border_width <= mx <= w,
         }'''
         directions = {
-        "top": my <= self.border_width,  # Мышь в верхней зоне
-        "bottom": my >= h - self.border_width,  # Мышь в нижней зоне
-        "left": mx <= self.border_width,  # Мышь в левой зоне
-        "right": mx >= w - self.border_width,  # Мышь в правой зоне
+        "top": my <= self.border_width, 
+        "bottom": my >= h - self.border_width,
+        "left": mx <= self.border_width, 
+        "right": mx >= w - self.border_width,
     }
         direction = None
         if directions["top"] and directions["left"]:
@@ -134,11 +129,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         elif directions["right"]:
             direction = "right"
         
-        print(f"Direction: {direction}")  # Отладочная печать
+        #print(f"Direction: {direction}")
         return direction
     
     def get_cursor_shape(self, direction):
-        """Возвращает подходящую форму курсора"""
         cursors = {
             "top": QtCore.Qt.SizeVerCursor,
             "bottom": QtCore.Qt.SizeVerCursor,
@@ -149,11 +143,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
             "top_right": QtCore.Qt.SizeBDiagCursor,
             "bottom_left": QtCore.Qt.SizeBDiagCursor,
         }
-        print(f"Cursor direction: {direction}")  # Для отладки
+        print(f"Cursor direction: {direction}")
         return QtGui.QCursor(cursors.get(direction)) if direction else None
         
     def resize_window(self, global_pos):
-        """Изменяет размер окна в зависимости от направления"""
         self.is_resizing = True
         rect = self.frameGeometry()
         diff = global_pos - rect.topLeft()
