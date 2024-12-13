@@ -29,8 +29,11 @@ def discover_peers(local_host: str, local_port: int,
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
+                    print("peer_info", peer_info)
                     actual_port = peer_info.split(":")[-1]
+                    print("actual_port", actual_port)
                     address = set(list(addr)[0])
+                    print("address", address)
                     address_with_port = address.add(actual_port)
                     print(address_with_port)
                     if address_with_port not in peers:
