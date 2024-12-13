@@ -88,7 +88,7 @@ def discover_peers(local_host, local_port, broadcast_port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.bind(("", broadcast_port))
 
-            group = sock.inet_aton("224.1.1.1")
+            group = socket.inet_aton("224.1.1.1")
             mreq = struct.pack('4sL', group, socket.INADDR_ANY)
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
