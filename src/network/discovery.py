@@ -32,6 +32,7 @@ def discover_peers(local_host: str, local_port: int,
                     actual_port = peer_info.split(":")[-1]
                     address = set(list(addr)[0])
                     address_with_port = address.add(actual_port)
+                    print(address_with_port)
                     if address_with_port not in peers:
                         peers.add(address_with_port)
                         print(f"Discovered new peer: {peer_info} at {addr}")
