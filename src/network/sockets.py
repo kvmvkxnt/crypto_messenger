@@ -31,7 +31,6 @@ class P2PSocket:
         try:
             while True:
                 data = conn.recv(1024)
-                print("data", data)
                 if not data:
                     break
                 print(f"Received from {addr}: {data.decode()}")
