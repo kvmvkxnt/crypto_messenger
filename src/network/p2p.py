@@ -1,122 +1,229 @@
-import threading
 import socket
-import utils.logger as logger
+from threading import Thread
+from time import sleep
+import datetime
 
-log = logger.Logger("p2p")
+
+class Log:
+    def __init__(self, name: str):
+        self.name = name
+        try:
+            self.file = open(name, "a")
+        except FileNotFoundError:
+            self.file = open(name, "w")
+        self.save_data("Log started at " + str(datetime.datetime.now()))
+        self.file.close()
+
+    def save_data(self, data: str):
+        self.file = open(self.name, "a")
+        self.file.write("{}\n".format(data))
+        self.file.close()
+
+    @staticmethod
+    def read_and_return_list(name: str):
+        try:
+            file = open(name, "r")
+        except FileNotFoundError:
+            return []
+        data = file.read()
+        return data.split("\n")
+
+    def kill_log(self):
+        self.file = open(self.name, "a")
+        self.save_data("Log stopped at {}\n".format(datetime.datetime.now()))
+        self.file.close()
 
 
-class P2PNetwork:
-    def __init__(self, host, port, broadcast_port):
-        """Инициализация P2P сети."""
-        self.host = host
+class P2P:
+    def __init__(self, port: int, max_clients: int = 1):
+        self.running = True
         self.port = port
-        self.broadcast_port = broadcast_port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connections = []  # Acrive connections list
-        self.peers = set()  # Список известных узлов
+        self.max_clients = max_clients
+        self.clients_ip = ["" for i in range(self.max_clients)]
+        self.incoming_requests = {}
+        self.clients_logs = [Log for i in range(self.max_clients)]
+        self.client_sockets = [socket.socket()
+                               for i in range(self.max_clients)]
+        for i in self.client_sockets:
+            i.settimeout(0.2)
+        #self.keys = [rsa.key.PublicKey for i in range(self.max_clients)]
+        #self.my_keys = [rsa.key.PrivateKey for i in range(self.max_clients)]
+        self.socket_busy = [False for i in range(self.max_clients)]
+        self.blacklist = ["127.0.0.1"] + \
+            Log.read_and_return_list("blacklist.txt")
+        self.server_socket = socket.socket()
+        self.server_socket.settimeout(0.2)
+        self.server_socket.bind(('localhost', port))
+        self.server_socket.listen(self.max_clients)
+        self.log = Log("server.log")
+        self.log.save_data("Server initialized")
 
-    def start(self):
-        print(f"Node started at {self.host}:{self.port}")
-        threading.Thread(target=self.start_server, daemon=True).start()
-
-    def start_server(self):
-        """Запуск узла в режиме сервера."""
-        self.socket.bind((self.host, self.port))
-        self.socket.listen(5)
-        log.debug(f"Server started at {self.host}:{self.port}")
-
-        while True:
-            conn, addr = self.socket.accept()
-            print(f"Connection estabilished with {addr}")
-            self.connections.append((conn, addr))
-            threading.Thread(target=self.handle_client, args=(conn, addr)) \
-            .start()
-
-    def handle_client(self, conn, addr):
+    # Create session with specific user
+    def create_session(self, address: str):
+        self.log.save_data(f"Creating session with {address}")
+        ind = self.get_free_socket()
+        if address in self.blacklist:
+            self.log.save_data(f"{address} in blacklist")
+            return
+        if ind is None:
+            self.log.save_data(f"All sockets are buse, can't connect \
+            to {address}")
+            return
         try:
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                print(f"Recieved from {addr}: {data.encode()}")
-                self.broadcast(data, conn)
-        except Exception as e:
-            print(f"Error with client {addr}: {e}")
-        finally:
-            print(f"Connection closed with {addr}")
-            self.connections.remove((conn, addr))
-            conn.close()
-
-    def broadcast(self, message: bytes):
-        for conn in self.connections:
+            self.add_user(address)
+            thread = Thread(target=self.connect, args=(address, 1))
+            thread.start()
+            thread.join(0)
+            connection, address = self.server_socket.accept()
+            connection.settimeout(0.2)
+        except OSError:
+            self.log.save_data(f"Failed to create session with {address}")
+            self.del_user(address)
+        #my_key = rsa.newkeys(512)
+        #self.was_send(address, my_key[0].save_pkcs1())
+        #key = connection.recv(162).decode()
+        #self.clients_logs[ind].save_data(f"from {address}: {key}")
+        #key = rsa.PublicKey.load_pkcs1(key)
+        #self.add_keys(address, key, my_key[1])
+        while self.running and self.socket_busy[ind]:
             try:
-                conn.send(message)
-            except Exception as e:
-                log.error(f"Error broadcasting message: {e}")
+                data = connection.recv(2048)
+            except socket.timeout:
+                continue
+            except OSError:
+                self.close_connection(address)
+                return
+            if data:
+                # data = rsa.decrypt(data, self.my_keys[ind])
+                self.add_request(address, data)
 
-    def connect_to_peer(self, peer_host: str, peer_port: int):
-        """Подключение к новому узлу."""
         try:
-            conn = socket.create_connection((peer_host, peer_port))
-            self.connections.append(conn)
-            threading.Thread(target=self.handle_client,
-                             args=(conn, (peer_host, peer_port))).start()
-            print(f"Connected to peer {peer_host}:{peer_port}")
-        except Exception as e:
-            print(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
-        self.peers.add((peer_host, peer_port))
+            self.close_connection(address)
+        except TypeError or KeyError:
+            pass
 
-    def discover_peers(self, discoverer: set):
-        """Механизм обнаружения новых узлов."""
-        # Заглушка: этот метод будет доработан в файле discovery.py
-        self.peers = discoverer(self.host, self.port, self.broadcast_port)
+    def connect(self, address: str, *args):
+        ind = self.get_ind_by_address(address)
+        try:
+            self.client_sockets[ind].connect((address, self.port))
+            self.socket_busy[ind] = True
+            return True
+        except OSError:
+            return False
 
-    def sync_with_peers(self, sync_manager, blockchain):
-        """Синхронизация данных с подключенными узлами."""
-        # Заглушка: функциональность будет доработана в файле sync.py
-        return sync_manager(self, blockchain)
+    def reload_socket(self, ind: int):
+        self.client_sockets[ind].close()
+        self.client_sockets[ind] = socket.socket()
+        self.socket_busy[ind] = False
 
+    def close_connection(self, address: str):
+        ind = self.get_ind_by_address(address)
+        #self.del_key(address)
+        self.reload_socket(ind)
+        self.del_user(address)
 
-if __name__ == "__main__":
-    from discovery import discover_peers
-    from sync import SyncManager
-    import os
-    import sys
+    def kill_server(self):
+        self.running = False
+        sleep(1)
+        self.server_socket.close()
+        self.log.kill_log()
+        for i in self.client_sockets:
+            i.close()
+        for i in self.clients_logs:
+            try:
+                i.kill_log()
+            except TypeError:
+                pass
 
-    parent_dir = os.path.dirname(os.path.realpath(__file__)) + "/.."
-    sys.path.append(parent_dir)
-    from blockchain.blockchain import Blockchain, Block
+    def send(self, address: str, message: str):
+        ind = self.get_ind_by_address(address)
+        try:
+            self.clients_logs[ind].save_data(f"to {address}: {message}")
+            # self.client_sockets[ind].send(rsa.encrypt(message.encode(),
+            #                                           self.keys[ind]))
+            self.log.save_data(f"Send message to {address}")
+        except OSError:
+            self.log.save_data(f"Can't send message to {address}")
 
-    host = "10.255.196.200"
-    port = 12345
+    def raw_send(self, address: str, message: bytes):
+        ind = self.get_ind_by_address(address)
+        try:
+            self.client_sockets[ind].send(message)
+            self.clients_logs[ind].save_data(f"to {address}: {message}")
+            self.log.save_data(f"Raw send message to {address}")
+        except OSError:
+            self.log.save_data(f"Raw send to {address} failed")
 
-    blockchain = Blockchain()
-    new_block = Block(1, "ahfjdlasf", 0.2, [])
-    blockchain.chain.append(new_block)
+    def add_user(self, address):
+        ind = self.get_free_socket()
+        self.clients_logs[ind] = Log(f"{address}.log")
+        self.clients_ip[ind] = address
+        self.incoming_requests[address] = []
+        self.log.save_data(f"Added user {address}")
 
-    p2p = P2PNetwork(host, port)
-    p2p.start()
+    # def add_keys(self, address: str, key: rsa.key.PublicKey,
+    #              my_key: rsa.key.PrivateKey):
+    #     ind = self.get_ind_by_address(address)
+    #     try:
+    #         self.keys[ind] = key
+    #         self.my_keys[ind] = my_key
+    #     except TypeError:
+    #         return
 
-    while True:
-        command = input("Enter command \
-        (connect, broadcast, discover, sync, list peers, exit): ")
-        if command == "connect":
-            peer_host = input("Enter peer host: ")
-            peer_port = int(input("Enter peer port: "))
-            p2p.connect_to_peer(peer_host, peer_port)
-        elif command == "broadcast":
-            message = input("Enter message to broadcast: ")
-            p2p.broadcast_message(message)
-        elif command == "discover":
-            p2p.discover_peers(discover_peers)
-        elif command == "sync":
-            sm = p2p.sync_with_peers(SyncManager, blockchain)
-            sm.start_sync_loop()
-            sm.broadcast_block(new_block.__repr__())
-        elif command == "list peers":
-            print(f"known peers: {list(p2p.peers)}")
-        elif command == "exit":
-            print("Exiting...")
-            break
-        else:
-            print("Unknown command.")
+    def add_request(self, address: str, message: bytes):
+        self.incoming_requests[address].append(message.decode())
+        self.client_logs[self.__get_ind_by_address(address)] \
+            .save_data(f"from {address}: {str(message)}")
+        self.log.save_data(f"Get incoming message from {address}")
+
+    def get_free_socket(self):
+        for i in range(len(self.socket_busy)):
+            if not self.socket_busy[i]:
+                return i
+        return None
+
+    def get_ind_by_address(self, address: str):
+        for i in range(len(self.clients_ip)):
+            if self.clients_ip[i] == address:
+                return i
+            else:
+                return None
+
+    def get_request(self, address: str):
+        data = self.incoming_requests[address][0]
+        self.incoming_requests[address] = [self.incoming_requests[address][i]
+                                           for i in range(1, len(
+                                             self.incoming_requests[address]))]
+        return data
+
+    def check_request(self, address: str):
+        return bool(self.incoming_requests.get(address))
+
+    def check_address(self, address: str):
+        return True if address in self.clients_ip else False
+
+    def del_user(self, address: str):
+        ind = self.get_ind_by_address(address)
+        self.clients_logs[ind].kill_log()
+        self.clients_logs[ind] = Log
+        self.clients_ip[ind] = ""
+        self.incoming_requests.pop(address)
+        self.log.save_data(f"Deleted user {address}")
+
+    # def del_key(self, address: str):
+    #     ind = self.get_ind_by_address(address)
+    #     self.keys[ind] = rsa.key.PublicKey
+    #     self.my_keys[ind] = rsa.key.PrivateKey
+
+    def __len__(self):
+        num = 0
+        for i in self.clients_ip:
+            if i != "":
+                num += 1
+        return num
+
+    def __bool__(self):
+        for i in self.clients_ip:
+            if i != "":
+                return True
+        return False
