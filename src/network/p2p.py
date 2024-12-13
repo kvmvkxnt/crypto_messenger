@@ -47,13 +47,12 @@ class P2PNetwork:
             self.connections.remove((conn, addr))
             conn.close()
 
-    def broadcast(self, message: bytes, sender_conn):
+    def broadcast(self, message: bytes):
         for conn in self.connections:
-            if list(conn)[0] != sender_conn:
-                try:
-                    conn.send(message)
-                except Exception as e:
-                    print(f"Error broadcasting to a connection: {e}")
+            try:
+                conn.send(message.encode())
+            except Exception as e:
+                log.error(f"Error broadcasting message: {e}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
