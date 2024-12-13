@@ -66,11 +66,16 @@ class P2PNetwork:
                                  args=(conn, (peer_host, peer_port))).start()
                 print(f"Connected to peer(addr={addr}): \
 {peer_host}:{peer_port}")
-            elif len(self.connections) and len(self.peers):
-                conn = [conn for conn in self.connections if peer_host ==
-                        conn[1].split(":")[0]][0]
-                if conn == peer_host:
-                    return
+            elif [conn for conn in self.connections if peer_host == conn[1].split(":")[0]][0]:
+                return
+            else:
+                conn, addr = socket.create_connection((peer_host, peer_port))
+                self.connections.append((conn, addr))
+                threading.Thread(target=self.handle_client,
+                                 args=(conn, (peer_host, peer_port))).start()
+                print(f"Connected to peer(addr={addr}): \
+{peer_host}:{peer_port}")
+
         except Exception as e:
             print(f"Error connecting to peer(addr={addr}) \
 {peer_host}:{peer_port}: {e}")
