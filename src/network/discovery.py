@@ -27,6 +27,7 @@ def discover_peers(local_host: str, local_port: int,
 
             while True:
                 try:
+                    print("breakpoint 2")
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
                     actual_port = peer_info.split(":")[-1]
@@ -53,11 +54,12 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
+                    print("breakpoint 1")
                     log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     print(f"Error in sending broadcast: {e}")
                 finally:
-                    time.sleep(1)  # Повторение каждые 5 секунд
+                    time.sleep(0.5)  # Повторение каждые 5 секунд
 
     threading.Thread(target=listen_for_broadcast, daemon=True).start()
     threading.Thread(target=send_broadcast, daemon=True).start()
