@@ -107,6 +107,9 @@ def discover_peers(local_host, local_port, broadcast_port):
                 except Exception as e:
                     print("Error in recieving broadcast: ", e)
 
+    threading.Thread(target=listen_for_broadcast, daemon=True).start()
+    threading.Thread(target=send_broadcast, daemon=True).start()
+
     return peers
 
 
