@@ -30,7 +30,7 @@ class P2PNetwork:
             print(f"Connection estabilished with {addr}")
             self.connections.append((conn, addr))
             threading.Thread(target=self.handle_client, args=(conn, addr)) \
-                     .start()
+            .start()
 
     def handle_client(self, conn, addr):
         try:
@@ -44,7 +44,7 @@ class P2PNetwork:
             print(f"Error with client {addr}: {e}")
         finally:
             print(f"Connection closed with {addr}")
-            self.connection.remove((conn, addr))
+            self.connections.remove((conn, addr))
             conn.close()
 
     def broadcast(self, message: bytes, sender_conn):
@@ -58,27 +58,14 @@ class P2PNetwork:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
         try:
-            if (peer_host, peer_port) not in self.peers:
-                conn, addr = socket.create_connection((peer_host, peer_port))
-                self.connections.append((conn, addr))
-                self.peers.add((peer_host, peer_port))
-                threading.Thread(target=self.handle_client,
-                                 args=(conn, (peer_host, peer_port))).start()
-                print(f"Connected to peer(addr={addr}): \
-{peer_host}:{peer_port}")
-            elif len(self.connections) and [conn for conn in self.connections if peer_host == conn[1].split(":")[0]][0]:
-                return
-            else:
-                conn, addr = socket.create_connection((peer_host, peer_port))
-                self.connections.append((conn, addr))
-                threading.Thread(target=self.handle_client,
-                                 args=(conn, (peer_host, peer_port))).start()
-                print(f"Connected to peer(addr={addr}): \
-{peer_host}:{peer_port}")
-
+            conn = socket.create_connection((peer_host, peer_port))
+            self.connections.append(conn)
+            threading.Thread(target=self.handle_client,
+                             args=(conn, (peer_host, peer_port))).start()
+            print(f"Connected to peer {peer_host}:{peer_port}")
         except Exception as e:
-            print(f"Error connecting to peer \
-{peer_host}:{peer_port}: {e}")
+            print(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
+        self.peers.add((peer_host, peer_port))
 
     def discover_peers(self, discoverer: set):
         """Механизм обнаружения новых узлов."""
