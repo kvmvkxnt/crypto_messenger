@@ -77,7 +77,7 @@ class P2PNetwork:
 {peer_host}:{peer_port}")
 
         except Exception as e:
-            print(f"Error connecting to peer(addr={addr}) \
+            print(f"Error connecting to peer \
 {peer_host}:{peer_port}: {e}")
 
     def discover_peers(self, discoverer: set):
