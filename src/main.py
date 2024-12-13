@@ -81,7 +81,7 @@ while True:
         network.discover_peers(discover_peers)
     elif user_input == 2:
         message = input("Enter a message: ")
-        network.broadcast_message(message)
+        network.broadcast(message)
     elif user_input == 1:
         peer_host = input("Enter peer's ip: ")
         peer_port = int(input("Enter peer's port: "))
