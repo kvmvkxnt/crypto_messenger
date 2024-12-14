@@ -44,7 +44,7 @@ log.debug(f"Selected broadcast port: {broadcast_port}")
 network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
-sm = SyncManager(network, blockchain)
+sm = SyncManager(network, blockchain, Block)
 sm.request_block("10.255.197.95", 12345)
 # new_block = Block(blockchain.get_latest_block().index + 1,
 #                   blockchain.get_latest_block().hash,
