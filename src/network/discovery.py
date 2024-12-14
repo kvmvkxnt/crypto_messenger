@@ -1,8 +1,6 @@
 import socket
 import threading
 import time
-import utils.logger as logger
-log = logger.Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
@@ -21,7 +19,7 @@ def discover_peers(local_host: str, local_port: int,
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
-            log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
+            print(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
@@ -60,7 +58,7 @@ def discover_peers(local_host: str, local_port: int,
 
 
 if __name__ == "__main__":
-    local_host = input("Enter your host: ")
+    local_host = input("HOST: ")
     local_port = 12345
     broadcast_port = 5000
 
