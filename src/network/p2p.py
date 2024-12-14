@@ -23,7 +23,7 @@ class P2PNetwork:
         node: P2PSocket,
         blockchain: Blockchain,
         broadcast_port: int,
-        sync_interval: int = 10,
+        sync_interval: int = 5,
         broadcast_interval: int = 1,
         discovery_timeout: int = 5,
     ):
@@ -39,18 +39,18 @@ class P2PNetwork:
         self.sync_interval = sync_interval
         self.broadcast_interval = broadcast_interval
         self.discovery_timeout = discovery_timeout
+        self.signer = None
 
     def start(self):
         self.node.blockchain = self.blockchain  # Добавляем blockchain в node
         threading.Thread(target=self.node.start_server, daemon=True).start()
-        log.debug(f"Node started at {self.host}:{self.port}")
+        log.info(f"Node started at {self.host}:{self.port}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
         try:
             self.node.connect_to_peer(peer_host, peer_port)
             self.peers.add((peer_host, peer_port))
-            log.info(f"Connected to peer: {peer_host}:{peer_port}")
         except Exception as e:
             log.error(f"Error connecting to peer: {e}")
 
@@ -65,7 +65,7 @@ class P2PNetwork:
 
     def broadcast_transaction(self, transaction: Transaction):
         """Рассылает транзакцию всем подключенным узлам."""
-        transaction_data = json.dumps(transaction.__dict__).encode()
+        transaction_data = json.dumps(transaction.to_dict()).encode()
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
         for conn in self.node.connections:
             try:
@@ -83,9 +83,9 @@ class P2PNetwork:
             self.discovery_timeout,
         )
         self.peers.update(discovered)
-        log.info(f"Discovered peers: {self.peers}")
+        log.info(f"Discovered peers: {list(self.peers)}")
 
-    def sync_with_peers(self):  # Убираем blockchain из аргументов
+    def sync_with_peers(self):
         """Синхронизация данных с подключенными узлами."""
         sync_manager = SyncManager(
             self, self.blockchain

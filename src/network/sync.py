@@ -4,15 +4,18 @@ import time
 from utils.logger import Logger
 from typing import Optional
 from blockchain.transaction import Transaction
+from blockchain.blockchain import Block
 import socket  # Import the socket module
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
+import base64
+import traceback
 
 
 log = Logger("sync")
 
 
 class SyncManager:
-    def __init__(self, p2p_network, blockchain, sync_interval: int = 10):
+    def __init__(self, p2p_network, blockchain, sync_interval: int = 5):
         """
         Инициализация менеджера синхронизации.
 
@@ -23,7 +26,7 @@ class SyncManager:
         self.blockchain = blockchain  # Локальная копия блокчейна
         self.sync_interval = sync_interval
 
-    def request_chain(self, peer_host: str, peer_port: int) -> None:
+    def request_chain(self, peer_host: str, peer_port: int) -> None: 
         """
         Запрашивает копию блокчейна у указанного узла.
 
@@ -40,15 +43,25 @@ class SyncManager:
                     return
             if conn:
                 conn.send(b"REQUEST_CHAIN")
-                response = conn.recv(4096).decode()
-                received_chain_data = json.loads(response)
-                received_chain = [
-                    self.block_from_dict(block_data)
-                    for block_data in received_chain_data
-                ]
+                # response = b""
+                # while True:
+                #     chunk = conn.recv(4096)
+                #     if not chunk:
+                #         break
+                #     response += chunk
+                response = conn.recv(4096)
 
-                log.info(f"Received chain from {peer_host}:{peer_port}")
+                received_chain = json.loads(response.decode())
+
+                for block in received_chain:
+                    for transaction in block['transactions']:
+                        transaction['signature'] = base64.b64decode(transaction["signature"]) if transaction["signature"] else None
+                    block['transactions'] = [Transaction(**transaction) for transaction in block['transactions']]
+                received_chain = [Block(**block) for block in received_chain]
+
+                log.debug(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(received_chain)
+                log.info(f"Received NEW chain from {peer_host}:{peer_port}")
             else:
                 log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
 
@@ -78,7 +91,7 @@ class SyncManager:
         else:
             log.debug("Received chain is not longer than the local chain.")
 
-    def broadcast_block(self, block: str) -> None:
+    def broadcast_block(self, block: Block) -> None:
         """
         Рассылает новый блок всем известным узлам.
 
@@ -87,11 +100,13 @@ class SyncManager:
         if not block:
             log.debug("Cannot broadcast empty block")
             return
-        block_data = json.dumps(block).encode()
         log.debug("Broadcasting new block...")
+        
+        block_bytes = json.dumps(block.to_dict()).encode()
+        
         for conn in self.p2p_network.node.connections:
             try:
-                conn.send(b"NEW_BLOCK" + block_data)
+                conn.sendall(b"NEW_BLOCK" + block_bytes)
             except socket.error as e:
                 log.error(f"Error broadcasting block: {e}")
 
@@ -118,22 +133,17 @@ class SyncManager:
         Обрабатывает новый блок, полученный от другого узла.
         """
         try:
-            block_string = block_data.decode()
-            block_dict = json.loads(block_string)
-            block = self.block_from_dict(block_dict)
-            latest_block = self.blockchain.get_latest_block()
-
-            if latest_block and self.blockchain.validator.validate_block(
-                block, latest_block
-            ):
+            block_dict = json.loads(block_data.decode())
+            for transaction in block_dict['transactions']:
+                transaction['signature'] = base64.b64decode(transaction["signature"]) if transaction["signature"] else None
+            block_dict['transactions'] = [Transaction(**transaction) for transaction in block_dict['transactions']]
+            block = Block(**block_dict)
+            if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
                 self.blockchain.chain.append(block)
                 log.info(f"Added new block with index {block.index}")
-
-                # broadcast validated block
-                self.broadcast_block(block_string.encode())  # Рассылаем новый блок
-
             else:
                 log.warning("Invalid block received")
+
         except json.JSONDecodeError as e:
             log.error(f"Error decoding block data: {e}")
         except Exception as e:
@@ -146,6 +156,10 @@ class SyncManager:
         try:
             transaction_string = transaction_data.decode()
             transaction_dict = json.loads(transaction_string)
+            transaction_dict["sender_public_key"] = load_pem_public_key(
+                transaction_dict["sender_public_key"].encode()
+            )
+            transaction_dict["signature"] = base64.b64decode(transaction_dict["signature"]) if transaction_dict["signature"] else None
             transaction = Transaction(**transaction_dict)
             log.debug(f"Received transaction {transaction.calculate_hash()}")
             if self.blockchain.is_transaction_valid(transaction):
@@ -158,25 +172,3 @@ class SyncManager:
         except Exception as e:
             log.error(f"Error during transaction handling: {e}")
 
-    def block_from_dict(self, block_data: dict):
-        from blockchain.blockchain import Block, Transaction
-
-        transactions = []
-        for trans in block_data["transactions"]:
-            if trans["sender_public_key"]:
-                try:
-                    trans["sender_public_key"] = load_pem_public_key(
-                        trans["sender_public_key"].encode()
-                    )  # Loading key from string if available
-                except Exception as e:
-                    log.error(f"Error loading public key: {e}")
-            transactions.append(Transaction(**trans))
-
-        block = Block(
-            index=block_data["index"],
-            previous_hash=block_data["previous_hash"],
-            timestamp=block_data["timestamp"],
-            transactions=transactions,
-            nonce=block_data["nonce"],
-        )
-        return block

@@ -4,6 +4,7 @@ from typing import List, Dict
 from .consensus import ProofOfWork, Validator
 from .transaction import Transaction
 from cryptography.hazmat.primitives.asymmetric import rsa
+import json
 
 
 class Block:
@@ -31,6 +32,7 @@ class Block:
         timestamp: float,
         transactions: List[Transaction],
         nonce: int = 0,
+        hash: str = None,
     ) -> None:
         """Initiates the block class"""
         self.index = index
@@ -38,7 +40,7 @@ class Block:
         self.timestamp = timestamp
         self.transactions = transactions
         self.nonce = nonce
-        self.hash = self.calculate_hash()
+        self.hash = self.calculate_hash() if not hash else hash
 
     def calculate_hash(self) -> str:
         """
@@ -47,22 +49,26 @@ class Block:
         :return: hash of the block
         :rtype: str
         """
+        transactions = [transaction.to_dict() for transaction in self.transactions]
         block_string = f"{self.index}{self.previous_hash}{self.timestamp}\
-                         {self.transactions}{self.nonce}"
+                         {transactions}{self.nonce}"
         return hashlib.sha256(block_string.encode()).hexdigest()
 
-    def __repr__(self) -> str:
+    def to_dict(self) -> dict:
         """
         Returns block content as a string
 
         :returns: block content
         :rtype: str
         """
-        return f"Block(index={self.index},\
-            previous_hash={self.previous_hash},\
-            hash={self.hash}, \
-            transactions={self.transactions},\
-            nonce={self.nonce})"
+        return {
+            "index": self.index,
+            "previous_hash": self.previous_hash,
+            "hash": self.hash,
+            "timestamp": self.timestamp,
+            "transactions": [transaction.to_dict() for transaction in self.transactions],
+            "nonce": self.nonce
+        }
 
 
 class Blockchain:
@@ -81,7 +87,7 @@ class Blockchain:
         """
         Initiates the blockchain with its own difficulty
 
-        :param difficulty: difficulty of geting the right hash
+        :param difficulty: difficulty of getting the right hash
         :type difficulty: int
         """
         self.chain: List[Block] = [self.create_genesis_block()]
@@ -151,7 +157,7 @@ class Blockchain:
                     balance += transaction.amount
         return balance
 
-    def mine_pending_transactions(self, miner, miner_address: str) -> None:
+    def mine_pending_transactions(self, miner, miner_address: str, sync_manager) -> None:
         """
         Creates new block using pending transactions and adds it to chain
 
@@ -185,6 +191,7 @@ class Blockchain:
         if self.validator.validate_block(new_block, self.chain[-1]):
             self.chain.append(new_block)
             # Clearing pending transactions list after successful mining
+            sync_manager.broadcast_block(new_block)
             self.pending_transactions = []
         else:
             print("Invalid block. Block was not added to the chain")

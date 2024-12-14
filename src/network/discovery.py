@@ -54,6 +54,10 @@ def discover_peers(
                         continue
 
                     peer = (addr[0], peer_port)
+                    if peer == (local_host, local_port) or (peer_host, peer_port) == (local_host, local_port):
+                        log.debug(f"Ignoring self broadcast from {peer}")
+                        continue
+
                     if peer not in peers:
                         peers.add(peer)
                         log.info(f"Discovered new peer: {peer_info} at {addr}")

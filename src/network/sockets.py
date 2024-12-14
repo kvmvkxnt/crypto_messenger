@@ -50,51 +50,45 @@ class P2PSocket:
 
     def handle_client(self, conn, addr):
         """Обработка клиента."""
-
-        with self.lock:
-            if len(self.connections) >= self.max_connections:
-                log.warning(
-                    f"Maximum connections reached. Connection from {addr} rejected"
-                )
-                conn.close()
-                return
-            self.connections.append(conn)
-            self.connections_info.append((conn, addr))
-
-        self.node.peers.add(addr)  # <---- Добавляем пира в p2p.peers
-        log.info(f"Connection established with {addr}")
-
         try:
             while True:
                 try:
                     data = conn.recv(4096)
-                    if not data:  # Соединение закрыто клиентом
+                    if not data:
                         break
 
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
                     if data.startswith(b"NEW_BLOCK"):
-                        block_data = data[len(b"NEW_BLOCK") :]
+                        block_data = data[len(b"NEW_BLOCK"):]
                         self.sync_manager.handle_new_block(block_data)
+                    
+                    if data.startswith(b"INCOME_PORT"):
+                        port = data[len(b"INCOME_PORT"):].decode()
+                        self.node.peers.add((addr[0], int(port)))
 
                     elif data.startswith(b"REQUEST_CHAIN"):
-                        chain_data = json.dumps(
-                            [block.__dict__ for block in self.blockchain.chain]
-                        ).encode()
+                        chain_data = json.dumps([block.to_dict() for block in self.blockchain.chain]).encode()
 
                         try:
-                            conn.sendall(
-                                chain_data
-                            )  # Используем sendall для полной отправки
+                            conn.sendall(chain_data)
                             log.debug(f"Sent blockchain to {addr}")
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
                             break
+                    elif data.startswith(b"REQUEST_PUBLIC_KEY"):
+                        try:
+                            public_key = self.node.signer.get_public_key()
+                            conn.sendall(public_key)
+                            log.debug(f"Sent public key to {addr}")
 
-                    elif data.startswith(b"NEW_TRANSACTION"):  # Обработка транзакций
-                        transaction_data = data[len(b"NEW_TRANSACTION") :]
+                        except Exception as e:
+                            log.error(f"Error during sending public key {e}")
+                            break
+
+                    elif data.startswith(b"NEW_TRANSACTION"):
+                        transaction_data = data[len(b"NEW_TRANSACTION"):]
                         self.sync_manager.handle_new_transaction(transaction_data)
-
                     else:  # Простое сообщение
                         self.broadcast(data, conn)
 
@@ -103,15 +97,15 @@ class P2PSocket:
                     break
 
         except Exception as e:
-            log.error(f"Error with client {addr}: {e}")
-
+             log.error(f"Error with client {addr}: {e}")
         finally:
             with self.lock:
-                if conn in self.connections:
+                 if conn in self.connections:
                     for i in range(len(self.connections_info)):
                         if self.connections_info[i][0] == conn:
                             del self.connections_info[i]
                             break
+
                     self.connections.remove(conn)
 
             log.info(f"Connection closed with {addr}")
@@ -137,19 +131,19 @@ class P2PSocket:
                         f"Maximum connections reached. Connection to {peer_host}:{peer_port} rejected"
                     )
                     conn.close()
-                    return None  # Возвращаем None, если не удалось подключиться
+                    return None 
                 self.connections.append(conn)
                 self.connections_info.append(
                     (conn, (peer_host, peer_port))
-                )  # Добавляем информацию о соединении
+                )
             threading.Thread(
                 target=self.handle_client, args=(conn, (peer_host, peer_port))
             ).start()
             log.info(f"Connected to peer {peer_host}:{peer_port}")
-            return conn  # Возвращаем соединение
+            return conn
         except socket.error as e:
             log.error(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
-            return None  # Возвращаем None при ошибке
+            return None 
 
     def get_connection(self, peer_host: str, peer_port: int):
         """Возвращает существующее соединение или None, если его нет."""
