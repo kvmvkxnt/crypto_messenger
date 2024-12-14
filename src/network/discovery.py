@@ -28,7 +28,6 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
-                    print(data, addr)
                     peer_info = data.decode()
                     if addr == (local_host, broadcast_port):
                         pass
@@ -53,7 +52,6 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    print("sending")
                     log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     log.error(f"Error in sending broadcast: {e}")
