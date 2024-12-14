@@ -2,15 +2,13 @@ import socket
 import threading
 import time
 import utils.logger as logger
-
 log = logger.Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
-                   broadcast_port: int):
+                   broadcast_port: int = 5000):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
-
     :param local_host: Локальный хост узла
     :param local_port: Локальный порт узла для приема сообщений
     :param broadcast_port: Порт для широковещательной рассылки
@@ -29,12 +27,8 @@ def discover_peers(local_host: str, local_port: int,
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
-                    actual_port = peer_info.split(":")[-1]
-                    address = list(addr)[:-1]
-                    address.append(int(actual_port))
-                    address_with_port = tuple(address)
-                    if address_with_port not in peers:
-                        peers.add(address_with_port)
+                    if addr not in peers:
+                        peers.add(addr)
                         print(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
                     print(f"Error in receiving broadcast: {e}")
@@ -53,11 +47,11 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    log.debug(f"Broadcasting: {message}")
+                    print(f"Broadcasting: {message}")
                 except Exception as e:
                     print(f"Error in sending broadcast: {e}")
                 finally:
-                    time.sleep(5)  # Повторение каждые 5 секунд
+                    time.sleep(1)  # Повторение каждые 5 секунд
 
     threading.Thread(target=listen_for_broadcast, daemon=True).start()
     threading.Thread(target=send_broadcast, daemon=True).start()
@@ -65,19 +59,19 @@ def discover_peers(local_host: str, local_port: int,
     return peers
 
 
-#if __name__ == "__main__":
-#    local_host = "127.0.0.1"
-#    local_port = 12345
-#    broadcast_port = 5000
-#
-#    discovered_peers = discover_peers(local_host, local_port, broadcast_port)
-#
-#    while True:
-#        command = input("Enter command (list, exit): ")
-#        if command == "list":
-#            print(f"Known peers: {list(discovered_peers)}")
-#        elif command == "exit":
-#            print("Exiting...")
-#            break
-#        else:
-#            print("Unknown command.")
+if __name__ == "__main__":
+    local_host = input("Enter your host: ")
+    local_port = 12345
+    broadcast_port = 5000
+
+    discovered_peers = discover_peers(local_host, local_port, broadcast_port)
+
+    while True:
+        command = input("Enter command (list, exit): ")
+        if command == "list":
+            print(f"Known peers: {list(discovered_peers)}")
+        elif command == "exit":
+            print("Exiting...")
+            break
+        else:
+            print("Unknown command.")
