@@ -26,7 +26,9 @@ def discover_peers(local_host: str, local_port: int,
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
-                    if addr not in peers:
+                    if addr == (local_host, broadcast_port):
+                        pass
+                    elif addr not in peers:
                         peers.add(addr)
                         print(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
