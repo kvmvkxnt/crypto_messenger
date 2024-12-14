@@ -10,7 +10,11 @@ from cryptography.hazmat.primitives.serialization import (
     NoEncryption,
     PublicFormat
 )
+from cryptography import exceptions
+from typing import Optional
+from utils.logger import Logger
 
+log = Logger("signatures")
 
 class DigitalSignature:
     '''
@@ -22,13 +26,18 @@ class DigitalSignature:
         :type public_key: RSAPublicKey
     '''
 
-    def __init__(self):
+    def __init__(self, key_size: int = 2048):
         '''Generating RSA key pair'''
+        self.key_size = key_size
         self.private_key = rsa.generate_private_key(
             public_exponent=65537,
-            key_size=2048
+            key_size=self.key_size
         )
         self.public_key = self.private_key.public_key()
+        self.padding = padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH
+        )
 
     def get_private_key(self) -> bytes:
         '''
@@ -55,24 +64,29 @@ class DigitalSignature:
             format=PublicFormat.SubjectPublicKeyInfo
         )
 
-    def sign(self, message: str) -> bytes:
+    def sign(self, message: str) -> Optional[bytes]:
         '''
             Creates digital signature of a message
 
             :return: signature
             :rtype: bytes
         '''
-        return self.private_key.sign(
-            message.encode(),
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
+        if not message:
+            log.error("Cannot sign empty message")
+            return None
+        try:
+            signature = self.private_key.sign(
+                message.encode(),
+                self.padding,
+                hashes.SHA256()
+            )
+            log.debug(f"Signed message: {message}")
+            return signature
+        except Exception as e:
+            log.error(f"Error during signing: {e}")
+            return None
 
-    @staticmethod
-    def verify(public_key_pem: bytes, message: str, signature: bytes) -> bool:
+    def verify(self, public_key_pem: bytes, message: str, signature: bytes) -> bool:
         '''
             Verifys digital signature
 
@@ -85,27 +99,43 @@ class DigitalSignature:
             :return: if signature is valid or not
             :rtype: bool
         '''
-        public_key = load_pem_public_key(public_key_pem)
+        if not public_key_pem:
+            log.error("Public key cannot be None")
+            return False
+        if not message:
+            log.error("Message cannot be None")
+            return False
+        if not signature:
+           log.error("Signature cannot be None")
+           return False
         try:
+           log.debug(f"Loading public key")
+           public_key = load_pem_public_key(public_key_pem) # loading pub key here
+        except Exception as e:
+            log.error(f"Error loading public key during verification: {e}")
+            return False
+        try:
+            log.debug(f"Verifying signature for message {message}")
             public_key.verify(
                 signature,
                 message.encode(),
-                padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
-                ),
+                self.padding,
                 hashes.SHA256()
             )
+            log.debug("Signature is valid")
             return True
+        except exceptions.InvalidSignature as e:
+            log.error(f"Signature verification failed: {e}")
+            return False
         except Exception as e:
-            print(f"Verification failed: {e}")
+            log.error(f"Unexpected error during signature verification: {e}")
             return False
 
 
 # Example usage
 if __name__ == "__main__":
     # Creating example for signature
-    signer = DigitalSignature()
+    signer = DigitalSignature(key_size=2048)
 
     # Generating keys
     private_key_pem = signer.get_private_key()
@@ -114,8 +144,8 @@ if __name__ == "__main__":
     # Signing message
     message = "This is a secure message."
     signature = signer.sign(message)
-    print("Signature:", signature.hex())
+    print("Signature:", signature.hex() if signature else "None")
 
     # Validating sign
-    is_valid = DigitalSignature.verify(public_key_pem, message, signature)
+    is_valid = signer.verify(public_key_pem, message, signature)
     print("Is signature valid?:", is_valid)
