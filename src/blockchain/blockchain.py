@@ -100,7 +100,7 @@ class Blockchain:
             :return: absolutely empty block
             :rtype: Block
         '''
-        return Block(0, "0", time.time(), [])
+        return Block(0, "0", 0, [])
 
     def get_latest_block(self) -> Block:
         '''
