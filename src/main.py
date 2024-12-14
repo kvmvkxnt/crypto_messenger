@@ -13,7 +13,7 @@ from utils import logger
 import socket
 
 log = logger.Logger("main")
-blockchain = Blockchain(cfg.BLOCK_DIFFICULTY)
+blockchain = Blockchain(Validator.validate_blockchain, cfg.BLOCK_DIFFICULTY)
 
 
 def get_ip():
@@ -34,7 +34,7 @@ host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
 log.debug(f"Got host: {host}")
 
 port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
-cfg.DEFAULT_PORT
+    cfg.DEFAULT_PORT
 log.debug(f"Selected port: {port}")
 
 broadcast_port = input(f"Enter your broadcast \
@@ -44,7 +44,13 @@ log.debug(f"Selected broadcast port: {broadcast_port}")
 network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
-
+sm = SyncManager(network, blockchain)
+# sm.request_block("10.255.196.84", 12345)
+new_block = Block(blockchain.get_latest_block().index + 1,
+                  blockchain.get_latest_block().hash,
+                  blockchain.get_latest_block().timestamp + 1,
+                  [])
+sm.broadcast_block(new_block)
 
 print("""
     If you're using any vpn or proxy, please turn it off

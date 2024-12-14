@@ -1,8 +1,8 @@
 import json
 import threading
 import time
-# from utils.logger import Logger
-# log = Logger("sync")
+from utils.logger import Logger
+log = Logger("sync")
 
 
 class SyncManager:
@@ -25,35 +25,56 @@ class SyncManager:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096).decode()
-            received_chain = json.loads(response)
-            print(f"Received chain from {peer_host}:{peer_port}")
-            self.merge_chain(received_chain)
+            recieved_chain = json.loads(response)
+            log.debug(f"Received chain from {peer_host}:{peer_port}")
+            self.merge_chain(recieved_chain)
         except Exception as e:
-            print(f"Error requesting chain: {e}")
+            log.error(f"Error requesting chain: {e}")
 
-    def merge_chain(self, received_chain):
+    def merge_chain(self, recieved_chain):
         """
         Обновляет локальный блокчейн, если полученная цепочка длиннее.
         :param received_chain: Полученная цепочка блоков
         """
-        if len(received_chain) > len(self.blockchain):
-            self.blockchain = received_chain
-            print("Local blockchain updated.")
+        if len(recieved_chain) > len(self.blockchain):
+            self.blockchain = recieved_chain
+            log.info("Local blockchain updated.")
         else:
-            print("Received chain is not longer than the local chain.")
+            log.debug("Received chain is not longer than the local chain.")
+
+    def merge_block(self, recieved_block):
+        if self.blockchain.get_latest_block().timestamp < \
+                recieved_block.timestamp:
+            self.blockchain.chain.append(recieved_block)
+            log.debug("Validating blockchain...")
+            if not self.blockchain.is_chain_valid():
+                log.error("Blockchain is invalid")
+
+    def request_block(self, peer_host: str, peer_port: int):
+        log.debug(f"Requesting block from {peer_host}:{peer_port}")
+        try:
+            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            conn.send(b"REQUEST_BLOCK")
+            response = conn.recv(4096).decode()
+            recieved_block = json.loads(response)
+            print(recieved_block)
+            log.debug(f"Received block from {peer_host}:{peer_port}")
+            self.merge_block(recieved_block)
+        except Exception as e:
+            log.error(f"Error requesting block: {e}")
 
     def broadcast_block(self, block):
         """
         Рассылает новый блок всем известным узлам.
         :param block: Новый блок для добавления в цепочку
         """
-        block_data = json.dumps(block).encode()
-        print("Broadcasting new block...")
+        block_data = json.dumps(block.__repr__()).encode()
+        log.info("Broadcasting new block...")
         for conn in self.p2p_network.node.connections:
             try:
                 conn.send(b"NEW_BLOCK" + block_data)
             except Exception as e:
-                print(f"Error broadcasting block: {e}")
+                log.error(f"Error broadcasting block: {e}")
 
     def start_sync_loop(self):
         """
@@ -61,12 +82,12 @@ class SyncManager:
         """
         def sync_loop():
             while True:
-                # log.debug("Starting synchronization loop...")
+                log.debug("Starting synchronization loop...")
                 for peer in self.p2p_network.peers:
                     try:
                         self.request_chain(peer[0], peer[1])
                     except Exception as e:
-                        print(f"Error syncing with peer {peer}: {e}")
+                        log.error(f"Error syncing with peer {peer}: {e}")
                 time.sleep(10)  # Интервал синхронизации
 
         threading.Thread(target=sync_loop, daemon=True).start()

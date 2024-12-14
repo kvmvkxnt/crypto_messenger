@@ -77,7 +77,7 @@ class Blockchain:
         :type chain: List[Block]
     '''
 
-    def __init__(self, difficulty: float = 4) -> None:
+    def __init__(self, validator, difficulty: float = 4) -> None:
         '''
             Initiates the blockchain with its own difficulty
 
@@ -87,6 +87,7 @@ class Blockchain:
         self.chain: List[Block] = [self.create_genesis_block()]
         self.difficulty = difficulty
         self.pending_transactions: List = []
+        self.validator = validator
 
     def __len__(self):
         return len(self.chain)
@@ -118,7 +119,7 @@ class Blockchain:
         '''
         self.pending_transactions.append(transaction)
 
-    def mine_pending_transactions(self, miner, miner_address: str) -> None:
+    def mine_pending_transactions(self, miner, transactioner, miner_address: str) -> None:
         '''
             Creates new block using pending transactions and adds it to chain
 
@@ -147,11 +148,11 @@ class Blockchain:
         self.chain.append(new_block)
 
         # Clearing pending transactions list after successful mining
-        self.pending_transactions = [{"sender": None,
-                                      "recipient": miner_address,
-                                      "amount": 1}]
+        self.pending_transactions = [transactioner(sender=None,
+                                                   recipient=miner_address,
+                                                   amount=1)]
 
-    def is_chain_valid(self, validator):
+    def is_chain_valid(self):
         '''
             Validates the blockchain using given validator
 
@@ -160,7 +161,7 @@ class Blockchain:
             :return: return's chain state
             :rtype: bool
         '''
-        return validator(self)
+        return self.validator(self)
 
 
 if __name__ == "__main__":
@@ -182,7 +183,8 @@ if __name__ == "__main__":
 
     # Chain validation
     print(Block(0, "123", 14.23423, []).calculate_hash())
-    print("Blockchain valid:", Validator().validate_blockchain(blockchain))
+    print("Blockchain valid:",
+          blockchain.is_chain_valid(Validator.validate_blockchain))
 
     # Printing chain
     for block in blockchain.chain:
