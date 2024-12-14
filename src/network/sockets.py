@@ -1,4 +1,4 @@
-mport socket
+import socket
 import threading
 from utils import logger
 
@@ -58,6 +58,7 @@ class P2PSocket:
             threading.Thread(target=self.handle_client,
                              args=(conn, (peer_host, peer_port))).start()
             print(f"Connected to peer {peer_host}:{peer_port}")
+            return conn
         except Exception as e:
             print(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
 

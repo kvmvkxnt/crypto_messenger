@@ -1,8 +1,8 @@
 import json
 import threading
 import time
-from utils.logger import Logger
-log = Logger("sync")
+# from utils.logger import Logger
+# log = Logger("sync")
 
 
 class SyncManager:
@@ -61,7 +61,7 @@ class SyncManager:
         """
         def sync_loop():
             while True:
-                log.debug("Starting synchronization loop...")
+                # log.debug("Starting synchronization loop...")
                 for peer in self.p2p_network.peers:
                     try:
                         self.request_chain(peer[0], peer[1])
@@ -80,12 +80,13 @@ if __name__ == "__main__":
     sys.path.append(parent_dir)
     from p2p import P2PNetwork
     from blockchain.blockchain import Blockchain, Block
+    from sockets import P2PSocket
 
-    host = "10.255.196.200"
+    host = input("HOST: ")
     port = 12345
 
     blockchain = Blockchain()
-    p2p_network = P2PNetwork(host, port)
+    p2p_network = P2PNetwork(P2PSocket(host, port))
     sync_manager = SyncManager(p2p_network, blockchain)
 
     p2p_network.start()
