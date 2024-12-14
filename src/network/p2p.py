@@ -5,10 +5,11 @@ log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, node):
+    def __init__(self, node, broadcast_port: int):
         """Инициализация P2P сети."""
         self.host = node.host
         self.port = node.port
+        self.broadcast_port = broadcast_port
         self.node = node
         self.peers = set()  # Список известных узлов
 
@@ -44,7 +45,7 @@ class P2PNetwork:
         # for item in discoverer(self.host, self.port):
         #    if item not in self.peers:
         #        self.peers.add(item)
-        self.peers = discoverer(self.host, self.port)
+        self.peers = discoverer(self.host, self.port, self.broadcast_port)
 
     def sync_with_peers(self, sync_manager, blockchain):
         """Синхронизация данных с подключенными узлами."""

@@ -5,6 +5,7 @@ from crypto.diffie_hellman import DiffieHellmanKeyExchange
 from crypto.encryption import SymmetricEncryption
 from crypto.signatures import DigitalSignature
 from network.p2p import P2PNetwork
+from network.sockets import P2PSocket
 from network.discovery import discover_peers
 from network.sync import SyncManager
 from utils import config as cfg
@@ -33,27 +34,16 @@ host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
 log.debug(f"Got host: {host}")
 
 port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
-    cfg.DEFAULT_PORT
+cfg.DEFAULT_PORT
 log.debug(f"Selected port: {port}")
-action = input("Choose action (connect, start): ")
-p2p = P2PNetwork(host, port)
-while True:
-    if action == "start":
-        p2p.start_server()
-    elif action == "connect":
-        peer_host = input("Enter peer host: ")
-        peer_port = int(input("Enter peer port: "))
-        p2p.connect(peer_host, peer_port)
-    else:
-        print("No such action")
-#
+
 broadcast_port = input(f"Enter your broadcast \
 port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
-
 log.debug(f"Selected broadcast port: {broadcast_port}")
 
-network = P2PNetwork(host, port, broadcast_port)
+network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
+network.discover_peers(discover_peers)
 
 
 print("""
@@ -85,10 +75,8 @@ while True:
         else:
             print("No peers")
     elif user_input == 4:
-        network.discover_peers(discover_peers)
-    elif user_input == 2:
         message = input("Enter a message: ")
-        network.broadcast(message.encode())
+        network.broadcast_message(message)
     elif user_input == 1:
         peer_host = input("Enter peer's ip: ")
         peer_port = int(input("Enter peer's port: "))

@@ -1,4 +1,3 @@
-
 import os
 
 # Основные настройки
@@ -16,7 +15,7 @@ SIGNATURE_ALGORITHM = "ECDSA"  # Алгоритм подписей
 
 # Логирование
 LOG_DIR = os.path.join(os.getcwd(), "logs")
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = os.getenv("LOG_LEVEL") or "INFO"
 # Уровень логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # Время между синхронизациями

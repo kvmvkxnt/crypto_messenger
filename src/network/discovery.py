@@ -1,10 +1,13 @@
 import socket
 import threading
 import time
+from utils.logger import Logger
+
+log = Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
-                   broadcast_port: int = 5000):
+                   broadcast_port: int):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
     :param local_host: Локальный хост узла
@@ -20,7 +23,7 @@ def discover_peers(local_host: str, local_port: int,
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
-            print(f"Listening for broadcasts on {local_host}:{broadcast_port}")
+            log.info(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
@@ -30,9 +33,9 @@ def discover_peers(local_host: str, local_port: int,
                         pass
                     elif addr not in peers:
                         peers.add(addr)
-                        print(f"Discovered new peer: {peer_info} at {addr}")
+                        log.info(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
-                    print(f"Error in receiving broadcast: {e}")
+                    log.error(f"Error in receiving broadcast: {e}")
 
     def send_broadcast():
         """
@@ -44,13 +47,14 @@ def discover_peers(local_host: str, local_port: int,
 
             message = f"Node at {local_host}:{local_port}"
             broadcast_address = ("<broadcast>", broadcast_port)
+            log.info(f"Broadcasting: {message}")
 
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
-                    print(f"Broadcasting: {message}")
+                    log.debug(f"Broadcasting: {message}")
                 except Exception as e:
-                    print(f"Error in sending broadcast: {e}")
+                    log.error(f"Error in sending broadcast: {e}")
                 finally:
                     time.sleep(1)  # Повторение каждые 5 секунд
 
