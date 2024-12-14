@@ -45,12 +45,13 @@ network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
 sm = SyncManager(network, blockchain)
-# sm.request_block("10.255.196.84", 12345)
-new_block = Block(blockchain.get_latest_block().index + 1,
-                  blockchain.get_latest_block().hash,
-                  blockchain.get_latest_block().timestamp + 1,
-                  [])
-sm.broadcast_block(new_block)
+sm.request_block("10.255.196.84", 12345)
+# new_block = Block(blockchain.get_latest_block().index + 1,
+#                   blockchain.get_latest_block().hash,
+#                   blockchain.get_latest_block().timestamp + 1,
+#                   [])
+# blockchain.chain.append(new_block)
+# sm.broadcast_block(new_block)
 
 print("""
     If you're using any vpn or proxy, please turn it off
