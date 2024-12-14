@@ -43,6 +43,7 @@ class SyncManager:
             log.debug("Received chain is not longer than the local chain.")
 
     def merge_block(self, recieved_block, block_generator):
+        block_info_array = recieved_block[:-9]
         block_info_array = ["".join(block_info.split()) for block_info in
                             recieved_block[6:-1].split(",")]
         block_info_array = [info.split("=")[1] for info in block_info_array]

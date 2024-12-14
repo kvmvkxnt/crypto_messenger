@@ -51,6 +51,12 @@ sm.request_block("10.255.197.95", 12345)
 #                   blockchain.get_latest_block().timestamp + 1,
 #                   [])
 # blockchain.chain.append(new_block)
+# while True:
+#     if network.node.connections:
+#         sm.broadcast_block(new_block)
+#         break
+#     else:
+#         pass
 
 print("""
     If you're using any vpn or proxy, please turn it off
