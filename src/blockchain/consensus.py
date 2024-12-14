@@ -62,6 +62,7 @@ class Validator:
             :rtype: bool
         '''
         for i in range(1, len(blockchain.chain)):
+            print(i)
             current_block = blockchain.chain[i]
             previous_block = blockchain.chain[i - 1]
 
