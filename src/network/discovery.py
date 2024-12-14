@@ -21,13 +21,14 @@ def discover_peers(local_host: str, local_port: int,
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            udp_socket.bind((local_host, broadcast_port))
+            udp_socket.bind(('', broadcast_port))
 
             log.info(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
+                    print(data, addr)
                     peer_info = data.decode()
                     if addr == (local_host, broadcast_port):
                         pass
@@ -52,6 +53,7 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
+                    print("sending")
                     log.debug(f"Broadcasting: {message}")
                 except Exception as e:
                     log.error(f"Error in sending broadcast: {e}")
