@@ -12,10 +12,11 @@ def discover_peers(local_host: str, local_port: int,
     :param broadcast_port: Порт для широковещательной рассылки
     """
     peers = set()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind((local_host, broadcast_port))
 
@@ -36,7 +37,7 @@ def discover_peers(local_host: str, local_port: int,
             Отправляет широковещательное сообщение
             для оповещения о своем узле.
         """
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = f"Node at {local_host}:{local_port}"
