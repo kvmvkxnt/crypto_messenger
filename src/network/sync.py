@@ -55,17 +55,21 @@ class SyncManager:
         # block_timestamp = float(block_info_array[5])
         # new_block = Block(block_index, block_previous_hash, block_timestamp,
         #                   block_transactions, block_nonce)
+        print(recieved_block)
         new_block = self.block_generator(recieved_block["index"],
                                          recieved_block["previous_hash"],
                                          recieved_block["timestamp"],
                                          recieved_block["transactions"],
                                          recieved_block["nonce"])
+        print(new_block)
         if self.blockchain.get_latest_block().timestamp < \
                 new_block.timestamp:
             self.blockchain.chain.append(recieved_block)
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():
                 log.error("Blockchain is invalid")
+        else:
+            print("huy")
 
     def request_block(self, peer_host: str, peer_port: int):
         log.debug(f"Requesting block from {peer_host}:{peer_port}")
