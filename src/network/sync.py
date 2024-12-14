@@ -42,9 +42,19 @@ class SyncManager:
         else:
             log.debug("Received chain is not longer than the local chain.")
 
-    def merge_block(self, recieved_block):
-        if self.blockchain.get_latest_block().timestamp > \
-                recieved_block.timestamp:
+    def merge_block(self, recieved_block, block_generator):
+        block_info_array = ["".join(block_info.split()) for block_info in
+                            recieved_block[6:-1].split(",")]
+        block_info_array = [info.split("=")[1] for info in block_info_array]
+        block_index = int(block_info_array[0])
+        block_previous_hash = block_info_array[1]
+        block_transactions = [*block_info_array[3][2:-1].split(",")]
+        block_nonce = int(block_info_array)[4]
+        block_timestamp = float(block_info_array[5])
+        new_block = Block(block_index, block_previous_hash, block_timestamp,
+                          block_transactions, block_nonce)
+        if self.blockchain.get_latest_block().timestamp < \
+                new_block.timestamp:
             self.blockchain.chain.append(recieved_block)
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():

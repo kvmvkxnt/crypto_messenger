@@ -4,6 +4,7 @@ from utils import logger
 
 log = logger.Logger("sockets")
 
+
 class P2PSocket:
     def __init__(self, host: str, port: int):
         """Инициализация сокета для P2P соединений."""
@@ -11,6 +12,7 @@ class P2PSocket:
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []  # Список активных подключений
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     def start_server(self):
         """Запуск сервера для приема подключений."""

@@ -61,7 +61,8 @@ class Block:
             previous_hash={self.previous_hash},\
             hash={self.hash}, \
             transactions={self.transactions},\
-            nonce={self.nonce})"
+            nonce={self.nonce},\
+            timestamp={self.timestamp})"
         )
 
 
