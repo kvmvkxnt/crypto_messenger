@@ -34,6 +34,7 @@ QPushButton#sendMessage_button:pressed {
 }
 
 QPushButton {
+    color: white;
     border: none;           
     background: transparent;
     border-radius: 8px;    
@@ -74,6 +75,7 @@ QFrame#up_stroke {
 
 QMainWindow{
     background-color: rgb(36, 18, 54);
+    border: 5px solid darkslateblue;
 }
 QLineEdit{
     color: rgb(255, 255, 255);
@@ -85,11 +87,19 @@ QLineEdit{
 QTextBrowser{
     background-color: rgb(59, 18, 63);
     border: none;
+    width: 100%;
 }
 QListWidget{
     background-color: rgb(59,18,63);
     border: none;
 }
-QMainWindow {
-    border: 5px solid darkslateblue;
+QScrollBar{
+    background: none;
+}
+QInputDialog{
+    background-color: rgb(36, 18, 54);
+}
+
+QLabel{
+    color: #ffffff;
 }

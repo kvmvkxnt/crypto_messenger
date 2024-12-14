@@ -15,6 +15,10 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.username = "Guest"
 
+        bubbles_file = "formats.html"
+        self.load_stylesheet()
+        self.templates = self.load_message_bubbles(bubbles_file)
+
         self.border_width = 5
         self.is_resizing = False
         self.resize_direction = None
@@ -31,15 +35,39 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         text = self.messagePrint_area.text().strip()
         if text:
             time = datetime.now().strftime("%H:%M")
+            bubble = self.templates["Sender Bubble"].format(time=time, username=self.username, text=text)
             
-            sender_bubble_path = os.path.join(os.path.dirname(__file__), "formats.html")
-            with open(sender_bubble_path, "r", encoding="utf-8") as file:
-                bubble_template = file.read()
-            
-            bubble = bubble_template.format(time=time, username=self.username, text=text)
-            self.message_area.append(bubble)
+            current_html = self.message_area.toHtml()
+            new_html = current_html + bubble
+            self.message_area.setHtml(new_html)
             self.messagePrint_area.clear()
 
+    def receive_message(self, sender, text):
+        if text:
+            time = datetime.now().strftime("%H:%M")
+            bubble = self.templates["Receiver Bubble"].format(time=time, username=sender, text=text)
+
+            current_html = self.message_area.toHtml()
+            new_html = current_html + bubble
+            self.message_area.setHtml(new_html)
+
+    def load_message_bubbles(self, file_path):
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+        
+        templates = {}
+        sections = content.split("<!-- TEMPLATE:")
+        for section in sections[1:]:
+            marker, html = section.split("-->", 1)
+            templates[marker.strip()] = html.strip()
+        
+        print(f"Loaded templates: {templates}")
+        return templates
+    
+    def load_stylesheet(self):
+        with open("messages.qss", "r") as file:
+            style_sheet = file.read()
+        self.setStyleSheet(style_sheet)
 
     def change_nickname(self):
         new_username, ok = QInputDialog.getText(self, "Change Nickname", "Enter new nickname:")
@@ -81,11 +109,7 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
             event.accept()
         else:
             direction = self.get_resize_direction(event.pos())
-            cursor = self.get_cursor_shape(direction)
-            if cursor:
-                self.setCursor(cursor)
-            else:
-                self.unsetCursor()
+
 
     
     def mouseReleaseEvent(self, event):
@@ -99,12 +123,6 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
         mx, my = pos.x(), pos.y()
 
-        '''directions = {
-            "top": y <= my <= y + self.border_width,
-            "bottom": h - self.border_width <= my <= h,
-            "left": x <= mx <= x + self.border_width,
-            "right": w - self.border_width <= mx <= w,
-        }'''
         directions = {
         "top": my <= self.border_width, 
         "bottom": my >= h - self.border_width,
@@ -132,20 +150,7 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         #print(f"Direction: {direction}")
         return direction
     
-    def get_cursor_shape(self, direction):
-        cursors = {
-            "top": QtCore.Qt.SizeVerCursor,
-            "bottom": QtCore.Qt.SizeVerCursor,
-            "left": QtCore.Qt.SizeHorCursor,
-            "right": QtCore.Qt.SizeHorCursor,
-            "top_left": QtCore.Qt.SizeFDiagCursor,
-            "bottom_right": QtCore.Qt.SizeFDiagCursor,
-            "top_right": QtCore.Qt.SizeBDiagCursor,
-            "bottom_left": QtCore.Qt.SizeBDiagCursor,
-        }
-        print(f"Cursor direction: {direction}")
-        return QtGui.QCursor(cursors.get(direction)) if direction else None
-        
+
     def resize_window(self, global_pos):
         self.is_resizing = True
         rect = self.frameGeometry()
@@ -167,6 +172,20 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         elif self.resize_direction == "bottom_right":
             rect.setBottomRight(global_pos)
         self.setGeometry(rect)
+
+    def test_receive_message(self):
+        sender = "Campot"
+        text = "PUT UR PHONE DOWN!!!"
+        print(f"Testing receive message: sender={sender}, text={text}")
+        self.receive_message(sender, text)
+    
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_V:
+            print("Key V pressed")
+            self.test_receive_message()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
 
 
 if __name__ == "__main__":
