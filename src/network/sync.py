@@ -43,7 +43,7 @@ class SyncManager:
         else:
             log.debug("Received chain is not longer than the local chain.")
 
-    def merge_block(self, recieved_block, block_generator):
+    def merge_block(self, recieved_block):
         # block_info_array = recieved_block[9:-1]
         # block_info_array = ["".join(block_info.split()) for block_info in
         #                     recieved_block[6:-1].split(",")]
@@ -55,11 +55,11 @@ class SyncManager:
         # block_timestamp = float(block_info_array[5])
         # new_block = Block(block_index, block_previous_hash, block_timestamp,
         #                   block_transactions, block_nonce)
-        new_block = block_generator(recieved_block["index"],
-                                    recieved_block["previous_hash"],
-                                    recieved_block["timestamp"],
-                                    recieved_block["transactions"],
-                                    recieved_block["nonce"])
+        new_block = self.block_generator(recieved_block["index"],
+                                         recieved_block["previous_hash"],
+                                         recieved_block["timestamp"],
+                                         recieved_block["transactions"],
+                                         recieved_block["nonce"])
         if self.blockchain.get_latest_block().timestamp < \
                 new_block.timestamp:
             self.blockchain.chain.append(recieved_block)
@@ -76,7 +76,7 @@ class SyncManager:
             recieved_block = json.loads(response)
             print(recieved_block)
             log.debug(f"Received block from {peer_host}:{peer_port}")
-            self.merge_block(recieved_block, self.block_generator)
+            self.merge_block(recieved_block)
         except Exception as e:
             log.error(f"Error requesting block: {e}")
 
