@@ -22,7 +22,6 @@ def discover_peers(local_host: str, local_port: int,
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            udp_socket.bind(('', broadcast_port))
             if os.name == "posix":
                 udp_socket.bind(('', broadcast_port))
             else:
