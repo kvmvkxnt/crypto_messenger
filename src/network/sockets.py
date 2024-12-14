@@ -24,8 +24,8 @@ class P2PSocket:
             conn, addr = self.socket.accept()
             print(f"Connection established with {addr}")
             self.connections.append(conn)
-            threading.Thread(target=self.handle_client,
-                             args=(conn, addr)).start()
+            # threading.Thread(target=self.handle_client,
+            #                  args=(conn, addr)).start()
 
     def handle_client(self, conn, addr):
         """Обработка клиента."""
@@ -57,8 +57,8 @@ class P2PSocket:
         try:
             conn = socket.create_connection((peer_host, peer_port))
             self.connections.append(conn)
-            threading.Thread(target=self.handle_client,
-                             args=(conn, (peer_host, peer_port))).start()
+            # threading.Thread(target=self.handle_client,
+            #                  args=(conn, (peer_host, peer_port))).start()
             print(f"Connected to peer {peer_host}:{peer_port}")
             return conn
         except Exception as e:
