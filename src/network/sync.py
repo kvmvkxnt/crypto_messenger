@@ -43,7 +43,7 @@ class SyncManager:
             log.debug("Received chain is not longer than the local chain.")
 
     def merge_block(self, recieved_block):
-        if self.blockchain.get_latest_block().timestamp < \
+        if self.blockchain.get_latest_block().timestamp > \
                 recieved_block.timestamp:
             self.blockchain.chain.append(recieved_block)
             log.debug("Validating blockchain...")
