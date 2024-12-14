@@ -68,7 +68,6 @@ while True:
     elif user_input == 6:
         break
     elif user_input == 5:
-        print(network.peers)
         if len(network.peers):
             for i in network.peers:
                 print(i)

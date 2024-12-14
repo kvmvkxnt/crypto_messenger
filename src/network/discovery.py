@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+import os
 from utils.logger import Logger
 
 log = Logger("discovery")
@@ -22,6 +23,10 @@ def discover_peers(local_host: str, local_port: int,
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             udp_socket.bind(('', broadcast_port))
+            if os.name == "posix":
+                udp_socket.bind(('', broadcast_port))
+            else:
+                udp_socket.bind((local_host, broadcast_port))
 
             log.info(f"Listening for broadcasts on {local_host}:{broadcast_port}")
 
