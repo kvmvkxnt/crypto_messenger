@@ -6,13 +6,14 @@ log = Logger("sync")
 
 
 class SyncManager:
-    def __init__(self, p2p_network, blockchain):
+    def __init__(self, p2p_network, blockchain, block_generator):
         """
         Инициализация менеджера синхронизации.
         :param p2p_network: Экземпляр P2PNetwork для взаимодействия с узлами
         """
         self.p2p_network = p2p_network
         self.blockchain = blockchain  # Локальная копия блокчейна
+        self.block_generator = block_generator
 
     def request_chain(self, peer_host: str, peer_port: int):
         """
@@ -54,6 +55,11 @@ class SyncManager:
         # block_timestamp = float(block_info_array[5])
         # new_block = Block(block_index, block_previous_hash, block_timestamp,
         #                   block_transactions, block_nonce)
+        new_block = block_generator(recieved_block["index"],
+                                    recieved_block["previous_hash"],
+                                    recieved_block["timestamp"],
+                                    recieved_block["transactions"],
+                                    recieved_block["nonce"])
         if self.blockchain.get_latest_block().timestamp < \
                 new_block.timestamp:
             self.blockchain.chain.append(recieved_block)
@@ -70,7 +76,7 @@ class SyncManager:
             recieved_block = json.loads(response)
             print(recieved_block)
             log.debug(f"Received block from {peer_host}:{peer_port}")
-            self.merge_block(recieved_block)
+            self.merge_block(recieved_block, self.block_generator)
         except Exception as e:
             log.error(f"Error requesting block: {e}")
 
@@ -79,6 +85,11 @@ class SyncManager:
         Рассылает новый блок всем известным узлам.
         :param block: Новый блок для добавления в цепочку
         """
+        block = {"index": block.index,
+                 "previous_hash": block.previous_hash,
+                 "timestamp": block.timestamp,
+                 "transactions": block.transactions,
+                 "nonce": block.nonce}
         block_data = json.dumps(block).encode()
         log.info("Broadcasting new block...")
         for conn in self.p2p_network.node.connections:
