@@ -106,7 +106,9 @@ class SyncManager:
                   "timestamp": block.timestamp,
                   "transactions": block.transactions,
                   "nonce": block.nonce} for block in self.blockchain.chain]
+        print(chain)
         blockchain_data = json.dumps({"chain": chain}).encode()
+        print(blockchain_data)
         log.info("Broadcasting chain...")
         for conn in self.p2p_network.node.connections:
             try:
