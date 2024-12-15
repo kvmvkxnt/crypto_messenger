@@ -186,6 +186,7 @@ class SyncManager:
                             if self.awaiting_broad_transactions:
                                 for i in self.awaiting_broad_transactions:
                                     self.broadcast_transaction(i)
+                time.sleep(1)
 
         threading.Thread(target=sync_broad, daemon=True).start()
         threading.Thread(target=sync_loop, daemon=True).start()
