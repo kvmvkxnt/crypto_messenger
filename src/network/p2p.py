@@ -43,8 +43,6 @@ class P2PNetwork:
         for i in self.peers:
             if i[0] == addr[0]:
                 peer = i
-        print(peer)
-        print(data, conn, addr)
 
         peer_public_key = peer[2]
         chat_shared_key = self.key_manager.generate_shared_key(peer_public_key)
@@ -56,9 +54,8 @@ class P2PNetwork:
         encryptor = self.encryptor(chat_shared_key)
         got_message = encryptor.decrypt(bytes.fromhex(data.decode()))
         print(got_message)
-        while True:
-            message = input("Message: ")
-            conn.send(encryptor.encrypt(message).hex().encode())
+        message = input("Message: ")
+        conn.send(encryptor.encrypt(message).hex().encode())
 
     def discover_peers(self, discoverer: set, public_key):
         """Механизм обнаружения новых узлов."""
