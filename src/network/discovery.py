@@ -34,11 +34,12 @@ def discover_peers(local_host: str, local_port: int,
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = json.loads(data.decode())
-                    print(peer_info)
                     if addr == (local_host, broadcast_port):
                         pass
-                    elif (addr[0], peer_info.split(":")[-1]) not in peers:
-                        peers.add((addr[0], peer_info.split(":")[-1]))
+                    elif (addr[0], peer_info["port"], peer_info["public_key"]
+                          .encode()) not in peers:
+                        peers.add((addr[0], peer_info["port"],
+                                   peer_info["public_key"].encode()))
                         log.info(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
                     log.error(f"Error in receiving broadcast: {e}")
