@@ -45,7 +45,7 @@ log.debug(f"Selected broadcast port: {broadcast_port}")
 network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
-sm = SyncManager(network, blockchain, Block, Transaction)
+sm = SyncManager
 # new_block = Block(blockchain.get_latest_block().index + 1,
 #                   blockchain.get_latest_block().hash,
 #                   blockchain.get_latest_block().timestamp + 1,
@@ -63,7 +63,8 @@ sm = SyncManager(network, blockchain, Block, Transaction)
 # new_transaction2.sign_transaction(private_key)
 # blockchain.add_transaction(new_transaction2)
 
-sm.start_sync_loop()
+syncronizer = network.sync_with_peers(sm, blockchain, Block, Transaction)
+syncronizer.start_sync_loop()
 
 print("""
     If you're using any vpn or proxy, please turn it off

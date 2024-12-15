@@ -47,13 +47,15 @@ class P2PNetwork:
         #        self.peers.add(item)
         self.peers = discoverer(self.host, self.port, self.broadcast_port)
 
-    def sync_with_peers(self, sync_manager, blockchain):
+    def sync_with_peers(self, sync_manager, blockchain, block_generator,
+                        transaction_generator):
         """Синхронизация данных с подключенными узлами."""
         # Заглушка: функциональность будет доработана в файле sync.py
         # print("Synchronizing with peers...")
         # time.sleep(1)
         # print("Synchronization complete.")
-        return sync_manager(self, blockchain)
+        return sync_manager(self, blockchain, block_generator,
+                            transaction_generator)
 
 
 if __name__ == "__main__":
