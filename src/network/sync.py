@@ -18,7 +18,7 @@ class SyncManager:
         self.transaction_generator = transaction_generator
 
     def request_block(self, peer_host: str, peer_port: int):
-        log.debug(f"Requesting block from {peer_host}:{peer_port}")
+        log.info(f"Requesting block from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_BLOCK")
@@ -35,7 +35,7 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
-        log.debug(f"Requesting blockchain from {peer_host}:{peer_port}")
+        log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
@@ -47,19 +47,13 @@ class SyncManager:
             log.error(f"Error requesting chain: {e}")
 
     def request_transaction(self, peer_host: str, peer_port: int):
-        log.debug(f"Requesting transaction from {peer_host}:{peer_port}")
+        log.info(f"Requesting transaction from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-            print("break1")
             conn.send(b"REQUEST_TRANSACTION")
-            print("break2")
             response = conn.recv(4096).decode()
-            print("break3")
-            print(response)
             recieved_transaction = json.loads(response[15:])
-            print("break4")
             log.debug(f"Recieved transaction from {peer_host}:{peer_port}")
-            print(recieved_transaction)
             self.merge_transaction(recieved_transaction)
         except Exception as e:
             log.error(f"Error requesting transaction: {e}")
@@ -166,8 +160,8 @@ class SyncManager:
                 for peer in self.p2p_network.peers:
                     try:
                         self.request_chain(peer[0], peer[1])
-                        self.request_block(peer[0], peer[1])
-                        self.request_transaction(peer[0], peer[1])
+                        # self.request_block(peer[0], peer[1])
+                        # self.request_transaction(peer[0], peer[1])
                     except Exception as e:
                         log.error(f"Error syncing with peer {peer}: {e}")
                 time.sleep(10)  # Интервал синхронизации
