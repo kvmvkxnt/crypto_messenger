@@ -41,7 +41,7 @@ class P2PNetwork:
     def main_handler(self, data, conn, addr):
         peer = ()
         for i in self.peers:
-            if i[1] == addr[0]:
+            if i[0] == addr[0]:
                 peer = i
 
         peer_public_key = peer[2]
