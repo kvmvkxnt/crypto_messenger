@@ -71,7 +71,7 @@ class DiffieHellmanKeyExchange:
             print("Invalid Public Key Format")
             return
 
-        log.debug("Received public key:", peer_public_key_bytes.decode())
+        log.debug("Received public key:" + peer_public_key_bytes.decode())
         shared_key = self.private_key.exchange(peer_public_key)
 
         # Using KDF to strenghten key
