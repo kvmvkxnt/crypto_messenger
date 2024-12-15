@@ -36,7 +36,7 @@ def discover_peers(local_host: str, local_port: int,
                     if addr == (local_host, broadcast_port):
                         pass
                     elif addr not in peers:
-                        peers.add(addr)
+                        peers.add((addr[0], peer_info.split(":")[-1]))
                         log.info(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
                     log.error(f"Error in receiving broadcast: {e}")
@@ -49,8 +49,8 @@ def discover_peers(local_host: str, local_port: int,
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-            message = f"Node at {local_host}:{broadcast_port}"
-            broadcast_address = ("<broadcast>", local_port)
+            message = f"Node at {local_host}:{local_port}"
+            broadcast_address = ("<broadcast>", broadcast_port)
             log.info(f"Broadcasting: {message}")
 
             while True:
