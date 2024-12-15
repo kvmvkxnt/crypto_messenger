@@ -37,6 +37,8 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         self.renameChatAction.triggered.connect(self.rename_chat)
         self.deleteChatAction.triggered.connect(self.delete_chat)
         self.changeNicknameAction.triggered.connect(self.change_nickname)
+        self.chat_Search.textChanged.connect(self.search_chats)
+
 
 
     def add_chat(self):
@@ -242,6 +244,13 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
             event.accept()
         else:
             super().keyPressEvent(event)
+
+    def search_chats(self, text):
+        self.chatList.clear()
+
+        filtered_chats = [chat for chat in self.chat_names if text.lower() in chat.lower()]
+        self.chatList.addItems(filtered_chats)
+
 
 
 if __name__ == "__main__":
