@@ -67,8 +67,8 @@ class DiffieHellmanKeyExchange:
             return
 
         print("Received public key:", peer_public_key_bytes.decode())
+        print(self.private_key.exchange(peer_public_key))
         shared_key = self.private_key.exchange(peer_public_key)
-        print(shared_key)
 
         # Using KDF to strenghten key
         derived_key = HKDF(

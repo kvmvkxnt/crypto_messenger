@@ -36,7 +36,6 @@ class P2PSocket:
                 if not data:
                     break
                 self.requests.append(data.decode())
-                print(self.requests)
                 print(f"Received from {addr}: {data.decode()}")
                 break
                 self.broadcast(data, conn)
