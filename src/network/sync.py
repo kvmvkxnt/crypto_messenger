@@ -40,18 +40,19 @@ class SyncManager:
         :param peer_port: Порт узла
         """
         log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
-        try:
-            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-            print(conn)
-            conn.send(b"REQUEST_CHAIN")
-            print(conn)
-            response = conn.recv(4096).decode()
-            print(response)
-            recieved_chain = json.loads(response[9:])
-            log.debug(f"Received chain from {peer_host}:{peer_port}")
-            self.merge_chain(recieved_chain)
-        except Exception as e:
-            log.error(f"Error requesting chain: {e}")
+        if (peer_host, peer_port) not in self.p2p_network.node.connections:
+            try:
+                conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+                print(conn)
+                conn.send(b"REQUEST_CHAIN")
+                print(conn)
+                response = conn.recv(4096).decode()
+                print(response)
+                recieved_chain = json.loads(response[9:])
+                log.debug(f"Received chain from {peer_host}:{peer_port}")
+                self.merge_chain(recieved_chain)
+            except Exception as e:
+                log.error(f"Error requesting chain: {e}")
 
     def request_transaction(self, peer_host: str, peer_port: int):
         log.info(f"Requesting transaction from {peer_host}:{peer_port}")
