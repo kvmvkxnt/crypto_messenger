@@ -167,6 +167,7 @@ class SyncManager:
                     try:
                         self.request_chain(peer[0], peer[1])
                         self.request_block(peer[0], peer[1])
+                        self.request_transaction(peer[0], peer[1])
                     except Exception as e:
                         log.error(f"Error syncing with peer {peer}: {e}")
                 time.sleep(10)  # Интервал синхронизации

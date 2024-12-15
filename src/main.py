@@ -46,7 +46,6 @@ network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
 sm = SyncManager(network, blockchain, Block, Transaction)
-sm.request_transaction("10.255.197.95", 12345)
 # new_block = Block(blockchain.get_latest_block().index + 1,
 #                   blockchain.get_latest_block().hash,
 #                   blockchain.get_latest_block().timestamp + 1,
@@ -61,14 +60,10 @@ sm.request_transaction("10.255.197.95", 12345)
 # new_transaction1.sign_transaction(private_key)
 # blockchain.add_transaction(new_transaction1)
 # new_transaction2 = Transaction("alex", "bob", 50, "hi")
+# new_transaction2.sign_transaction(private_key)
 # blockchain.add_transaction(new_transaction2)
-#
-# while True:
-#     if network.node.connections:
-#         sm.broadcast_transaction(new_transaction1)
-#         break
-#     else:
-#         pass
+
+sm.start_sync_loop()
 
 print("""
     If you're using any vpn or proxy, please turn it off
@@ -77,7 +72,9 @@ print("""
     3. Sync with other peers (manual)
     4. Discover other peers (manual)
     5. List peers
-    6. Exit
+    6. Show chain
+    7. Show pending transactions
+    8. Exit
 """)
 
 while True:
@@ -87,14 +84,17 @@ while True:
         print("Not an option. Please, choose another")
         continue
 
-    if user_input > 6 or user_input < 1:
+    if user_input > 8 or user_input < 1:
         print("Not an option. Please, choose another")
-    elif user_input == 6:
+    elif user_input == 8:
         break
+    elif user_input == 7:
+        print(blockchain.pending_transactions)
+    elif user_input == 6:
+        print(blockchain.chain)
     elif user_input == 5:
         if len(network.peers):
-            for i in network.peers:
-                print(i)
+            print(network.peers)
         else:
             print("No peers")
     elif user_input == 4:
