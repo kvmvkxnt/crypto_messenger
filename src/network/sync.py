@@ -55,6 +55,7 @@ class SyncManager:
             print("break2")
             response = conn.recv(4096).decode()
             print("break3")
+            print(response)
             recieved_transaction = json.loads(response[19:])
             print("break4")
             log.debug(f"Recieved transaction from {peer_host}:{peer_port}")
