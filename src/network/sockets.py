@@ -24,8 +24,8 @@ class P2PSocket:
             conn, addr = self.socket.accept()
             print(f"Connection established with {addr}")
             self.connections.append(conn)
-            # threading.Thread(target=self.handle_client,
-            #                  args=(conn, addr)).start()
+            threading.Thread(target=self.handle_client,
+                             args=(conn, addr)).start()
 
     def handle_client(self, conn, addr):
         """Обработка клиента."""
