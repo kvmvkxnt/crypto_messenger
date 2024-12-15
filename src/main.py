@@ -77,12 +77,11 @@ network.discover_peers(discover_peers, user_public_key)
 def startChat(peer):
     network.connect_to_peer(peer[0], peer[1], peer[2])
     chat_shared_key = key_manager.generate_shared_key(peer[2])
-    print('break')
     encryptor = SymmetricEncryption(chat_shared_key)
     while True:
         message = input("Message: ")
         encrypted_message = encryptor.encrypt(message)
-        network.broadcast_message(encrypted_message)
+        network.broadcast_message(encrypted_message.decode())
 
 
 while True:
