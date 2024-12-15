@@ -127,6 +127,7 @@ def main():
                     return peers_list
                 else:
                     print("No response from rendez-vous server.")
+                    return []
 
         except Exception as e:
             print(f"Error requesting peers: {e}")
