@@ -59,6 +59,7 @@ class SyncManager:
             recieved_transaction = json.loads(response[15:])
             print("break4")
             log.debug(f"Recieved transaction from {peer_host}:{peer_port}")
+            print(recieved_transaction)
             self.merge_transaction(recieved_transaction)
         except Exception as e:
             log.error(f"Error requesting transaction: {e}")
