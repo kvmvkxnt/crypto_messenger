@@ -47,7 +47,7 @@ network.start()
 network.discover_peers(discover_peers)
 sm = SyncManager
 syncronizer = network.sync_with_peers(sm, blockchain, Block, Transaction)
-#syncronizer.start_sync_loop()
+syncronizer.start_sync_loop()
 # syncronizer.broadcast_chain()
 # new_block = Block(blockchain.get_latest_block().index + 1,
 #                   blockchain.get_latest_block().hash,
