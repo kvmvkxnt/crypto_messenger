@@ -52,7 +52,7 @@ def discover_peers(local_host: str, local_port: int,
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = json.dumps({"host": local_host, "port": local_port,
-                                  "public_key": public_key.decode()}).encode()
+                                  "public_key": public_key.decode()})
             broadcast_address = ("<broadcast>", broadcast_port)
             log.info(f"Broadcasting: {message}")
 
