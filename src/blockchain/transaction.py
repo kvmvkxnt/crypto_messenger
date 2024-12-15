@@ -127,6 +127,9 @@ if __name__ == "__main__":
     # Signing transaction
     transaction.sign_transaction(private_key)
     print("Transaction signed.")
+    print(transaction.calculate_hash())
+    print(type(transaction.signature))
+    print(transaction.to_dict())
 
     # Validating signature
     is_valid = transaction.is_valid(public_key)

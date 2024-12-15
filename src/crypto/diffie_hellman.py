@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat
 )
 from cryptography.exceptions import InvalidKey
+import os
 
 
 class DiffieHellmanKeyExchange:
@@ -72,7 +73,7 @@ class DiffieHellmanKeyExchange:
         derived_key = HKDF(
             algorithm=hashes.SHA256(),
             length=32,
-            salt=None,
+            salt=os.urandom(16),
             info=b'dh key exchange'
         ).derive(shared_key)
 

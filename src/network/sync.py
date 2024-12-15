@@ -2,12 +2,12 @@ import json
 import threading
 import time
 from utils.logger import Logger
-import pickle
 log = Logger("sync")
 
 
 class SyncManager:
-    def __init__(self, p2p_network, blockchain, block_generator):
+    def __init__(self, p2p_network, blockchain, block_generator,
+                 transaction_generator):
         """
         Инициализация менеджера синхронизации.
         :param p2p_network: Экземпляр P2PNetwork для взаимодействия с узлами
@@ -15,6 +15,19 @@ class SyncManager:
         self.p2p_network = p2p_network
         self.blockchain = blockchain  # Локальная копия блокчейна
         self.block_generator = block_generator
+        self.transaction_generator = transaction_generator
+
+    def request_block(self, peer_host: str, peer_port: int):
+        log.debug(f"Requesting block from {peer_host}:{peer_port}")
+        try:
+            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            conn.send(b"REQUEST_BLOCK")
+            response = conn.recv(4096).decode()
+            recieved_block = json.loads(response[9:])
+            log.debug(f"Received block from {peer_host}:{peer_port}")
+            self.merge_block(recieved_block)
+        except Exception as e:
+            log.error(f"Error requesting block: {e}")
 
     def request_chain(self, peer_host: str, peer_port: int):
         """
@@ -22,18 +35,45 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
-        print(f"Requesting blockchain from {peer_host}:{peer_port}")
+        log.debug(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096).decode()
-            print("break 1")
             recieved_chain = json.loads(response[9:])
-            print("break 2")
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
         except Exception as e:
             log.error(f"Error requesting chain: {e}")
+
+    def request_transaction(self, peer_host: str, peer_port: int):
+        log.debug(f"Requesting transaction from {peer_host}:{peer_port}")
+        try:
+            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            conn.send(b"REQUEST_TRANSACTION")
+            response = conn.recv(4096).decode()
+            recieved_transaction = json.loads(response[19:])
+            log.debug(f"Recieved transaction from {peer_host}:{peer_port}")
+            self.merge_transaction(recieved_transaction)
+        except Exception as e:
+            log.error(f"Error requesting transaction: {e}")
+
+    def merge_block(self, recieved_block):
+        new_block = self.block_generator(recieved_block["index"],
+                                         recieved_block["previous_hash"],
+                                         recieved_block["timestamp"],
+                                         recieved_block["transactions"],
+                                         recieved_block["nonce"])
+        if self.blockchain.get_latest_block().timestamp < \
+                new_block.timestamp:
+            self.blockchain.chain.append(new_block)
+            log.debug("Validating blockchain...")
+            if not self.blockchain.is_chain_valid():
+                log.error("Blockchain is invalid")
+            else:
+                log.debug("Blockchain is valid")
+        else:
+            log.debug("Local blockchain doesn't nned and update")
 
     def merge_chain(self, recieved_chain):
         """
@@ -53,34 +93,14 @@ class SyncManager:
         else:
             log.debug("Received chain is not longer than the local chain.")
 
-    def merge_block(self, recieved_block):
-        new_block = self.block_generator(recieved_block["index"],
-                                         recieved_block["previous_hash"],
-                                         recieved_block["timestamp"],
-                                         recieved_block["transactions"],
-                                         recieved_block["nonce"])
-        if self.blockchain.get_latest_block().timestamp < \
-                new_block.timestamp:
-            self.blockchain.chain.append(new_block)
-            log.debug("Validating blockchain...")
-            if not self.blockchain.is_chain_valid():
-                log.error("Blockchain is invalid")
-            else:
-                log.debug("Blockchain is valid")
-        else:
-            log.debug("Local blockchain doesn't nned and update")
-
-    def request_block(self, peer_host: str, peer_port: int):
-        log.debug(f"Requesting block from {peer_host}:{peer_port}")
-        try:
-            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-            conn.send(b"REQUEST_BLOCK")
-            response = conn.recv(4096).decode()
-            recieved_block = json.loads(response[9:])
-            log.debug(f"Received block from {peer_host}:{peer_port}")
-            self.merge_block(recieved_block)
-        except Exception as e:
-            log.error(f"Error requesting block: {e}")
+    def merge_transaction(self, recieved_transaction):
+        new_transaction = self. \
+            transaction_generator(recieved_transaction["sender"],
+                                  recieved_transaction["recipient"],
+                                  int(recieved_transaction["amount"]),
+                                  recieved_transaction["content"])
+        new_transaction.signature = recieved_transaction["signature"]
+        self.blockchain.add_transaction(new_transaction)
 
     def broadcast_block(self, block):
         """
@@ -106,15 +126,24 @@ class SyncManager:
                   "timestamp": block.timestamp,
                   "transactions": block.transactions,
                   "nonce": block.nonce} for block in self.blockchain.chain]
-        print(chain)
         blockchain_data = json.dumps({"chain": chain}).encode()
-        print(blockchain_data)
         log.info("Broadcasting chain...")
         for conn in self.p2p_network.node.connections:
             try:
                 conn.send(b"NEW_CHAIN" + blockchain_data)
             except Exception as e:
                 log.error(f"Error broadcasting blockchain: {e}")
+
+    def broadcast_transaction(self, new_transaction):
+        transaction = new_transaction.to_dict()
+        transaction["signature"] = new_transaction.signature
+        data = json.dumps(transaction).encode()
+        log.info("Broadcasting new transaction...")
+        for conn in self.p2p_network.node.connections:
+            try:
+                conn.send(b"NEW_TRANSACTION" + data)
+            except Exception as e:
+                log.error(f"Error broadcasting transaction: {e}")
 
     def start_sync_loop(self):
         """
