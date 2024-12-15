@@ -35,7 +35,7 @@ def discover_peers(local_host: str, local_port: int,
                     peer_info = data.decode()
                     if addr == (local_host, broadcast_port):
                         pass
-                    elif addr not in peers:
+                    elif (addr[0], peer_info.split(":")[-1]) not in peers:
                         peers.add((addr[0], peer_info.split(":")[-1]))
                         log.info(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
