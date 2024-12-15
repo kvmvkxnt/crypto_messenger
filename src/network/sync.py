@@ -165,6 +165,8 @@ class SyncManager:
                 for peer in self.p2p_network.peers:
                     if peer not in self.p2p_network.node.connections:
                         try:
+                            print(self.p2p_network.node.connections)
+                            print(self.p2p_network.peers)
                             self.request_chain(peer[0], peer[1])
                             # self.request_block(peer[0], peer[1])
                             # self.request_transaction(peer[0], peer[1])
