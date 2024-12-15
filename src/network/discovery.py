@@ -33,7 +33,7 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
-                    peer_info = data
+                    peer_info = json.loads(data).decode()
                     print(data)
                     if addr == (local_host, broadcast_port):
                         pass
@@ -52,7 +52,7 @@ def discover_peers(local_host: str, local_port: int,
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = json.dumps({"host": local_host, "port": local_port,
-                                  "public_key": public_key.decode()})
+                                  "public_key": public_key.decode()}).encode()
             broadcast_address = ("<broadcast>", broadcast_port)
             log.info(f"Broadcasting: {message}")
 
