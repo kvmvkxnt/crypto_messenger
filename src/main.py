@@ -73,7 +73,18 @@ user_public_key = key_manager.get_public_key()
 print(f"This is your public key: {user_public_key}")
 network.discover_peers(discover_peers, user_public_key)
 
-peer_public_key = input("Enter user's public key you want to chat with: ")
+while True:
+    user_input = input("Command (start_chat, list_peers): ")
+
+    if user_input == "start_chat":
+        chat = input("Input peer id or peer public_key: ")
+    elif user_input == "list_peers":
+        for i in network.peers:
+            print("IP:", i[0], "    PORT:", i[1], "    PUBLIC_KEY:",
+                  i[3].decode()[26:31] + "..." + i[3].decode()[-29:-24])
+
+peer_public_key = input("Enter user's public key or select from list who\
+ you want to chat with: ")
 
 # print("""
 #     If you're using any vpn or proxy, please turn it off
