@@ -11,7 +11,6 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat
 )
 from cryptography.exceptions import InvalidKey
-import os
 
 
 class DiffieHellmanKeyExchange:
@@ -67,14 +66,13 @@ class DiffieHellmanKeyExchange:
             return
 
         print("Received public key:", peer_public_key_bytes.decode())
-        print(self.private_key.exchange(peer_public_key))
         shared_key = self.private_key.exchange(peer_public_key)
 
         # Using KDF to strenghten key
         derived_key = HKDF(
             algorithm=hashes.SHA256(),
             length=32,
-            salt=os.urandom(16),
+            salt=None,
             info=b'dh key exchange'
         ).derive(shared_key)
 
