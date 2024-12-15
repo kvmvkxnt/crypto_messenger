@@ -85,9 +85,10 @@ def startChat(peer):
     encryptor = SymmetricEncryption(chat_shared_key)
     while True:
         message = input("Message: ")
+        if message == ":q!":
+            break
         encrypted_message = encryptor.encrypt(message)
         network.broadcast_message(encrypted_message.hex())
-        print("Done")
 
 
 while True:
@@ -116,6 +117,9 @@ while True:
         for i, val in enumerate(network.peers):
             print("ID:", i, "    IP:", val[0], "    PORT:", val[1], "    PUBLIC_KEY:",
                   val[2].decode()[27:37] + "..." + val[2].decode()[-36:-26])
+
+    elif user_input == "exit":
+        break
 
 # print("""
 #     If you're using any vpn or proxy, please turn it off
