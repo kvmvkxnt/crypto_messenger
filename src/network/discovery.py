@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import os
+import json
 from utils.logger import Logger
 
 log = Logger("discovery")
@@ -32,8 +33,8 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
-                    peer_info = data.decode()
-                    print(peer_info)
+                    peer_info = data
+                    print(data)
                     if addr == (local_host, broadcast_port):
                         pass
                     elif (addr[0], peer_info.split(":")[-1]) not in peers:
@@ -50,8 +51,8 @@ def discover_peers(local_host: str, local_port: int,
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-            message = f"Node at {local_host}:{local_port}\
-My public: {public_key}"
+            message = json.dumps({"host": local_host, "port": local_port,
+                                  "public_key": public_key.decode()})
             broadcast_address = ("<broadcast>", broadcast_port)
             log.info(f"Broadcasting: {message}")
 
