@@ -27,6 +27,7 @@ class SyncManager:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096)
+            print("breakpoint 1")
             recieved_chain = pickle.loads(response)
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
