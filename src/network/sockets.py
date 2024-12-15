@@ -46,11 +46,11 @@ class P2PSocket:
     def broadcast(self, message: bytes, sender_conn):
         """Отправка сообщения всем подключенным клиентам, кроме отправителя."""
         for conn in self.connections:
-            # if conn != sender_conn:
-            try:
-                conn.send(message)
-            except Exception as e:
-                print(f"Error broadcasting to a connection: {e}")
+            if conn != sender_conn:
+                try:
+                    conn.send(message)
+                except Exception as e:
+                    print(f"Error broadcasting to a connection: {e}")
 
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к другому узлу."""
