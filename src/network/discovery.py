@@ -33,8 +33,8 @@ def discover_peers(local_host: str, local_port: int,
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
-                    peer_info = json.loads(data).decode()
-                    print(data)
+                    peer_info = json.loads(data.decode())
+                    print(peer_info)
                     if addr == (local_host, broadcast_port):
                         pass
                     elif (addr[0], peer_info.split(":")[-1]) not in peers:
