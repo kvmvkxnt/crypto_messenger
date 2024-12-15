@@ -67,7 +67,8 @@ log.debug(f"Selected broadcast port: {broadcast_port}")
 
 key_manager = DiffieHellmanKeyExchange()
 user_public_key = key_manager.get_public_key()
-network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port), user_public_key)
+network = P2PNetwork(P2PSocket, host, port, broadcast_port, user_public_key,
+                     key_manager, SymmetricEncryption)
 network.start()
 
 print(f"This is your public key: {user_public_key}")
@@ -77,11 +78,15 @@ network.discover_peers(discover_peers, user_public_key)
 def startChat(peer):
     network.connect_to_peer(peer[0], peer[1], peer[2])
     chat_shared_key = key_manager.generate_shared_key(peer[2])
+    peer_id = list(network.peers).index(peer)
+    network.peers = list(network.peers)
+    network.peers[peer_id].add(chat_shared_key)
+    network.peers = set(network.peers)
     encryptor = SymmetricEncryption(chat_shared_key)
     while True:
         message = input("Message: ")
         encrypted_message = encryptor.encrypt(message)
-        network.broadcast_message(encrypted_message.decode())
+        network.broadcast_message(encrypted_message.hex())
 
 
 while True:

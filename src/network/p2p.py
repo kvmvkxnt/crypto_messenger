@@ -5,14 +5,17 @@ log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, node, broadcast_port: int, public_key):
+    def __init__(self, node, host, port, broadcast_port: int, public_key,
+                 key_manager, encryptor):
         """Инициализация P2P сети."""
-        self.host = node.host
-        self.port = node.port
+        self.host = host
+        self.port = port
         self.broadcast_port = broadcast_port
-        self.node = node
+        self.node = node(self.host, self.port, self.main_handler)
         self.peers = set()  # Список известных узлов
         self.public_key = public_key
+        self.key_manager = key_manager
+        self.encryptor = encryptor
 
     def start(self):
         """Запуск узла в режиме сервера."""
@@ -35,28 +38,30 @@ class P2PNetwork:
             except Exception as e:
                 log.error(f"Error broadcasting message: {e}")
 
+    def main_handler(self, data, conn, addr):
+        peer = ()
+        for i in self.peers:
+            if i[1] == addr[0]:
+                peer = i
+
+        peer_public_key = peer[2]
+        chat_shared_key = self.key_manager.generate_shared_key(peer_public_key)
+        peer_id = list(self.peers).index(peer)
+        self.peers = list(self.peers)
+        self.peers[peer_id].add(chat_shared_key)
+        self.peers = set(self.peers)
+        encryptor = self.encryptor(chat_shared_key)
+        got_message = encryptor.decrypt(bytes.fromhex(data.decode()))
+        print(got_message)
+
     def discover_peers(self, discoverer: set, public_key):
         """Механизм обнаружения новых узлов."""
-        # Заглушка: этот метод будет доработан в файле discovery.py
-        # print("Discovering peers...")
-        # time.sleep(2)
-        # # Имитация обнаружения нового узла
-        # new_peer = ("127.0.0.1", 54321)
-        # self.peers.add(new_peer)
-        # print(f"Discovered new peer: {new_peer}")
-        # for item in discoverer(self.host, self.port):
-        #    if item not in self.peers:
-        #        self.peers.add(item)
         self.peers = discoverer(self.host, self.port, self.broadcast_port,
                                 public_key)
 
     def sync_with_peers(self, sync_manager, blockchain, block_generator,
                         transaction_generator):
         """Синхронизация данных с подключенными узлами."""
-        # Заглушка: функциональность будет доработана в файле sync.py
-        # print("Synchronizing with peers...")
-        # time.sleep(1)
-        # print("Synchronization complete.")
         return sync_manager(self, blockchain, block_generator,
                             transaction_generator)
 

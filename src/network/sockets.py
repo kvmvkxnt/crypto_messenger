@@ -6,7 +6,7 @@ log = logger.Logger("sockets")
 
 
 class P2PSocket:
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, main_handler):
         """Инициализация сокета для P2P соединений."""
         self.host = host
         self.port = port
@@ -14,6 +14,9 @@ class P2PSocket:
         self.connections = []  # Список активных подключений
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.requests = []
+        self.syncers = ['REQUEST_BLOCK', 'REQUEST_TRANSACTION',
+                        'REQUEST_CHAIN']
+        self.main_handler = main_handler
 
     def start_server(self):
         """Запуск сервера для приема подключений."""
@@ -32,10 +35,13 @@ class P2PSocket:
         """Обработка клиента."""
         try:
             while True:
-                data = conn.recv(2048)
-                print(data)
+                data = conn.recv(1024)
                 if not data:
                     break
+                if data.decode() in self.syncers:
+                    self.requests.append(data.decode())
+                else:
+                    self.main_handler(data, conn, addr)
                 print(f"Received from {addr}: {data.decode()}")
                 self.broadcast(data, conn)
         except Exception as e:
