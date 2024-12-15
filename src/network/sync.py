@@ -16,6 +16,14 @@ class SyncManager:
         self.blockchain = blockchain  # Локальная копия блокчейна
         self.block_generator = block_generator
         self.transaction_generator = transaction_generator
+        self.awaiting_broad_blocks = []
+        self.awaiting_broad_transactions = []
+
+    def add_block(self, block):
+        self.awaiting_broad_blocks.append(block)
+
+    def add_transaction(self, transaction):
+        self.awaiting_broad_transactions.append(transaction)
 
     def request_block(self, peer_host: str, peer_port: int):
         log.info(f"Requesting block from {peer_host}:{peer_port}")
@@ -161,8 +169,25 @@ class SyncManager:
                             self.request_transaction(peer[0], peer[1])
                         except Exception as e:
                             log.error(f"Error syncing with peer {peer}: {e}")
+
                 time.sleep(10)  # Интервал синхронизации
 
+        def sync_broad():
+            while True:
+                if len(self.p2p_network.node.requests):
+                    for i in self.p2p_network.node.requests:
+                        if i == "REQUEST_CHAIN":
+                            self.broadcast_chain()
+                        elif i == "REQUEST_BLOCK":
+                            if self.awaiting_broad_blocks:
+                                for i in self.awaiting_broad_blocks:
+                                    self.broadcast_block(i)
+                        elif i == "REQUEST_TRANSACTION":
+                            if self.awaiting_broad_transactions:
+                                for i in self.awaiting_broad_transactions:
+                                    self.broadcast_transaction(i)
+
+        threading.Thread(target=sync_broad, daemon=True).start()
         threading.Thread(target=sync_loop, daemon=True).start()
 
 
