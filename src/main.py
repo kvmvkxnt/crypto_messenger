@@ -87,6 +87,7 @@ def startChat(peer):
         message = input("Message: ")
         encrypted_message = encryptor.encrypt(message)
         network.broadcast_message(encrypted_message.hex())
+        print("Done")
 
 
 while True:
