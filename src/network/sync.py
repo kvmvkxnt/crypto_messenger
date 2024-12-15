@@ -50,9 +50,13 @@ class SyncManager:
         log.debug(f"Requesting transaction from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            print("break1")
             conn.send(b"REQUEST_TRANSACTION")
+            print("break2")
             response = conn.recv(4096).decode()
+            print("break3")
             recieved_transaction = json.loads(response[19:])
+            print("break4")
             log.debug(f"Recieved transaction from {peer_host}:{peer_port}")
             self.merge_transaction(recieved_transaction)
         except Exception as e:
