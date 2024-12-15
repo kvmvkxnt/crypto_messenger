@@ -66,6 +66,8 @@ class SyncManager:
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():
                 log.error("Blockchain is invalid")
+            else:
+                log.debug("Blockchain is valid")
         else:
             print("huy")
 
