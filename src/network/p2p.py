@@ -54,8 +54,9 @@ class P2PNetwork:
         encryptor = self.encryptor(chat_shared_key)
         got_message = encryptor.decrypt(bytes.fromhex(data.decode()))
         print(got_message)
-        message = input("Message: ")
-        conn.send(encryptor.encrypt(message).hex().encode())
+        while True:
+            message = input("Message: ")
+            conn.send(encryptor.encrypt(message).hex().encode())
 
     def discover_peers(self, discoverer: set, public_key):
         """Механизм обнаружения новых узлов."""
