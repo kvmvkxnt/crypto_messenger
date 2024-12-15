@@ -8,9 +8,10 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import (
     load_pem_public_key,
     Encoding,
-    PublicFormat
+    PublicFormat,
 )
 from cryptography.exceptions import InvalidKey
+from cryptography.hazmat.backends import default_backend
 
 
 class DiffieHellmanKeyExchange:
@@ -35,7 +36,8 @@ class DiffieHellmanKeyExchange:
         '''
         # Getting parameters for DH or generating them
         self.parameters = parameters or \
-            dh.generate_parameters(generator=2, key_size=2048)
+            dh.generate_parameters(generator=2, key_size=2048,
+                                   backend=default_backend())
         self.private_key = self.parameters.generate_private_key()
         self.public_key = self.private_key.public_key()
 
