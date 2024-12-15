@@ -21,6 +21,7 @@ class SyncManager:
         log.info(f"Requesting block from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            print(conn)
             conn.send(b"REQUEST_BLOCK")
             response = conn.recv(4096).decode()
             recieved_block = json.loads(response[9:])
