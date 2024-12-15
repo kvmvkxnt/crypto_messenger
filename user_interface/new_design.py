@@ -4,7 +4,21 @@ from PyQt5.QtCore import Qt
 
 
 class Ui_BlockChain(object):
+    """
+    UI setup class for the BlockChain Messenger application
+    
+    This class defines the user interface components of the messenger
+    """
+
     def setupUi(self, BlockChain):
+        """
+        Set up the user interface for the BlockChain application
+        
+        This method initializes and arranges all the UI components
+
+        Args:
+            BlockChain (QtWidgets.QMainWindow): The main window of the application
+        """
         BlockChain.setObjectName("BlockChain")
         BlockChain.setMinimumSize(800, 600)
         BlockChain.resize(800, 600)
@@ -31,7 +45,7 @@ class Ui_BlockChain(object):
         self.chat_Search.setObjectName("lineEdit")
         self.chatsLayout.addWidget(self.chat_Search)
 
-        self.chatList = QtWidgets.QListWidget(self.centralwidget)  
+        self.chatList = QtWidgets.QListWidget(self.centralwidget)
         self.chatList.setObjectName("chatList")
         self.chatsLayout.addWidget(self.chatList)
 
@@ -40,7 +54,7 @@ class Ui_BlockChain(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
 
-        self.currentChatLabel = QtWidgets.QLabel(self.centralwidget) 
+        self.currentChatLabel = QtWidgets.QLabel(self.centralwidget)
         self.currentChatLabel.setObjectName("currentChatLabel")
         self.currentChatLabel.setText("Select chat")
         self.currentChatLabel.setAlignment(Qt.AlignCenter)
@@ -67,7 +81,6 @@ class Ui_BlockChain(object):
         self.sendMessage_button.setIconSize(self.sendMessage_button.size())
         self.horizontalLayout.addWidget(self.sendMessage_button)
 
-
         self.verticalLayout.addWidget(self.frame)
         self.allelementsgrid.addLayout(self.verticalLayout, 0, 1, 1, 1)
 
@@ -84,7 +97,7 @@ class Ui_BlockChain(object):
         self.options_Button = QtWidgets.QPushButton(self.up_stroke)
         self.options_Button.setObjectName("options_Button")
         self.optionsButtonsArea.addWidget(self.options_Button)
-        self.options_Button.setFixedSize(32,32)
+        self.options_Button.setFixedSize(32, 32)
 
         self.optionsMenu = QtWidgets.QMenu(self.centralwidget)
 
@@ -100,16 +113,15 @@ class Ui_BlockChain(object):
 
         self.options_Button.setMenu(self.optionsMenu)
 
-
         self.minimize_button = QtWidgets.QPushButton(self.up_stroke)
         self.minimize_button.setObjectName("minimize_button")
         self.optionsButtonsArea.addWidget(self.minimize_button)
-        self.minimize_button.setFixedSize(32,32)
+        self.minimize_button.setFixedSize(32, 32)
 
         self.maximize_button = QtWidgets.QPushButton(self.up_stroke)
         self.maximize_button.setObjectName("maximize_button")
         self.optionsButtonsArea.addWidget(self.maximize_button)
-        self.maximize_button.setFixedSize(32,32)
+        self.maximize_button.setFixedSize(32, 32)
 
         self.close_button = QtWidgets.QPushButton(self.up_stroke)
         self.close_button.setEnabled(True)
@@ -129,6 +141,12 @@ class Ui_BlockChain(object):
         QtCore.QMetaObject.connectSlotsByName(BlockChain)
 
     def retranslateUi(self, BlockChain):
+        """
+        Set the text for the UI elements
+        
+        Args:
+            BlockChain (QtWidgets.QMainWindow): The main window of the application
+        """
         _translate = QtCore.QCoreApplication.translate
         BlockChain.setWindowTitle(_translate("BlockChain", "Blockchain mess"))
         self.chat_Search.setPlaceholderText(_translate("BlockChain", "Search..."))
@@ -142,7 +160,7 @@ if __name__ == "__main__":
     with open("styles.qss", "r") as file:
         style_sheet = file.read()
         app.setStyleSheet(style_sheet)
-        
+
     BlockChain = QtWidgets.QMainWindow()
     ui = Ui_BlockChain()
     ui.setupUi(BlockChain)

@@ -57,9 +57,6 @@ QPushButton#options_Button{
     qproperty-icon: url("./icons/icon_settings.png");
 }
 
-
-
-
 QPushButton:hover {
     background-color: rgb(229, 161, 232);  
 }
@@ -77,6 +74,7 @@ QMainWindow{
     background-color: rgb(36, 18, 54);
     border: 5px solid darkslateblue;
 }
+
 QLineEdit{
     color: rgb(255, 255, 255);
     background-color: rgb(42, 33, 49);
@@ -89,18 +87,22 @@ QTextBrowser{
     border: none;
     width: 100%;
 }
+
 QListWidget{
     background-color: rgb(59, 18, 63);
     border: none;
 }
+
 QListWidget::item {
     color: #ffffff;
     padding: 10px;
 }
+
 QListWidget::item:selected {
     background-color: rgb(100, 26, 107);
     color: #fff;
 }
+
 QListWidget::item:hover {
     background-color: rgb(229, 161, 232);
 }
@@ -108,12 +110,15 @@ QListWidget::item:hover {
 QScrollBar{
     background: none;
 }
+
 QInputDialog{
     background-color: rgb(36, 18, 54);
 }
+
 QLabel{
     color: #ffffff;
 }
+
 QLabel#currentChatLabel{
    background-color: rgb(54, 42, 64); 
     font-size: 17px;
@@ -145,6 +150,7 @@ QMenu::separator {
     background: #ccc;        
     margin: 5px 0;
 }
+
 QMessageBox{
     background-color: rgb(59,18,63);
 }
