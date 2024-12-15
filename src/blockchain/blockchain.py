@@ -162,7 +162,7 @@ class Blockchain:
             :return: return's chain state
             :rtype: bool
         '''
-        return self.validator(self)
+        return self.validator(self, self)
 
 
 if __name__ == "__main__":
