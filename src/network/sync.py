@@ -28,7 +28,6 @@ class SyncManager:
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096).decode()
             recieved_chain = json.loads(response)
-            print(recieved_chain)
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
         except Exception as e:
@@ -39,8 +38,15 @@ class SyncManager:
         Обновляет локальный блокчейн, если полученная цепочка длиннее.
         :param received_chain: Полученная цепочка блоков
         """
-        if len(recieved_chain) > len(self.blockchain):
-            self.blockchain = recieved_chain
+        chain = []
+        for block in recieved_chain["chain"]:
+            chain.append(self.block_generator(block["index"],
+                                              block["previous_hash"],
+                                              block["timestamp",
+                                              block["transactions"]
+                                              block["nonce"]))
+        if len(chain) > len(self.blockchain):
+            self.blockchain = chain
             log.info("Local blockchain updated.")
         else:
             log.debug("Received chain is not longer than the local chain.")
@@ -51,8 +57,8 @@ class SyncManager:
                                          recieved_block["timestamp"],
                                          recieved_block["transactions"],
                                          recieved_block["nonce"])
-        if self.blockchain.get_latest_block().timestamp < \
-                new_block.timestamp:
+        if self.blockchain.get_latest_block().timestamp <
+            new_block.timestamp:
             self.blockchain.chain.append(new_block)
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():
@@ -93,7 +99,12 @@ class SyncManager:
                 log.error(f"Error broadcasting block: {e}")
 
     def broadcast_chain(self):
-        blockchain_data = json.dumps({"chain": self.blockchain.chain}).encode()
+        chain = [{"index": block.index,
+                  "previous_hash": block.previous_hash,
+                  "timestamp": block.timestamp,
+                  "transactions": block.transactions,
+                  "nonce": block.nonce} for block in self.blockchain.chain]
+        blockchain_data = json.dumps({"chain": chain}).encode()
         log.info("Broadcasting chain...")
         for conn in self.p2p_network.node.connections:
             try:
