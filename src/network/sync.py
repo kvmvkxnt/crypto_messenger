@@ -42,8 +42,8 @@ class SyncManager:
         for block in recieved_chain["chain"]:
             chain.append(self.block_generator(block["index"],
                                               block["previous_hash"],
-                                              block["timestamp",
-                                              block["transactions"]
+                                              block["timestamp"],
+                                              block["transactions"],
                                               block["nonce"]))
         if len(chain) > len(self.blockchain):
             self.blockchain = chain
@@ -57,8 +57,8 @@ class SyncManager:
                                          recieved_block["timestamp"],
                                          recieved_block["transactions"],
                                          recieved_block["nonce"])
-        if self.blockchain.get_latest_block().timestamp <
-            new_block.timestamp:
+        if self.blockchain.get_latest_block().timestamp < \
+                new_block.timestamp:
             self.blockchain.chain.append(new_block)
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():
