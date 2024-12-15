@@ -92,7 +92,7 @@ while True:
         try:
             if len(network.peers) and len(network.peers) >= int(chat):
                 startChat(network.peers[int(chat)])
-        except TypeError:
+        except ValueError:
             peer_public_key = str.encode(chat)
 
             try:
