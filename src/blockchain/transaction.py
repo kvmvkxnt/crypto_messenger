@@ -46,7 +46,7 @@ class Transaction:
             "sender": self.sender,
             "recipient": self.recipient,
             "amount": self.amount,
-            "conent": str(self.content)
+            "content": str(self.content)
         }
 
     def calculate_hash(self) -> str:
