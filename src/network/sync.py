@@ -42,8 +42,11 @@ class SyncManager:
         log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            print(conn)
             conn.send(b"REQUEST_CHAIN")
+            print(conn)
             response = conn.recv(4096).decode()
+            print(response)
             recieved_chain = json.loads(response[9:])
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
