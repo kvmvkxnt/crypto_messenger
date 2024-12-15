@@ -23,8 +23,11 @@ class SyncManager:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             print(conn)
             conn.send(b"REQUEST_BLOCK")
+            print(conn)
             response = conn.recv(4096).decode()
+            print(response)
             recieved_block = json.loads(response[9:])
+            print(recieved_block)
             log.debug(f"Received block from {peer_host}:{peer_port}")
             self.merge_block(recieved_block)
         except Exception as e:
