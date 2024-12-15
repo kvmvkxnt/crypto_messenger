@@ -107,6 +107,7 @@ class SyncManager:
                                   recieved_transaction["content"])
         new_transaction.signature = recieved_transaction["signature"]
         self.blockchain.add_transaction(new_transaction)
+        log.debug("Transaction added succesfully")
 
     def broadcast_block(self, block):
         """
