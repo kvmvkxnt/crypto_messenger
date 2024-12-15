@@ -29,7 +29,7 @@ class ProofOfWork:
         :rtype: str
         """
         target = self.get_target()
-        # Mining block
+
         while not block.hash.startswith(target):
             block.nonce += 1
             block.hash = block.calculate_hash()
@@ -95,7 +95,7 @@ class Validator:
             return blockchain.difficulty
 
         time_diff = time.time() - last_block.timestamp
-        expected_time = 10  # Expected time for mining
+        expected_time = 10  # Ожидаемое время майнинга
 
         if time_diff < expected_time / 2:
             blockchain.difficulty += 1
@@ -110,11 +110,9 @@ if __name__ == "__main__":
     from transaction import Transaction
     from blockchain import Blockchain, Block
 
-    # Blockchain initialization and PoW
     blockchain = Blockchain(difficulty=4)
     pow = ProofOfWork(difficulty=4)
 
-    # Creating and mining block
     transaction1 = Transaction("Alice", "Bob", 10, "Hi")
     transaction2 = Transaction("Charlie", "Dave", 20, "Hello")
 
@@ -130,9 +128,7 @@ if __name__ == "__main__":
 
     pow.mine(new_block)
 
-    # Adding block to the chain
     blockchain.chain.append(new_block)
 
-    # Validating chain
     validator = Validator()
     print("Blockchain valid:", validator.validate_blockchain(blockchain))

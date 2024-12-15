@@ -49,8 +49,13 @@ class P2PNetwork:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
         try:
-            self.node.connect_to_peer(peer_host, peer_port)
-            self.peers.add((peer_host, peer_port))
+            if (self.host == peer_host or peer_host == '127.0.0.1') and self.port == peer_port:
+                log.warning("Cannot connect to self")
+                raise Exception("Cannot connect to self")
+            conn = self.node.connect_to_peer(peer_host, peer_port)
+            if conn:
+                self.peers.add((peer_host, peer_port))
+            return conn
         except Exception as e:
             log.error(f"Error connecting to peer: {e}")
 
@@ -65,7 +70,7 @@ class P2PNetwork:
 
     def broadcast_transaction(self, transaction: Transaction):
         """Рассылает транзакцию всем подключенным узлам."""
-        transaction_data = json.dumps(transaction.to_dict()).encode()
+        transaction_data = json.dumps(transaction.to_dict(), ensure_ascii=False).encode()
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
         for conn in self.node.connections:
             try:
@@ -75,21 +80,21 @@ class P2PNetwork:
 
     def discover_peers(self):
         """Механизм обнаружения новых узлов."""
-        discovered = discover_peers(
+        discover_peers(
             self.host,
             self.port,
             self.broadcast_port,
             self.broadcast_interval,
             self.discovery_timeout,
+            self.peers
         )
-        self.peers.update(discovered)
         log.info(f"Discovered peers: {list(self.peers)}")
 
     def sync_with_peers(self):
         """Синхронизация данных с подключенными узлами."""
         sync_manager = SyncManager(
             self, self.blockchain
-        )  # Используем blockchain из self
+        )
         sync_manager.start_sync_loop()
         return sync_manager
 

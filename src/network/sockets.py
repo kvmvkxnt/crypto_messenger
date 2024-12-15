@@ -15,7 +15,7 @@ class P2PSocket:
         self.max_connections = max_connections
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []  # Список активных подключений
-        self.connections_info = []  # Список (connection, (host, port))
+        self.connections_info = []
         self.lock = threading.Lock()
         self.node = None
         self.blockchain = None
@@ -56,22 +56,27 @@ class P2PSocket:
                     data = conn.recv(4096)
                     if not data:
                         break
-
+                        
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
                     if data.startswith(b"NEW_BLOCK"):
-                        block_data = data[len(b"NEW_BLOCK"):]
+                        block_data = data[len(b"NEW_BLOCK") :]
                         self.sync_manager.handle_new_block(block_data)
-                    
-                    if data.startswith(b"INCOME_PORT"):
-                        port = data[len(b"INCOME_PORT"):].decode()
+
+                    elif data.startswith(b"INCOME_PORT"):
+                        port = data[len(b"INCOME_PORT") :].decode()
                         self.node.peers.add((addr[0], int(port)))
 
                     elif data.startswith(b"REQUEST_CHAIN"):
-                        chain_data = json.dumps([block.to_dict() for block in self.blockchain.chain]).encode()
+                        chain_data = json.dumps(
+                            [block.to_dict() for block in self.blockchain.chain],
+                            ensure_ascii=False
+                        ).encode()
 
                         try:
-                            conn.sendall(chain_data)
+                            with self.lock:
+                                conn.sendall(chain_data)
+                                time.sleep(0.05)
                             log.debug(f"Sent blockchain to {addr}")
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
@@ -79,7 +84,9 @@ class P2PSocket:
                     elif data.startswith(b"REQUEST_PUBLIC_KEY"):
                         try:
                             public_key = self.node.signer.get_public_key()
-                            conn.sendall(public_key)
+                            with self.lock:
+                                conn.sendall(public_key)
+                                time.sleep(0.05)
                             log.debug(f"Sent public key to {addr}")
 
                         except Exception as e:
@@ -87,7 +94,7 @@ class P2PSocket:
                             break
 
                     elif data.startswith(b"NEW_TRANSACTION"):
-                        transaction_data = data[len(b"NEW_TRANSACTION"):]
+                        transaction_data = data[len(b"NEW_TRANSACTION") :]
                         self.sync_manager.handle_new_transaction(transaction_data)
                     else:  # Простое сообщение
                         self.broadcast(data, conn)
@@ -97,10 +104,10 @@ class P2PSocket:
                     break
 
         except Exception as e:
-             log.error(f"Error with client {addr}: {e}")
+            log.error(f"Error with client {addr}: {e}")
         finally:
             with self.lock:
-                 if conn in self.connections:
+                if conn in self.connections:
                     for i in range(len(self.connections_info)):
                         if self.connections_info[i][0] == conn:
                             del self.connections_info[i]
@@ -117,7 +124,8 @@ class P2PSocket:
             for conn in self.connections:
                 if conn != sender_conn:
                     try:
-                        conn.send(message)
+                        conn.sendall(message)
+                        time.sleep(0.05)
                     except socket.error as e:
                         log.error(f"Error broadcasting to a connection: {e}")
 
@@ -131,11 +139,9 @@ class P2PSocket:
                         f"Maximum connections reached. Connection to {peer_host}:{peer_port} rejected"
                     )
                     conn.close()
-                    return None 
+                    return None
                 self.connections.append(conn)
-                self.connections_info.append(
-                    (conn, (peer_host, peer_port))
-                )
+                self.connections_info.append((conn, (peer_host, peer_port)))
             threading.Thread(
                 target=self.handle_client, args=(conn, (peer_host, peer_port))
             ).start()
@@ -143,7 +149,9 @@ class P2PSocket:
             return conn
         except socket.error as e:
             log.error(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
-            return None 
+            # self.node.peers.remove((peer_host, peer_port))
+            # log.info(f'Removed peer {peer_host}:{peer_port} due to connection error')
+            return None
 
     def get_connection(self, peer_host: str, peer_port: int):
         """Возвращает существующее соединение или None, если его нет."""
@@ -155,7 +163,6 @@ class P2PSocket:
 
 
 if __name__ == "__main__":
-    # Пример запуска сервера или клиента
     choice = input("Start as (s)erver or (c)lient? ")
     host = "127.0.0.1"
     port = 12345
@@ -170,7 +177,6 @@ if __name__ == "__main__":
         peer_port = int(input("Enter peer port: "))
         client.connect_to_peer(peer_host, peer_port)
 
-        # Sending messages to peers
         while True:
             message = input("Enter message: ")
             with client.lock:

@@ -4,6 +4,7 @@ import sys
 import time
 import hashlib
 import json
+import socket
 
 parent_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(parent_dir)
@@ -45,7 +46,11 @@ def generate_keys():
     return address, dh_key_exchange, signer, private_key_pem, public_key
 
 def main():
-    host = "0.0.0.0" #### 0.0.0.0
+    rv_host = '85.234.107.233'
+    rv_port = 5050
+    peers_list = []
+
+    host = "62.181.51.106"
     port = int(input('Enter port: '))
     broadcast_port = 5000
     sync_interval = 5
@@ -66,7 +71,7 @@ def main():
 
     p2p_network.signer = signer
     p2p_network.start()
-    p2p_network.discover_peers()
+    # p2p_network.discover_peers() # <--- кривовато работает
 
 
     log.info(f"Your address: {address}")
@@ -87,14 +92,11 @@ def main():
                 return derived_key
         return None
 
-    def get_peer_address(peer_host, peer_port):
-        """Return peer address"""
-        return f"{peer_host}:{peer_port}"
-
     def request_peer_public_key(conn, peer_address):
         """Requests public key from peer"""
         try:
-            conn.send(b"REQUEST_PUBLIC_KEY")
+            with node.lock:
+                conn.send(b"REQUEST_PUBLIC_KEY")
             response = conn.recv(4096)
             if response:
                 try:
@@ -109,18 +111,74 @@ def main():
         except Exception as e:
             log.error(f"Error during obtaining public key: {e}")
 
+
+    def request_peers():
+        """
+        Отправляет запрос get_peers на сервер и выводит полученный список.
+        """
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect((rv_host, rv_port))
+                client_socket.sendall(b"GET_PEERS")
+                response = client_socket.recv(4096)
+                if response:
+                    peers_list = json.loads(response.decode())
+                    print(f"Received peers list: {peers_list}")
+                    return peers_list
+                else:
+                    print("No response from rendez-vous server.")
+
+        except Exception as e:
+            print(f"Error requesting peers: {e}")
+
+    def new_peer():
+        """
+        Отправляет запрос new_peer на сервер и выводит полученный список.
+        """
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect((rv_host, rv_port))
+                message = b"NEW_PEER" + str(port).encode()
+                client_socket.sendall(message)
+        except Exception as e:
+            print(f"Error adding to peers: {e}")
+    def invalid_peer(address, port):
+        """
+        Отправляет запрос new_peer на сервер и выводит полученный список.
+        """
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect((rv_host, rv_port))
+                message = b"INVALID_PEER" + f'{address}:{port}'.encode()
+                client_socket.sendall(message)
+        except Exception as e:
+            print(f"Error sending invalid peer: {e}")
+    
+    peers_list = request_peers()
+    new_peer()
+    for peer in peers_list:
+        conn = p2p_network.connect_to_peer(peer[0], int(peer[1]))
+        if not conn:
+            invalid_peer(peer[0], int(peer[1]))
+            continue
+        with node.lock:
+            conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
+            time.sleep(0.05)
+
     while True:
-        command = input("Enter command (connect, message, send, mine, balance, list peers, show chain, exit): ")
+        command = input("Enter command (connect, message, send, mine, balance, peers, chain, exit): ")
         if command == "connect":
             peer_host = input("Enter peer host: ")
             peer_port = int(input("Enter peer port: "))
 
             p2p_network.connect_to_peer(peer_host, peer_port)
             conn = p2p_network.node.get_connection(peer_host, peer_port)
-            conn.send(b"INCOME_PORT" + str(port).encode())
+            if conn:
+                with node.lock:
+                    conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
+                    time.sleep(0.05)
 
-            peer_address = get_peer_address(peer_host, peer_port)
-
+            # peer_address = get_peer_address(peer_host, peer_port)
             # conn = p2p_network.node.get_connection(peer_host, peer_port)
             # if conn:
             #     request_peer_public_key(conn, peer_address)
@@ -161,9 +219,9 @@ def main():
         elif command == "balance":
              balance = blockchain.get_balance(address)
              print(f"Your balance: {balance} MEM")
-        elif command == "list peers":
+        elif command == "peers":
             print(f"Known peers: {list(p2p_network.peers)}")
-        elif command == 'show chain':
+        elif command == 'chain':
             for block in blockchain.chain:
                 print(block.to_dict())
         elif command == "exit":

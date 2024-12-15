@@ -66,8 +66,10 @@ class Block:
             "previous_hash": self.previous_hash,
             "hash": self.hash,
             "timestamp": self.timestamp,
-            "transactions": [transaction.to_dict() for transaction in self.transactions],
-            "nonce": self.nonce
+            "transactions": [
+                transaction.to_dict() for transaction in self.transactions
+            ],
+            "nonce": self.nonce,
         }
 
 
@@ -125,7 +127,6 @@ class Blockchain:
         """
         if self.is_transaction_valid(transaction):
             self.pending_transactions.append(transaction)
-            # Broadcast transaction
             try:
                 p2p_network.broadcast_transaction(transaction)
             except Exception as e:
@@ -157,7 +158,9 @@ class Blockchain:
                     balance += transaction.amount
         return balance
 
-    def mine_pending_transactions(self, miner, miner_address: str, sync_manager) -> None:
+    def mine_pending_transactions(
+        self, miner, miner_address: str, sync_manager
+    ) -> None:
         """
         Creates new block using pending transactions and adds it to chain
 
@@ -172,7 +175,6 @@ class Blockchain:
             print("No transactions to mine.")
             return
 
-        # creating a new block
         new_block = Block(
             index=len(self.chain),
             previous_hash=self.get_latest_block().hash,
@@ -183,14 +185,11 @@ class Blockchain:
         reward_transaction = Transaction(None, miner_address, 1, "Mining Reward")
         new_block.transactions.append(reward_transaction)
 
-        # Mining and validating new block
         miner(self.difficulty).mine(new_block)
         miner(self.difficulty).validate(new_block)
 
-        # Checking
         if self.validator.validate_block(new_block, self.chain[-1]):
             self.chain.append(new_block)
-            # Clearing pending transactions list after successful mining
             sync_manager.broadcast_block(new_block)
             self.pending_transactions = []
         else:
@@ -204,20 +203,22 @@ class Blockchain:
         :rtype: bool
         """
         return self.validator.validate_blockchain(self)
+    
+    def contains_block(self, target_block: Block) -> bool:
+        """Checks if the blockchain already contains the given block."""
+        for block in self.chain:
+            if block.hash == target_block.hash:
+                return True
+        return False
+
 
 
 if __name__ == "__main__":
 
-    # Usage example
     blockchain = Blockchain(difficulty=4)
-    private_key = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048
-    )
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key()
 
-
-    # Adding transactions
     transaction1 = Transaction("Alice", "Bob", 50, "test transaction 1")
     transaction1.sender_public_key = public_key
     transaction1.sign_transaction(private_key)
@@ -226,19 +227,13 @@ if __name__ == "__main__":
     transaction2.sender_public_key = public_key
     transaction2.sign_transaction(private_key)
 
-
     blockchain.add_transaction(transaction1)
     blockchain.add_transaction(transaction2)
 
-    # Mining
-    blockchain.mine_pending_transactions(ProofOfWork,
-                                         miner_address="Miner1")
-    blockchain.mine_pending_transactions(ProofOfWork,
-                                         miner_address="Miner1")
+    blockchain.mine_pending_transactions(ProofOfWork, miner_address="Miner1")
+    blockchain.mine_pending_transactions(ProofOfWork, miner_address="Miner1")
 
-    # Chain validation
     print("Blockchain valid:", blockchain.is_chain_valid())
 
-    # Printing chain
     for block in blockchain.chain:
         print(block)

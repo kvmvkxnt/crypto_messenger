@@ -35,7 +35,7 @@ class DiffieHellmanKeyExchange:
             generate keys
             :type parameters: DHParameters or None
         """
-        # Getting parameters for DH or generating them
+
         if parameters is None:
             self.parameters = dh.generate_parameters(generator=2, key_size=2048)
         else:
@@ -81,7 +81,6 @@ class DiffieHellmanKeyExchange:
         try:
             shared_key = self.private_key.exchange(peer_public_key)
 
-            # Using KDF to strenghten key
             derived_key = HKDF(
                 algorithm=hashes.SHA256(), length=32, salt=None, info=b"dh key exchange"
             ).derive(shared_key)
@@ -95,19 +94,15 @@ class DiffieHellmanKeyExchange:
 if __name__ == "__main__":
     shared_parameters = dh.generate_parameters(generator=2, key_size=2048)
 
-    # Simulating key generation
     alice = DiffieHellmanKeyExchange(shared_parameters)
     bob = DiffieHellmanKeyExchange(shared_parameters)
 
-    # Getting public keys
     alice_public_key = alice.get_public_key()
     bob_public_key = bob.get_public_key()
 
-    # Generating shared key
     alice_shared_key = alice.generate_shared_key(bob_public_key)
     bob_shared_key = bob.generate_shared_key(alice_public_key)
 
-    # Validating key equalness
     print("Alice's shared key:", alice_shared_key.hex() if alice_shared_key else "None")
     print("Bob's shared key:", bob_shared_key.hex() if bob_shared_key else "None")
     print(

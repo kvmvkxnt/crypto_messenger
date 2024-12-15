@@ -13,6 +13,7 @@ def discover_peers(
     broadcast_port: int,
     broadcast_interval: int = 1,
     timeout: int = 5,
+    peers: Set[Tuple[str, int]] = set(),
 ) -> Set[Tuple[str, int]]:
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
@@ -23,7 +24,6 @@ def discover_peers(
     :param broadcast_interval: Интервал отправки широковещательных сообщений
     :param timeout: таймаут
     """
-    peers: Set[Tuple[str, int]] = set()
     stop_event = threading.Event()
 
     def listen_for_broadcast():
@@ -54,7 +54,10 @@ def discover_peers(
                         continue
 
                     peer = (addr[0], peer_port)
-                    if peer == (local_host, local_port) or (peer_host, peer_port) == (local_host, local_port):
+                    if peer == (local_host, local_port) or (peer_host, peer_port) == (
+                        local_host,
+                        local_port,
+                    ):
                         log.debug(f"Ignoring self broadcast from {peer}")
                         continue
 
@@ -93,8 +96,6 @@ def discover_peers(
 
     time.sleep(timeout)
     stop_event.set()
-
-    return peers
 
 
 if __name__ == "__main__":

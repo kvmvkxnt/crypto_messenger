@@ -51,17 +51,15 @@ class SymmetricEncryption:
         plaintext_bytes = plaintext.encode()
 
         if self.algorithm == "AES" and self.mode == "CBC":
-            iv = os.urandom(16)  # Random initialization vector
+            iv = os.urandom(16)
             cipher = Cipher(
                 algorithms.AES(self.key), modes.CBC(iv), backend=default_backend()
             )
             encryptor = cipher.encryptor()
 
-            # Padding data before ciphering
             padder = padding.PKCS7(algorithms.AES.block_size).padder()
             padded_data = padder.update(plaintext_bytes) + padder.finalize()
 
-            # Encrypting data
             ciphertext = encryptor.update(padded_data) + encryptor.finalize()
             return iv + ciphertext
         elif self.algorithm == "AES" and self.mode == "GCM":
@@ -89,7 +87,7 @@ class SymmetricEncryption:
             if len(ciphertext) < 16:
                 print("Ciphertext too short for CBC mode")
                 return None
-            iv = ciphertext[:16]  # Extrcating intialization vector
+            iv = ciphertext[:16]
             actual_ciphertext = ciphertext[16:]
 
             cipher = Cipher(
@@ -97,11 +95,9 @@ class SymmetricEncryption:
             )
             decryptor = cipher.decryptor()
 
-            # Decrypting data
             try:
                 padded_data = decryptor.update(actual_ciphertext) + decryptor.finalize()
 
-                # Deleting padding
                 unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
                 plaintext = unpadder.update(padded_data) + unpadder.finalize()
                 return plaintext.decode()
@@ -127,11 +123,9 @@ class SymmetricEncryption:
 
 
 if __name__ == "__main__":
-    # Example of usage
 
     key = os.urandom(32)
 
-    # Encryption and decryption
     encryptor = SymmetricEncryption(key, algorithm="AES", mode="GCM")
     plaintext = "This is a secret message."
 

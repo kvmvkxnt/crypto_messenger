@@ -5,7 +5,7 @@ from utils.logger import Logger
 from typing import Optional
 from blockchain.transaction import Transaction
 from blockchain.blockchain import Block
-import socket  # Import the socket module
+import socket
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 import base64
 import traceback
@@ -26,7 +26,7 @@ class SyncManager:
         self.blockchain = blockchain  # Локальная копия блокчейна
         self.sync_interval = sync_interval
 
-    def request_chain(self, peer_host: str, peer_port: int) -> None: 
+    def request_chain(self, peer_host: str, peer_port: int) -> None:
         """
         Запрашивает копию блокчейна у указанного узла.
 
@@ -37,31 +37,44 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.get_connection(peer_host, peer_port)
             if not conn:
-                conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+                conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
+                # conn.send(b"INCOME_PORT" + str(self.p2p_network.port).encode())
                 if not conn:
                     log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
                     return
             if conn:
-                conn.send(b"REQUEST_CHAIN")
-                # response = b""
-                # while True:
-                #     chunk = conn.recv(4096)
-                #     if not chunk:
-                #         break
-                #     response += chunk
-                response = conn.recv(4096)
+                with self.p2p_network.node.lock:
+                    conn.send(b"REQUEST_CHAIN")
+                    time.sleep(0.05)
+                response = b""
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    response += chunk
+                    try:
+                        received_chain = json.loads(response.decode())
+                    except:
+                        continue
+                    break
+                # response = conn.recv(4096)
 
                 received_chain = json.loads(response.decode())
 
                 for block in received_chain:
-                    for transaction in block['transactions']:
-                        transaction['signature'] = base64.b64decode(transaction["signature"]) if transaction["signature"] else None
-                    block['transactions'] = [Transaction(**transaction) for transaction in block['transactions']]
+                    for transaction in block["transactions"]:
+                        transaction["signature"] = (
+                            base64.b64decode(transaction["signature"])
+                            if transaction["signature"]
+                            else None
+                        )
+                    block["transactions"] = [
+                        Transaction(**transaction)
+                        for transaction in block["transactions"]
+                    ]
                 received_chain = [Block(**block) for block in received_chain]
-
                 log.debug(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(received_chain)
-                log.info(f"Received NEW chain from {peer_host}:{peer_port}")
             else:
                 log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
 
@@ -79,7 +92,7 @@ class SyncManager:
         :param received_chain: Полученная цепочка блоков
         """
         if not received_chain:
-            log.debug("Received empty chain")
+            log.info("Received empty chain")
             return
 
         if len(received_chain) > len(self.blockchain.chain):
@@ -101,12 +114,14 @@ class SyncManager:
             log.debug("Cannot broadcast empty block")
             return
         log.debug("Broadcasting new block...")
-        
-        block_bytes = json.dumps(block.to_dict()).encode()
-        
+
+        block_bytes = json.dumps(block.to_dict(), ensure_ascii=False).encode()
+
         for conn in self.p2p_network.node.connections:
             try:
-                conn.sendall(b"NEW_BLOCK" + block_bytes)
+                with self.p2p_network.node.lock:
+                    conn.sendall(b"NEW_BLOCK" + block_bytes)
+                    time.sleep(0.05)
             except socket.error as e:
                 log.error(f"Error broadcasting block: {e}")
 
@@ -134,13 +149,23 @@ class SyncManager:
         """
         try:
             block_dict = json.loads(block_data.decode())
-            for transaction in block_dict['transactions']:
-                transaction['signature'] = base64.b64decode(transaction["signature"]) if transaction["signature"] else None
-            block_dict['transactions'] = [Transaction(**transaction) for transaction in block_dict['transactions']]
+            for transaction in block_dict["transactions"]:
+                transaction["signature"] = (
+                    base64.b64decode(transaction["signature"])
+                    if transaction["signature"]
+                    else None
+                )
+            block_dict["transactions"] = [
+                Transaction(**transaction) for transaction in block_dict["transactions"]
+            ]
             block = Block(**block_dict)
+            if self.blockchain.contains_block(block):
+                return
+            
             if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
                 self.blockchain.chain.append(block)
                 log.info(f"Added new block with index {block.index}")
+                # self.broadcast_block(block)
             else:
                 log.warning("Invalid block received")
 
@@ -159,11 +184,19 @@ class SyncManager:
             transaction_dict["sender_public_key"] = load_pem_public_key(
                 transaction_dict["sender_public_key"].encode()
             )
-            transaction_dict["signature"] = base64.b64decode(transaction_dict["signature"]) if transaction_dict["signature"] else None
+            transaction_dict["signature"] = (
+                base64.b64decode(transaction_dict["signature"])
+                if transaction_dict["signature"]
+                else None
+            )
             transaction = Transaction(**transaction_dict)
+            if transaction in self.blockchain.pending_transactions:
+                return
+
             log.debug(f"Received transaction {transaction.calculate_hash()}")
             if self.blockchain.is_transaction_valid(transaction):
                 self.blockchain.pending_transactions.append(transaction)
+                # self.p2p_network.broadcast_transaction(transaction)
                 log.info(f"Added new transaction from network")
             else:
                 log.warning("Invalid transaction received")
@@ -171,4 +204,3 @@ class SyncManager:
             log.error(f"Error decoding transaction data: {e}")
         except Exception as e:
             log.error(f"Error during transaction handling: {e}")
-
