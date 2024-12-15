@@ -32,7 +32,7 @@ class P2PSocket:
         """Обработка клиента."""
         try:
             while True:
-                data = conn.recv(1024)
+                data = conn.recv(2048)
                 print(data)
                 if not data:
                     break
