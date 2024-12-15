@@ -11,6 +11,7 @@ from network.sync import SyncManager
 from utils import config as cfg
 from utils import logger
 import socket
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 log = logger.Logger("main")
 blockchain = Blockchain(Validator.validate_blockchain, cfg.BLOCK_DIFFICULTY)
@@ -52,6 +53,12 @@ sm.request_transaction("10.255.197.95", 12345)
 #                   [])
 # blockchain.chain.append(new_block)
 # new_transaction1 = Transaction("bob", "alex", 100, "hello")
+# private_key = rsa.generate_private_key(
+#     public_exponent=65537,
+#     key_size=2048
+# )
+# public_key = private_key.public_key()
+# new_transaction1.sign_transaction(private_key)
 # blockchain.add_transaction(new_transaction1)
 # new_transaction2 = Transaction("alex", "bob", 50, "hi")
 # blockchain.add_transaction(new_transaction2)

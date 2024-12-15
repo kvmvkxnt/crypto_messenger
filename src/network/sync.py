@@ -105,7 +105,10 @@ class SyncManager:
                                   recieved_transaction["recipient"],
                                   int(recieved_transaction["amount"]),
                                   recieved_transaction["content"])
-        new_transaction.signature = recieved_transaction["signature"]
+        new_transaction.signature = bytes \
+            .fromhex(recieved_transaction["signature"]) \
+            if recieved_transaction["signature"] \
+            else None
         self.blockchain.add_transaction(new_transaction)
         log.debug("Transaction added succesfully")
 
@@ -143,7 +146,8 @@ class SyncManager:
 
     def broadcast_transaction(self, new_transaction):
         transaction = new_transaction.to_dict()
-        transaction["signature"] = new_transaction.signature
+        transaction["signature"] = new_transaction.signature.hex() \
+            if new_transaction.signature else None
         data = json.dumps(transaction).encode()
         log.info("Broadcasting new transaction...")
         for conn in self.p2p_network.node.connections:
