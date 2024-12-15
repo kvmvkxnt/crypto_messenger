@@ -171,7 +171,9 @@ class SyncManager:
                             log.error(f"Error syncing with peer {peer}: {e}")
 
                 time.sleep(10)  # Интервал синхронизации
+        threading.Thread(target=sync_loop, daemon=True).start()
 
+    def start_sync_broad(self):
         def sync_broad():
             while True:
                 if len(self.p2p_network.node.requests):
@@ -189,7 +191,6 @@ class SyncManager:
                 time.sleep(1)
 
         threading.Thread(target=sync_broad, daemon=True).start()
-        threading.Thread(target=sync_loop, daemon=True).start()
 
 
 if __name__ == "__main__":
