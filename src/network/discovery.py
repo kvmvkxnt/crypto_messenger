@@ -49,8 +49,8 @@ def discover_peers(local_host: str, local_port: int,
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-            message = f"Node at {local_host}:{local_port}"
-            broadcast_address = ("<broadcast>", broadcast_port)
+            message = f"Node at {local_host}:{broadcast_port}"
+            broadcast_address = ("<broadcast>", local_port)
             log.info(f"Broadcasting: {message}")
 
             while True:
