@@ -44,7 +44,7 @@ log.debug(f"Selected broadcast port: {broadcast_port}")
 
 network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
-sm = SyncManager
+# sm = SyncManager
 # syncronizer = network.sync_with_peers(sm, blockchain, Block, Transaction)
 # syncronizer.start_sync_broad()
 # new_block = Block(blockchain.get_latest_block().index + 1,
@@ -70,8 +70,8 @@ sm = SyncManager
 key_manager = DiffieHellmanKeyExchange()
 user_public_key = key_manager.get_public_key()
 
-print(f"This is your public key: {user_public_key.hex()}")
-network.discover_peers(discover_peers, user_public_key.hex())
+print(f"This is your public key: {user_public_key}")
+network.discover_peers(discover_peers, user_public_key)
 
 peer_public_key = input("Enter user's public key you want to chat with: ")
 

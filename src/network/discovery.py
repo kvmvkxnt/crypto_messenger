@@ -8,7 +8,7 @@ log = Logger("discovery")
 
 
 def discover_peers(local_host: str, local_port: int,
-                   broadcast_port: int, public_key: str):
+                   broadcast_port: int, public_key):
     """
     Обнаружение новых узлов в сети через UDP широковещательные сообщения.
     :param local_host: Локальный хост узла
@@ -33,12 +33,11 @@ def discover_peers(local_host: str, local_port: int,
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
+                    print(peer_info)
                     if addr == (local_host, broadcast_port):
                         pass
                     elif (addr[0], peer_info.split(":")[-1]) not in peers:
-                        print(peer_info.split(":")[1])
-                        peers.add((addr[0], peer_info.split(":")[-1],
-                                   peer_info.split(":")[1]))
+                        peers.add((addr[0], peer_info.split(":")[-1]))
                         log.info(f"Discovered new peer: {peer_info} at {addr}")
                 except Exception as e:
                     log.error(f"Error in receiving broadcast: {e}")
@@ -51,7 +50,8 @@ def discover_peers(local_host: str, local_port: int,
         with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-            message = f"Peer public key: {public_key}\nNode at {local_host}:{local_port}"
+            message = f"Node at {local_host}:{local_port}\
+My public: {public_key}"
             broadcast_address = ("<broadcast>", broadcast_port)
             log.info(f"Broadcasting: {message}")
 
