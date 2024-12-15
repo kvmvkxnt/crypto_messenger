@@ -91,7 +91,7 @@ while True:
         chat = input("Input peer id or peer public_key: ")
         try:
             if len(network.peers) and len(network.peers) >= int(chat):
-                startChat(network.peers[int(chat)])
+                startChat(list(network.peers)[int(chat)])
         except ValueError:
             peer_public_key = str.encode(chat)
 
