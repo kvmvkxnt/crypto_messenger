@@ -55,7 +55,7 @@ class P2PNetwork:
         got_message = encryptor.decrypt(bytes.fromhex(data.decode()))
         print(got_message)
         message = input("Message: ")
-        conn.send(encryptor.encrypt(message).encode())
+        conn.send(encryptor.encrypt(message))
 
     def discover_peers(self, discoverer: set, public_key):
         """Механизм обнаружения новых узлов."""
