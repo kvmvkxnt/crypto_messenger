@@ -33,7 +33,7 @@ class P2PNetwork:
             except Exception as e:
                 log.error(f"Error broadcasting message: {e}")
 
-    def discover_peers(self, discoverer: set):
+    def discover_peers(self, discoverer: set, public_key):
         """Механизм обнаружения новых узлов."""
         # Заглушка: этот метод будет доработан в файле discovery.py
         # print("Discovering peers...")
@@ -45,7 +45,8 @@ class P2PNetwork:
         # for item in discoverer(self.host, self.port):
         #    if item not in self.peers:
         #        self.peers.add(item)
-        self.peers = discoverer(self.host, self.port, self.broadcast_port)
+        self.peers = discoverer(self.host, self.port, self.broadcast_port,
+                                public_key)
 
     def sync_with_peers(self, sync_manager, blockchain, block_generator,
                         transaction_generator):

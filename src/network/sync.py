@@ -182,13 +182,14 @@ class SyncManager:
                             self.broadcast_chain()
                         elif i == "REQUEST_BLOCK":
                             if self.awaiting_broad_blocks:
-                                for i in self.awaiting_broad_blocks:
-                                    self.broadcast_block(i)
+                                for j in self.awaiting_broad_blocks:
+                                    self.broadcast_block(j)
                         elif i == "REQUEST_TRANSACTION":
                             if self.awaiting_broad_transactions:
-                                for i in self.awaiting_broad_transactions:
-                                    self.broadcast_transaction(i)
-                time.sleep(1)
+                                for j in self.awaiting_broad_transactions:
+                                    self.broadcast_transaction(j)
+                    self.p2p_network.node.requests = []
+                time.sleep(10)
 
         threading.Thread(target=sync_broad, daemon=True).start()
 
