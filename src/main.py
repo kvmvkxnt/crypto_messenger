@@ -31,19 +31,6 @@ def get_ip():
     return IP
 
 
-host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
-log.debug(f"Got host: {host}")
-
-port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
-    cfg.DEFAULT_PORT
-log.debug(f"Selected port: {port}")
-
-broadcast_port = input(f"Enter your broadcast \
-port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
-log.debug(f"Selected broadcast port: {broadcast_port}")
-
-network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
-network.start()
 # sm = SyncManager
 # syncronizer = network.sync_with_peers(sm, blockchain, Block, Transaction)
 # syncronizer.start_sync_broad()
@@ -67,24 +54,58 @@ network.start()
 # blockchain.add_transaction(new_transaction2)
 # syncronizer.add_transaction(new_transaction2)
 
+host = input(f"Enter your host(default={get_ip()}): ") or get_ip()
+log.debug(f"Got host: {host}")
+
+port = input(f"Enter your port(default={cfg.DEFAULT_PORT}): ") or \
+    cfg.DEFAULT_PORT
+log.debug(f"Selected port: {port}")
+
+broadcast_port = input(f"Enter your broadcast \
+port(default={cfg.BROADCAST_PORT}): ") or cfg.BROADCAST_PORT
+log.debug(f"Selected broadcast port: {broadcast_port}")
+
 key_manager = DiffieHellmanKeyExchange()
 user_public_key = key_manager.get_public_key()
+network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port), user_public_key)
+network.start()
 
 print(f"This is your public key: {user_public_key}")
 network.discover_peers(discover_peers, user_public_key)
+
+
+def startChat(peer):
+    network.connect_to_peer(peer[0], peer[1], peer[2])
+    chat_shared_key = key_manager.generate_shared_key(peer[2])
+    encryptor = SymmetricEncryption(chat_shared_key)
+    while True:
+        message = input("Message: ")
+        encrypted_message = encryptor.encrypt(message)
+        print(encrypted_message)
+
 
 while True:
     user_input = input("Command (start_chat, list_peers): ")
 
     if user_input == "start_chat":
         chat = input("Input peer id or peer public_key: ")
+        try:
+            if len(network.peers) and len(network.peers) >= int(chat):
+                startChat(network.peers[int(chat)])
+        except TypeError:
+            peer_public_key = str.encode(chat)
+
+            try:
+                peer = [p for p in network.peers if peer_public_key == p[2]]
+                if len(peer) != 0:
+                    startChat(peer[0])
+            except Exception as e:
+                print(f"error ocured: {e}")
+
     elif user_input == "list_peers":
         for i, val in enumerate(network.peers):
             print("ID:", i, "    IP:", val[0], "    PORT:", val[1], "    PUBLIC_KEY:",
                   val[2].decode()[27:37] + "..." + val[2].decode()[-36:-26])
-
-peer_public_key = input("Enter user's public key or select from list who\
- you want to chat with: ")
 
 # print("""
 #     If you're using any vpn or proxy, please turn it off

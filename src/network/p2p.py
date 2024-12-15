@@ -5,28 +5,29 @@ log = logger.Logger("p2p")
 
 
 class P2PNetwork:
-    def __init__(self, node, broadcast_port: int):
+    def __init__(self, node, broadcast_port: int, public_key):
         """Инициализация P2P сети."""
         self.host = node.host
         self.port = node.port
         self.broadcast_port = broadcast_port
         self.node = node
         self.peers = set()  # Список известных узлов
+        self.public_key = public_key
 
     def start(self):
         """Запуск узла в режиме сервера."""
         threading.Thread(target=self.node.start_server, daemon=True).start()
         log.debug(f"Node started at {self.host}:{self.port}")
 
-    def connect_to_peer(self, peer_host: str, peer_port: int):
+    def connect_to_peer(self, peer_host: str, peer_port: int, peer_public_key):
         """Подключение к новому узлу."""
         self.node.connect_to_peer(peer_host, peer_port)
-        self.peers.add((peer_host, peer_port))
+        self.peers.add((peer_host, peer_port, peer_public_key))
         log.info(f"Connected to peer: {peer_host}:{peer_port}")
 
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""
-        print(f"Broadcasting message: {message}")
+        log.debug(f"Broadcasting message: {message}")
         for conn in self.node.connections:
             try:
                 conn.send(message.encode())
