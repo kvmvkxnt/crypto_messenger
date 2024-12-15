@@ -26,8 +26,9 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
-            response = conn.recv(4096)
-            recieved_chain = pickle.loads(response)
+            response = conn.recv(4096).decode()
+            recieved_chain = json.loads(response)
+            print(recieved_chain)
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
         except Exception as e:
@@ -59,7 +60,7 @@ class SyncManager:
             else:
                 log.debug("Blockchain is valid")
         else:
-            print("huy")
+            log.debug("Local blockchain doesn't nned and update")
 
     def request_block(self, peer_host: str, peer_port: int):
         log.debug(f"Requesting block from {peer_host}:{peer_port}")
@@ -92,7 +93,7 @@ class SyncManager:
                 log.error(f"Error broadcasting block: {e}")
 
     def broadcast_chain(self):
-        blockchain_data = pickle.dumps(self.blockchain.chain)
+        blockchain_data = json.dumps({"chain": self.blockchain.chain}).encode()
         log.info("Broadcasting chain...")
         for conn in self.p2p_network.node.connections:
             try:
