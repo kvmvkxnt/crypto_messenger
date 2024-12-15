@@ -27,7 +27,9 @@ class SyncManager:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
             conn.send(b"REQUEST_CHAIN")
             response = conn.recv(4096).decode()
+            print("break 1")
             recieved_chain = json.loads(response)
+            print("break 2")
             log.debug(f"Received chain from {peer_host}:{peer_port}")
             self.merge_chain(recieved_chain)
         except Exception as e:
