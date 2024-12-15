@@ -41,6 +41,7 @@ class SyncManager:
         if (peer_host, peer_port) not in self.p2p_network.node.connections:
             try:
                 conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+                print(conn)
                 conn.send(b"REQUEST_CHAIN")
                 response = conn.recv(4096).decode()
                 recieved_chain = json.loads(response[9:])
