@@ -81,7 +81,7 @@ while True:
     elif user_input == "list_peers":
         for i in network.peers:
             print("IP:", i[0], "    PORT:", i[1], "    PUBLIC_KEY:",
-                  i[3].decode()[26:31] + "..." + i[3].decode()[-29:-24])
+                  i[2].decode()[26:31] + "..." + i[2].decode()[-29:-24])
 
 peer_public_key = input("Enter user's public key or select from list who\
  you want to chat with: ")
