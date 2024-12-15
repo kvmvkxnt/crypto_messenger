@@ -80,7 +80,7 @@ def startChat(peer):
     chat_shared_key = key_manager.generate_shared_key(peer[2])
     peer_id = list(network.peers).index(peer)
     network.peers = list(network.peers)
-    network.peers[peer_id].add(chat_shared_key)
+    network.peers[peer_id] += chat_shared_key
     network.peers = set(network.peers)
     encryptor = SymmetricEncryption(chat_shared_key)
     while True:

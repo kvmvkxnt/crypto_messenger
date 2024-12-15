@@ -48,7 +48,7 @@ class P2PNetwork:
         chat_shared_key = self.key_manager.generate_shared_key(peer_public_key)
         peer_id = list(self.peers).index(peer)
         self.peers = list(self.peers)
-        self.peers[peer_id].add(chat_shared_key)
+        self.peers[peer_id] += chat_shared_key
         self.peers = set(self.peers)
         encryptor = self.encryptor(chat_shared_key)
         got_message = encryptor.decrypt(bytes.fromhex(data.decode()))
