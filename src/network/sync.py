@@ -21,13 +21,9 @@ class SyncManager:
         log.info(f"Requesting block from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-            print(conn)
             conn.send(b"REQUEST_BLOCK")
-            print(conn)
             response = conn.recv(4096).decode()
-            print(response)
             recieved_block = json.loads(response[9:])
-            print(recieved_block)
             log.debug(f"Received block from {peer_host}:{peer_port}")
             self.merge_block(recieved_block)
         except Exception as e:
@@ -39,15 +35,14 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
+        print(self.p2p_network.node.connections)
+        print(self.p2p_network.peers)
         log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
         if (peer_host, peer_port) not in self.p2p_network.node.connections:
             try:
                 conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-                print(conn)
                 conn.send(b"REQUEST_CHAIN")
-                print(conn)
                 response = conn.recv(4096).decode()
-                print(response)
                 recieved_chain = json.loads(response[9:])
                 log.debug(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(recieved_chain)
@@ -133,6 +128,8 @@ class SyncManager:
                 log.error(f"Error broadcasting block: {e}")
 
     def broadcast_chain(self):
+        print(self.p2p_network.node.connections)
+        print(self.p2p_network.peers)
         chain = [{"index": block.index,
                   "previous_hash": block.previous_hash,
                   "timestamp": block.timestamp,
