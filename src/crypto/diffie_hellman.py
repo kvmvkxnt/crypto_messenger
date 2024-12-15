@@ -12,6 +12,9 @@ from cryptography.hazmat.primitives.serialization import (
 )
 from cryptography.exceptions import InvalidKey
 from cryptography.hazmat.backends import default_backend
+from utils.logger import Logger
+
+log = Logger("dh")
 
 
 class DiffieHellmanKeyExchange:
@@ -68,7 +71,7 @@ class DiffieHellmanKeyExchange:
             print("Invalid Public Key Format")
             return
 
-        print("Received public key:", peer_public_key_bytes.decode())
+        log.debug("Received public key:", peer_public_key_bytes.decode())
         shared_key = self.private_key.exchange(peer_public_key)
 
         # Using KDF to strenghten key
