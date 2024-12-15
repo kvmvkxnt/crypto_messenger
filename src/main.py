@@ -45,7 +45,7 @@ network = P2PNetwork(P2PSocket(host, int(port)), int(broadcast_port))
 network.start()
 network.discover_peers(discover_peers)
 sm = SyncManager(network, blockchain, Block, Transaction)
-sm.request_chain("10.255.197.95", 12345)
+sm.request_transaction("10.255.197.95", 12345)
 # new_block = Block(blockchain.get_latest_block().index + 1,
 #                   blockchain.get_latest_block().hash,
 #                   blockchain.get_latest_block().timestamp + 1,
