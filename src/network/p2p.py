@@ -21,8 +21,9 @@ class P2PNetwork:
 
     def connect_to_peer(self, peer_host: str, peer_port: int, peer_public_key):
         """Подключение к новому узлу."""
+        if (peer_host, peer_port, peer_public_key) not in self.peers:
+            self.peers.add((peer_host, peer_port, peer_public_key))
         self.node.connect_to_peer(peer_host, peer_port)
-        self.peers.add((peer_host, peer_port, peer_public_key))
         log.info(f"Connected to peer: {peer_host}:{peer_port}")
 
     def broadcast_message(self, message: str):

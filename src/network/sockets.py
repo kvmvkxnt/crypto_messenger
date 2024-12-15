@@ -59,12 +59,15 @@ class P2PSocket:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к другому узлу."""
         try:
-            conn = socket.create_connection((peer_host, peer_port))
-            self.connections.append(conn)
-            threading.Thread(target=self.handle_client,
-                             args=(conn, (peer_host, peer_port))).start()
-            print(f"Connected to peer {peer_host}:{peer_port}")
-            return conn
+            if conn in self.connections:
+                break
+            else:
+                conn = socket.create_connection((peer_host, peer_port))
+                self.connections.append(conn)
+                threading.Thread(target=self.handle_client,
+                                 args=(conn, (peer_host, peer_port))).start()
+                print(f"Connected to peer {peer_host}:{peer_port}")
+                return conn
         except Exception as e:
             print(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
 

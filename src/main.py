@@ -75,9 +75,13 @@ network.discover_peers(discover_peers, user_public_key)
 
 
 def startChat(peer):
+    print(peer)
     network.connect_to_peer(peer[0], peer[1], peer[2])
+    print("break3")
     chat_shared_key = key_manager.generate_shared_key(peer[2])
+    print("break4")
     encryptor = SymmetricEncryption(chat_shared_key)
+    print("break5")
     while True:
         message = input("Message: ")
         encrypted_message = encryptor.encrypt(message)
@@ -91,7 +95,9 @@ while True:
         chat = input("Input peer id or peer public_key: ")
         try:
             if len(network.peers) and len(network.peers) >= int(chat):
+                print("break1")
                 startChat(list(network.peers)[int(chat)])
+                print("break2")
         except ValueError:
             peer_public_key = str.encode(chat)
 
