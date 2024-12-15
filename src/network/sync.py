@@ -165,12 +165,13 @@ class SyncManager:
             while True:
                 log.debug("Starting synchronization loop...")
                 for peer in self.p2p_network.peers:
-                    try:
-                        self.request_chain(peer[0], peer[1])
-                        # self.request_block(peer[0], peer[1])
-                        # self.request_transaction(peer[0], peer[1])
-                    except Exception as e:
-                        log.error(f"Error syncing with peer {peer}: {e}")
+                    if peer not in self.p2p_network.node.connections:
+                        try:
+                            self.request_chain(peer[0], peer[1])
+                            # self.request_block(peer[0], peer[1])
+                            # self.request_transaction(peer[0], peer[1])
+                        except Exception as e:
+                            log.error(f"Error syncing with peer {peer}: {e}")
                 time.sleep(10)  # Интервал синхронизации
 
         threading.Thread(target=sync_loop, daemon=True).start()
