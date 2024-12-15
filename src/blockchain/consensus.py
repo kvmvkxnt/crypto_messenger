@@ -61,10 +61,7 @@ class Validator:
             :return: if blockchain is corrupted or not
             :rtype: bool
         '''
-        print("blockchain: ", blockchain)
-        print("blockchain chain: ", blockchain.chain)
         for i in range(1, len(blockchain.chain)):
-            print(blockchain.chain[i])
             current_block = blockchain.chain[i]
             previous_block = blockchain.chain[i - 1]
 

@@ -62,7 +62,7 @@ class SyncManager:
                                          recieved_block["nonce"])
         if self.blockchain.get_latest_block().timestamp < \
                 new_block.timestamp:
-            self.blockchain.chain.append(recieved_block)
+            self.blockchain.chain.append(new_block)
             log.debug("Validating blockchain...")
             if not self.blockchain.is_chain_valid():
                 log.error("Blockchain is invalid")
