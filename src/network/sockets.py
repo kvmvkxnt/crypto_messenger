@@ -37,7 +37,6 @@ class P2PSocket:
                     break
                 self.requests.append(data.decode())
                 print(f"Received from {addr}: {data.decode()}")
-                break
                 self.broadcast(data, conn)
         except Exception as e:
             print(f"Error with client {addr}: {e}")

@@ -84,7 +84,7 @@ def startChat(peer):
         message = input("Message: ")
         # encrypted_message = encryptor.encrypt(message)
         # print(encrypted_message)
-        network.broadcast_message(message)
+        network.node.broadcast(message)
 
 
 while True:
