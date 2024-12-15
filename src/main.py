@@ -79,9 +79,9 @@ while True:
     if user_input == "start_chat":
         chat = input("Input peer id or peer public_key: ")
     elif user_input == "list_peers":
-        for i in network.peers:
-            print("IP:", i[0], "    PORT:", i[1], "    PUBLIC_KEY:",
-                  i[2].decode()[27:37] + "..." + i[2].decode()[-36:-26])
+        for i, val in enumerate(network.peers):
+            print("ID:", i, "    IP:", val[0], "    PORT:", val[1], "    PUBLIC_KEY:",
+                  val[2].decode()[27:37] + "..." + val[2].decode()[-36:-26])
 
 peer_public_key = input("Enter user's public key or select from list who\
  you want to chat with: ")
