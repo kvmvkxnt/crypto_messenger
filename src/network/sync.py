@@ -35,20 +35,16 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
-        print(self.p2p_network.node.connections)
-        print(self.p2p_network.peers)
         log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
-        if (peer_host, peer_port) not in self.p2p_network.node.connections:
-            try:
-                conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
-                print(conn)
-                conn.send(b"REQUEST_CHAIN")
-                response = conn.recv(4096).decode()
-                recieved_chain = json.loads(response[9:])
-                log.debug(f"Received chain from {peer_host}:{peer_port}")
-                self.merge_chain(recieved_chain)
-            except Exception as e:
-                log.error(f"Error requesting chain: {e}")
+        try:
+            conn = self.p2p_network.node.connect_to_peer(peer_host, peer_port)
+            conn.send(b"REQUEST_CHAIN")
+            response = conn.recv(4096).decode()
+            recieved_chain = json.loads(response[9:])
+            log.debug(f"Received chain from {peer_host}:{peer_port}")
+            self.merge_chain(recieved_chain)
+        except Exception as e:
+            log.error(f"Error requesting chain: {e}")
 
     def request_transaction(self, peer_host: str, peer_port: int):
         log.info(f"Requesting transaction from {peer_host}:{peer_port}")
@@ -68,16 +64,12 @@ class SyncManager:
                                          recieved_block["timestamp"],
                                          recieved_block["transactions"],
                                          recieved_block["nonce"])
-        if self.blockchain.get_latest_block().timestamp < \
-                new_block.timestamp:
-            self.blockchain.chain.append(new_block)
-            log.debug("Validating blockchain...")
-            if not self.blockchain.is_chain_valid():
-                log.error("Blockchain is invalid")
-            else:
-                log.debug("Blockchain is valid")
+        self.blockchain.add_block(new_block)
+        log.debug("Validating blockchain...")
+        if not self.blockchain.is_chain_valid():
+            log.error("Blockchain is invalid")
         else:
-            log.debug("Local blockchain doesn't nned and update")
+            log.debug("Blockchain is valid")
 
     def merge_chain(self, recieved_chain):
         """
@@ -129,8 +121,6 @@ class SyncManager:
                 log.error(f"Error broadcasting block: {e}")
 
     def broadcast_chain(self):
-        print(self.p2p_network.node.connections)
-        print(self.p2p_network.peers)
         chain = [{"index": block.index,
                   "previous_hash": block.previous_hash,
                   "timestamp": block.timestamp,
@@ -166,14 +156,12 @@ class SyncManager:
                 for peer in self.p2p_network.peers:
                     if peer not in self.p2p_network.node.connections:
                         try:
-                            print(self.p2p_network.node.connections)
-                            print(self.p2p_network.peers)
                             self.request_chain(peer[0], peer[1])
-                            # self.request_block(peer[0], peer[1])
-                            # self.request_transaction(peer[0], peer[1])
+                            self.request_block(peer[0], peer[1])
+                            self.request_transaction(peer[0], peer[1])
                         except Exception as e:
                             log.error(f"Error syncing with peer {peer}: {e}")
-                time.sleep(10)  # Интервал синхронизации
+                        time.sleep(10)  # Интервал синхронизации
 
         threading.Thread(target=sync_loop, daemon=True).start()
 

@@ -111,6 +111,14 @@ class Blockchain:
         '''
         return self.chain[-1]
 
+    def add_block(self, block):
+        if block.previous_hash == self.get_latest_block().hash and \
+           block.hash == block.calculate_hash():
+            self.chain.append(block)
+            print("Block was added to blockchain")
+        else:
+            print("Block is invalid")
+
     def add_transaction(self, transaction) -> None:
         '''
             Adds transaction to pending list, previously signing it

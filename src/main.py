@@ -47,27 +47,27 @@ network.start()
 network.discover_peers(discover_peers)
 sm = SyncManager
 syncronizer = network.sync_with_peers(sm, blockchain, Block, Transaction)
-syncronizer.start_sync_loop()
-# syncronizer.broadcast_chain()
-# new_block = Block(blockchain.get_latest_block().index + 1,
-#                   blockchain.get_latest_block().hash,
-#                   blockchain.get_latest_block().timestamp + 1,
-#                   [])
-# blockchain.chain.append(new_block)
-# syncronizer.broadcast_block(new_block)
-# new_transaction1 = Transaction("bob", "alex", 100, "hello")
-# private_key = rsa.generate_private_key(
-#     public_exponent=65537,
-#     key_size=2048
-# )
-# public_key = private_key.public_key()
-# new_transaction1.sign_transaction(private_key)
-# blockchain.add_transaction(new_transaction1)
-# syncronizer.broadcast_transaction(new_transaction1)
-# new_transaction2 = Transaction("alex", "bob", 50, "hi")
-# new_transaction2.sign_transaction(private_key)
-# blockchain.add_transaction(new_transaction2)
-# syncronizer.broadcast_transaction(new_transaction2)
+# syncronizer.start_sync_loop()
+syncronizer.broadcast_chain()
+new_block = Block(blockchain.get_latest_block().index + 1,
+                  blockchain.get_latest_block().hash,
+                  blockchain.get_latest_block().timestamp + 1,
+                  [])
+blockchain.chain.append(new_block)
+syncronizer.broadcast_block(new_block)
+new_transaction1 = Transaction("bob", "alex", 100, "hello")
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048
+)
+public_key = private_key.public_key()
+new_transaction1.sign_transaction(private_key)
+blockchain.add_transaction(new_transaction1)
+syncronizer.broadcast_transaction(new_transaction1)
+new_transaction2 = Transaction("alex", "bob", 50, "hi")
+new_transaction2.sign_transaction(private_key)
+blockchain.add_transaction(new_transaction2)
+syncronizer.broadcast_transaction(new_transaction2)
 
 
 print("""
