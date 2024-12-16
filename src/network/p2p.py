@@ -37,7 +37,7 @@ class P2PNetwork:
         self.peers = set()  # Список известных узлов
         self.sync_interval = sync_interval
         self.broadcast_interval = broadcast_interval
-        self.sync_manager = sync_manager
+        self.sync_manager = sync_manager(self, self.blockchain, self.sync_interval)
         self.node = node(self.host, self.port, self.blockchain, self.sync_manager, max_connections)
 
 
@@ -87,7 +87,7 @@ class P2PNetwork:
 
     def sync_with_peers(self):
         """Синхронизация данных с подключенными узлами."""
-        self.sync_manager(self, self.blockchain, self.sync_interval).start_sync_loop()
+        self.sync_manager.start_sync_loop()
 
 
 if __name__ == "__main__":
