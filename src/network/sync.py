@@ -7,6 +7,8 @@ from blockchain.transaction import Transaction
 from blockchain.blockchain import Block
 import socket
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
+import zlib
+
 
 
 log = Logger("sync")
@@ -42,7 +44,19 @@ class SyncManager:
                     return
             if conn:
                 conn.send(b"REQUEST_CHAIN")
-                response = conn.recv(4096)
+                chunks = []
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break  # Соединение закрыто
+                    chunks.append(chunk)
+                    if len(chunk) < 4096:
+                        break # последний чанк
+
+                    if not chunks:
+                        break # Выходим из цикла обработки, если нет данных
+                response = b"".join(chunks)
+                data = zlib.decompress(data)
 
                 received_chain = json.loads(response.decode())
 

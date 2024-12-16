@@ -59,9 +59,8 @@ class P2PSocket:
                         chunks.append(chunk)
                         if len(chunk) < 4096:
                             break # последний чанк
-
-                    if not chunks:
-                        break # Выходим из цикла обработки, если нет данных
+                        if not chunks:
+                            break # Выходим из цикла обработки, если нет данных
                         
                     data = b"".join(chunks)
                     data = zlib.decompress(data)
