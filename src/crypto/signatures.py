@@ -63,7 +63,7 @@ class DigitalSignature:
             encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
         )
 
-    def sign(self, message: str) -> Optional[bytes]:
+    def sign(self, message: bytes) -> Optional[bytes]:
         """
         Creates digital signature of a message
 
@@ -75,7 +75,7 @@ class DigitalSignature:
             return None
         try:
             signature = self.private_key.sign(
-                message.encode(), self.padding, hashes.SHA256()
+                message, self.padding, hashes.SHA256()
             )
             log.debug(f"Signed message: {message}")
             return signature

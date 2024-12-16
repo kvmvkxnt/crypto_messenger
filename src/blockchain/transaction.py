@@ -92,7 +92,7 @@ class Transaction:
         hash_bytes = self.calculate_hash().encode()
         self.signature = signer.sign(hash_bytes)
 
-    def is_valid(self, signer, public_key_pem) -> bool:
+    def is_valid(self, public_key, signature_manager) -> bool:
         """
         Checks transaction signature
 
@@ -106,7 +106,7 @@ class Transaction:
             return False
 
         try:
-            signer.verify(public_key_pem, self.calculate_hash(),
+            signature_manager.verify(public_key, self.calculate_hash(),
                            self.signature)
             return True
         except Exception as e:

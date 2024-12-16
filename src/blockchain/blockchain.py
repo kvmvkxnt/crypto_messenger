@@ -118,21 +118,21 @@ class Blockchain:
         """
         return self.chain[-1]
 
-    def add_transaction(self, transaction: Transaction) -> None:
+    def add_transaction(self, transaction: Transaction, signature_manager) -> None:
         """
         Adds transaction to pending list, previously signing it
 
         :param transaction: transaction that needs to be added to list
         :type transaction: Transaction
         """
-        if self.is_transaction_valid(transaction):
+        if self.is_transaction_valid(transaction, signature_manager):
             self.pending_transactions.append(transaction)
         else:
             print("Transaction is invalid")
 
-    def is_transaction_valid(self, transaction: Transaction):
+    def is_transaction_valid(self, transaction: Transaction, signature_manager):
         if transaction.sender:
-            if not transaction.is_valid(transaction.sender_public_key):
+            if not transaction.is_valid(signature_manager.get_public_key(), signature_manager):
                 return False
 
             sender_balance = self.get_balance(transaction.sender)
@@ -214,11 +214,11 @@ if __name__ == "__main__":
     public_key = private_key.public_key()
 
     transaction1 = Transaction("Alice", "Bob", 50, "test transaction 1")
-    transaction1.sender_public_key = public_key
+    transaction1.sender = public_key
     transaction1.sign_transaction(private_key)
 
     transaction2 = Transaction("Bob", "Alice", 25, "test transaction 2")
-    transaction2.sender_public_key = public_key
+    transaction2.sender = public_key
     transaction2.sign_transaction(private_key)
 
     blockchain.add_transaction(transaction1)

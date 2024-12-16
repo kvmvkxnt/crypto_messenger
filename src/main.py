@@ -143,14 +143,12 @@ def main():
                     log.debug("Creating signed encrypted transaction")
                     transaction = Transaction(dh_public_key, recipient, 0, encrypted_content.hex())
                     transaction.sign_transaction(signature_manager)
-                    blockchain.add_transaction(transaction)
+                    blockchain.add_transaction(transaction, signature_manager)
+                    p2p_network.broadcast_transaction(transaction)
                 else:
                     log.error("Message was not encrypted")
             else:
-                log.debug("Creating signed transaction")
-                transaction = Transaction(dh_public_key, recipient, 0, content)
-                transaction.sign_transaction(signature_manager)
-                blockchain.add_transaction(transaction)
+                log.warning("No shared key")
 
         elif command == "send":
             recipient = input("Enter recipient address: ")
@@ -160,7 +158,7 @@ def main():
             transaction.sign_transaction(signer.private_key)
             blockchain.add_transaction(transaction, p2p_network)
         elif command == "mine":
-            blockchain.mine_pending_transactions(ProofOfWork, address, sync_manager)
+            blockchain.mine_pending_transactions(ProofOfWork, dh_public_key)
         elif command == "balance":
             balance = blockchain.get_balance(address)
             print(f"Your balance: {balance} MEM")
