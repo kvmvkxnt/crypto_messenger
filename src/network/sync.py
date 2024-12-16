@@ -160,7 +160,7 @@ class SyncManager:
             block = Block(**block_dict)
             if self.blockchain.contains_block(block):
                 return
-            
+
             if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
                 self.blockchain.chain.append(block)
                 log.info(f"Added new block with index {block.index}")
@@ -181,13 +181,13 @@ class SyncManager:
             transaction_string = transaction_data.decode()
             transaction_dict = json.loads(transaction_string)
             transaction_dict["sender"] = (
-                bytes.fromhex(transaction_dict["sender"]).encode()
+                bytes.fromhex(transaction_dict["sender"])
                 if transaction_dict["sender"]
                 else None
             )
             transaction_dict["recipient"] = bytes.fromhex(
                 transaction_dict["recipient"]
-            ).encode()
+            )
             transaction_dict["signature"] = (
                 bytes.fromhex(transaction_dict["signature"])
                 if transaction_dict["signature"]
