@@ -81,6 +81,8 @@ class P2PSocket:
                     else:  # Простое сообщение
                         self.broadcast(data, conn)
 
+                except ConnectionResetError as e:   
+                    break # Выходим из цикла обработки клиента
                 except socket.error as e:
                     log.error(f"Error receiving data from {addr}: {e}")
                     break
