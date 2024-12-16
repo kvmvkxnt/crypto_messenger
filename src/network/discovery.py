@@ -58,8 +58,8 @@ def discover_peers(
                         continue
 
                     peer = (addr[0], peer_port, peer_info["username"],
-                            peer_info["public_key"])
-                    if peer == (local_host, local_port, username, public_key):
+                            bytes.fromhex(peer_info["public_key"]))
+                    if peer == (local_host, local_port, username, bytes.fromhex(public_key)):
                         log.debug(f"Ignoring self broadcast from {peer}")
                         continue
 

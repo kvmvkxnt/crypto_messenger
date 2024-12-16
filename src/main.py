@@ -89,14 +89,14 @@ def main():
     log.info(f"Your public key: {dh_public_key}")
     shared_keys = {}
 
-    def get_shared_key(peer_address, peer_public_key):
+    def get_shared_key(peer_public_key):
         """Retrieves existing shared key or generates new one."""
-        if (peer_address, peer_public_key) in shared_keys:
-            return shared_keys[(peer_address, peer_public_key)]
+        if peer_public_key in shared_keys:
+            return shared_keys[peer_public_key]
         else:
             shared_key = dh_key_manager.generate_shared_key(peer_public_key)
             if shared_key:
-                shared_keys[(peer_address, peer_public_key)] = shared_key
+                shared_keys[peer_public_key] = shared_key
                 return shared_key
 
     while True:
@@ -122,28 +122,35 @@ def main():
                         print(f"Error connecting to peer: {e}")
 
         elif command == "message":
-            recipient = input("Enter recipient address: ")
+            recipient_username = input("Enter recipient username: ")
+            recipient = None
+            for peer in list(p2p_network.peers):
+                if peer[2] == recipient_username:
+                    recipient = peer[3]
+                    break
+            if recipient is None:
+                print(f"User {recipient_username} not found")
+                continue
+
             content = input("Enter message content: ")
 
             shared_key = get_shared_key(recipient)
 
             if shared_key:
-                encryptor = SymmetricEncryption(shared_key, algorithm="AES", mode="GCM")
+                encryptor = SymmetricEncryption(shared_key, algorithm="AES", mode="CBC")
                 encrypted_content = encryptor.encrypt(content)
                 if encrypted_content:
                     log.debug("Creating signed encrypted transaction")
-                    transaction = Transaction(
-                        dh_public_key, recipient, 0, encrypted_content.hex(), public_key
-                    )
-                    transaction.sign_transaction(signer.private_key)
-                    blockchain.add_transaction(transaction, p2p_network)
+                    transaction = Transaction(dh_public_key, recipient, 0, encrypted_content.hex())
+                    transaction.sign_transaction(signature_manager)
+                    blockchain.add_transaction(transaction)
                 else:
                     log.error("Message was not encrypted")
             else:
                 log.debug("Creating signed transaction")
-                transaction = Transaction(address, recipient, 0, content, public_key)
-                transaction.sign_transaction(signer.private_key)
-                blockchain.add_transaction(transaction, p2p_network)
+                transaction = Transaction(dh_public_key, recipient, 0, content)
+                transaction.sign_transaction(signature_manager)
+                blockchain.add_transaction(transaction)
 
         elif command == "send":
             recipient = input("Enter recipient address: ")
@@ -160,7 +167,7 @@ def main():
         elif command == "peers":
             peers = list(p2p_network.peers)
             for peer in peers:
-                print(f"ID: {peers.index(peer)}     HOST: {peer[0]}     PORT: {peer[1]}     USERNAME: {peer[2]}     PUBLIC KEY: {peer[3]}")
+                print(f"ID: {peers.index(peer)}     HOST: {peer[0]}     PORT: {peer[1]}     USERNAME: {peer[2]}     PUBLIC KEY: {peer[3].hex()}")
         elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
