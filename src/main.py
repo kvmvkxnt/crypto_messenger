@@ -81,9 +81,10 @@ def main():
         dh_public_key.hex(),
         sync_interval,
         broadcast_interval,
+        max_connections
     )
     p2p_network.start()
-    # p2p_network.discover_peers() # <--- кривовато работает
+    p2p_network.discover_peers() # <--- кривовато работает
 
     log.info(f"Your public key: {dh_public_key}")
     shared_keys = {}
