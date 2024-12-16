@@ -28,7 +28,7 @@ class Transaction:
     def __init__(
         self,
         sender: bytes = None,
-        recipient: str = None,
+        recipient: bytes = None,
         amount: float = 0,
         content: any = "",
         signature: bytes = None,
@@ -53,7 +53,11 @@ class Transaction:
                 if self.sender
                 else None
             ),
-            "recipient": self.recipient,
+            "recipient": (
+                self.recipient.hex()
+                if self.recipient
+                else None
+            ),
             "amount": self.amount,
             "content": str(self.content),
             "signature": (

@@ -1,18 +1,12 @@
 import threading
-import time
 import utils.logger as logger
 from .sockets import P2PSocket
 from blockchain.transaction import Transaction
 import json
-import socket
 from .discovery import discover_peers
 from .sync import SyncManager
-import os
-import sys
 
-parent_dir = os.path.dirname(os.path.realpath(__file__)) + "/.."
-sys.path.append(parent_dir)
-from blockchain.blockchain import Blockchain, Block
+from blockchain.blockchain import Blockchain
 
 log = logger.Logger("p2p")
 
@@ -20,28 +14,33 @@ log = logger.Logger("p2p")
 class P2PNetwork:
     def __init__(
         self,
+        host: str,
+        port: int,
         node: P2PSocket,
+        sync_manager,
         blockchain: Blockchain,
         broadcast_port: int,
         username: str,
         public_key: str,
         sync_interval: int = 5,
         broadcast_interval: int = 1,
+        max_connections: int = 5
     ):
         """Инициализация P2P сети."""
         if not isinstance(node, P2PSocket):
             raise TypeError("Node must be an instance of P2PSocket")
         self.blockchain = blockchain
-        self.host = node.host
-        self.port = node.port
+        self.host = host
+        self.port = port
         self.username = username
         self.public_key = public_key
         self.broadcast_port = broadcast_port
-        self.node = node
         self.peers = set()  # Список известных узлов
         self.sync_interval = sync_interval
         self.broadcast_interval = broadcast_interval
-        self.signer = None
+        self.sync_manager = sync_manager
+        self.node = node(self.host, self.port, self.blockchain, self.sync_manager, max_connections)
+
 
     def start(self):
         self.node.blockchain = self.blockchain  # Добавляем blockchain в node
@@ -51,12 +50,12 @@ class P2PNetwork:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к новому узлу."""
         try:
-            if (self.host == peer_host or peer_host == '127.0.0.1') and self.port == peer_port:
+            if (
+                self.host == peer_host or peer_host == "127.0.0.1"
+            ) and self.port == peer_port:
                 log.warning("Cannot connect to self")
                 raise Exception("Cannot connect to self")
             conn = self.node.connect_to_peer(peer_host, peer_port)
-            if conn:
-                self.peers.add((peer_host, peer_port))
             return conn
         except Exception as e:
             log.error(f"Error connecting to peer: {e}")
@@ -64,38 +63,35 @@ class P2PNetwork:
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""
         log.debug(f"Broadcasting message: {message}")
-        for conn in self.node.connections:
-            try:
-                conn.send(message.encode())
-            except Exception as e:
-                log.error(f"Error broadcasting message: {e}")
+        self.node.broadcast(message.encode())
 
     def broadcast_transaction(self, transaction: Transaction):
         """Рассылает транзакцию всем подключенным узлам."""
-        transaction_data = json.dumps(transaction.to_dict(), ensure_ascii=False).encode()
+        transaction_data = json.dumps(
+            transaction.to_dict(), ensure_ascii=False
+        ).encode()
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
-        for conn in self.node.connections:
-            try:
-                conn.sendall(b"NEW_TRANSACTION" + transaction_data)
-            except socket.error as e:
-                log.error(f"Error broadcasting transaction: {e}")
+        self.broadcast_message(b"NEW_TRANSACTION" + transaction_data)
 
     def discover_peers(self):
         """Механизм обнаружения новых узлов."""
-        self.peers = discover_peers(self.host, self.port, self.broadcast_port, self.username, self.public_key, self.broadcast_interval)
+        self.peers = discover_peers(
+            self.host,
+            self.port,
+            self.broadcast_port,
+            self.username,
+            self.public_key,
+            self.broadcast_interval,
+        )
         log.info(f"Discovered peers: {list(self.peers)}")
 
     def sync_with_peers(self):
         """Синхронизация данных с подключенными узлами."""
-        sync_manager = SyncManager(
-            self, self.blockchain
-        )
-        sync_manager.start_sync_loop()
-        return sync_manager
+        self.sync_manager(self, self.blockchain, self.sync_interval).start_sync_loop()
 
 
 if __name__ == "__main__":
-
+    from blockchain.blockchain import Block
     host = "127.0.0.1"
     port = 12345
     broadcast_port = 5000

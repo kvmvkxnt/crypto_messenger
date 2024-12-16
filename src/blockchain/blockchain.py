@@ -107,7 +107,7 @@ class Blockchain:
         :return: absolutely empty block
         :rtype: Block
         """
-        return Block(0, "0", time.time(), [])
+        return Block(0, "0", 0, [])
 
     def get_latest_block(self) -> Block:
         """
@@ -118,7 +118,7 @@ class Blockchain:
         """
         return self.chain[-1]
 
-    def add_transaction(self, transaction: Transaction, p2p_network) -> None:
+    def add_transaction(self, transaction: Transaction) -> None:
         """
         Adds transaction to pending list, previously signing it
 
@@ -127,10 +127,6 @@ class Blockchain:
         """
         if self.is_transaction_valid(transaction):
             self.pending_transactions.append(transaction)
-            try:
-                p2p_network.broadcast_transaction(transaction)
-            except Exception as e:
-                print(e)
         else:
             print("Transaction is invalid")
 
@@ -145,7 +141,7 @@ class Blockchain:
 
         return True
 
-    def get_balance(self, address: str) -> float:
+    def get_balance(self, address: bytes) -> float:
         """
         Calculates balance of specific address.
         """
@@ -159,7 +155,7 @@ class Blockchain:
         return balance
 
     def mine_pending_transactions(
-        self, miner, miner_address: str, sync_manager
+        self, miner, miner_address: str
     ) -> None:
         """
         Creates new block using pending transactions and adds it to chain
@@ -183,15 +179,13 @@ class Blockchain:
         )
 
         reward_transaction = Transaction(None, miner_address, 1, "Mining Reward")
-        new_block.transactions.append(reward_transaction)
 
         miner(self.difficulty).mine(new_block)
         miner(self.difficulty).validate(new_block)
 
         if self.validator.validate_block(new_block, self.chain[-1]):
             self.chain.append(new_block)
-            sync_manager.broadcast_block(new_block)
-            self.pending_transactions = []
+            self.pending_transactions = [reward_transaction]
         else:
             print("Invalid block. Block was not added to the chain")
 

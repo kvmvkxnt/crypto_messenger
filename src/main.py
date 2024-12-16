@@ -6,9 +6,6 @@ import hashlib
 import json
 import socket
 
-parent_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(parent_dir)
-
 from network.p2p import P2PNetwork
 from blockchain.blockchain import Blockchain
 from network.sockets import P2PSocket
@@ -21,7 +18,8 @@ from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.hazmat.primitives import hashes
 from utils.logger import Logger
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
-from utils.config import DEFAULT_DH_PARAMETERS
+from utils.config import DEFAULT_DH_PARAMETERS, DEFAULT_PORT, BROADCAST_PORT
+from network.sync import SyncManager
 
 
 log = Logger("main")
@@ -37,150 +35,87 @@ def generate_keys():
     public_key_pem = signer.get_public_key()
     public_key = signer.public_key
 
-
     return dh_key_exchange, signer, private_key_pem, public_key, dh_public_key
 
-def main():
-    rv_host = '85.234.107.233'
-    rv_port = 5050
-    peers_list = []
 
-    username ='Loshara'
-    host = "0.0.0.0"
-    port = 12345
-    broadcast_port = 5000
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        s.connect(("10.254.254.254", 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = "127.0.0.1"
+    finally:
+        s.close()
+    return IP
+
+
+def main():
+    username = input("Enter your username (default=guest): ") or "guest"
+    host = input(f"Enter your host (default={get_ip()}): ") or get_ip()
+    try:
+        port = int(input(f"Enter your port (default={DEFAULT_PORT}): "))
+    except Exception:
+        port = DEFAULT_PORT
+
+    broadcast_port = BROADCAST_PORT
     sync_interval = 5
     max_connections = 5
     broadcast_interval = 2
-    discovery_timeout = 5
 
-    print('Generating keys...')
-    dh_key_exchange, signer, private_key_pem, public_key, dh_public_key = generate_keys()
+    print("Generating keys...")
+    dh_key_manager = DiffieHellmanKeyExchange(DEFAULT_DH_PARAMETERS)
+    signature_manager = DigitalSignature()
+    dh_public_key = dh_key_manager.get_public_key()
 
-    node = P2PSocket(host, port, max_connections)
     blockchain = Blockchain()
-    p2p_network = P2PNetwork(node, blockchain, broadcast_port, username, dh_public_key.hex(), sync_interval, broadcast_interval)
-    sync_manager = p2p_network.sync_with_peers()
-    node.sync_manager = sync_manager
-    node.node = p2p_network
-    node.blockchain = blockchain
-
-    p2p_network.signer = signer
+    p2p_network = P2PNetwork(
+        host,
+        port,
+        P2PSocket,
+        SyncManager,
+        blockchain,
+        broadcast_port,
+        username,
+        dh_public_key.hex(),
+        sync_interval,
+        broadcast_interval,
+    )
     p2p_network.start()
     # p2p_network.discover_peers() # <--- кривовато работает
 
-
     log.info(f"Your public key: {dh_public_key}")
-
     shared_keys = {}
-    peers_public_keys = {}
 
-    def get_shared_key(peer_address):
+    def get_shared_key(peer_address, peer_public_key):
         """Retrieves existing shared key or generates new one."""
-        if peer_address in shared_keys:
-            return shared_keys[peer_address]
-
-        peer_public_key_pem = peers_public_keys.get(peer_address)
-        if peer_public_key_pem:
-            derived_key = dh_key_exchange.generate_shared_key(peer_public_key_pem)
-            if derived_key:
-                shared_keys[peer_address] = derived_key
-                return derived_key
-        return None
-
-    def request_peer_public_key(conn, peer_address):
-        """Requests public key from peer"""
-        try:
-            with node.lock:
-                conn.send(b"REQUEST_PUBLIC_KEY")
-            response = conn.recv(4096)
-            if response:
-                try:
-                    public_key = load_pem_public_key(response)
-                    peers_public_keys[peer_address] = public_key # rsa.RSAPublicKey
-                    log.info(f"Received public key from {peer_address}: {response.hex() if response else 'None'}")
-                except Exception as e:
-                    log.error(f"Error during loading peer public key: {e}")
-            else:
-                log.error(f"Cannot obtain public key from {peer_address}")
-
-        except Exception as e:
-            log.error(f"Error during obtaining public key: {e}")
-
-
-    def request_peers():
-        """
-        Отправляет запрос get_peers на сервер и выводит полученный список.
-        """
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                client_socket.connect((rv_host, rv_port))
-                client_socket.sendall(b"GET_PEERS")
-                response = client_socket.recv(4096)
-                if response:
-                    peers_list = json.loads(response.decode())
-                    print(f"Received peers list: {peers_list}")
-                    return peers_list
-                else:
-                    print("No response from rendez-vous server.")
-                    return []
-
-        except Exception as e:
-            print(f"Error requesting peers: {e}")
-
-    def new_peer():
-        """
-        Отправляет запрос new_peer на сервер и выводит полученный список.
-        """
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                client_socket.connect((rv_host, rv_port))
-                message = b"NEW_PEER" + str(port).encode()
-                client_socket.sendall(message)
-        except Exception as e:
-            print(f"Error adding to peers: {e}")
-    def invalid_peer(address, port):
-        """
-        Отправляет запрос new_peer на сервер и выводит полученный список.
-        """
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                client_socket.connect((rv_host, rv_port))
-                message = b"INVALID_PEER" + f'{address}:{port}'.encode()
-                client_socket.sendall(message)
-        except Exception as e:
-            print(f"Error sending invalid peer: {e}")
-    
-    # peers_list = request_peers()
-    # new_peer()
-    # for peer in peers_list:
-    #     conn = p2p_network.connect_to_peer(peer[0], int(peer[1]))
-    #     if not conn:
-    #         invalid_peer(peer[0], int(peer[1]))
-    #         continue
-    #     with node.lock:
-    #         conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
-    #         time.sleep(0.05)
+        if (peer_address, peer_public_key) in shared_keys:
+            return shared_keys[(peer_address, peer_public_key)]
+        else:
+            shared_key = dh_key_manager.generate_shared_key(peer_public_key)
+            if shared_key:
+                shared_keys[(peer_address, peer_public_key)] = shared_key
+                return shared_key
 
     while True:
-        command = input("Enter command (connect, message, send, mine, balance, peers, chain, exit): ")
+        command = input(
+            "Enter command (connect, message, send, mine, balance, peers, chain, exit): "
+        )
         if command == "connect":
-            peer_host = input("Enter peer host: ")
-            peer_port = int(input("Enter peer port: "))
+            while True:
+                index = input("Enter peer index or username: ")
 
-            p2p_network.connect_to_peer(peer_host, peer_port)
-            conn = p2p_network.node.get_connection(peer_host, peer_port)
-            if conn:
-                with node.lock:
-                    conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
-                    time.sleep(0.05)
-
-            # peer_address = get_peer_address(peer_host, peer_port)
-            # conn = p2p_network.node.get_connection(peer_host, peer_port)
-            # if conn:
-            #     request_peer_public_key(conn, peer_address)
-            # else:
-            #     log.error(f"Cannot obtain public key from {peer_address}") ### Обмен ключами - доделать
+                try:
+                    index = int(index)
+                    p2p_network.connect_to_peer(p2p_network.peers[index][0], p2p_network.peers[index][1])
+                except ValueError:
+                    try:
+                        for p in p2p_network.peers:
+                            if p[2] == index:
+                                p2p_network.connect_to_peer(p[0], p[1])
+                    except Exception as e:
+                        print(f"Error connecting to peer: {e}")
 
         elif command == "message":
             recipient = input("Enter recipient address: ")
@@ -193,7 +128,9 @@ def main():
                 encrypted_content = encryptor.encrypt(content)
                 if encrypted_content:
                     log.debug("Creating signed encrypted transaction")
-                    transaction = Transaction(dh_public_key, recipient, 0, encrypted_content.hex(), public_key)
+                    transaction = Transaction(
+                        dh_public_key, recipient, 0, encrypted_content.hex(), public_key
+                    )
                     transaction.sign_transaction(signer.private_key)
                     blockchain.add_transaction(transaction, p2p_network)
                 else:
@@ -214,11 +151,12 @@ def main():
         elif command == "mine":
             blockchain.mine_pending_transactions(ProofOfWork, address, sync_manager)
         elif command == "balance":
-             balance = blockchain.get_balance(address)
-             print(f"Your balance: {balance} MEM")
+            balance = blockchain.get_balance(address)
+            print(f"Your balance: {balance} MEM")
         elif command == "peers":
-            print(f"Known peers: {list(p2p_network.peers)}")
-        elif command == 'chain':
+            for i in range(0, len(p2p_network.peers)):
+                print(f"ID: {i}     HOST: {p2p_network.peers[i][0]}     PORT: {p2p_network.peers[i][1]}     USERNAME: {p2p_network.peers[i][2]}     PUBLIC KEY: {p2p_network.peers[i][3]}")
+        elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
         elif command == "exit":

@@ -7,8 +7,6 @@ from blockchain.transaction import Transaction
 from blockchain.blockchain import Block
 import socket
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
-import base64
-import traceback
 
 
 log = Logger("sync")
@@ -35,7 +33,7 @@ class SyncManager:
         """
         log.debug(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
-            conn = self.p2p_network.node.get_connection(peer_host, peer_port)
+            conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
                 conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
                 # conn.send(b"INCOME_PORT" + str(self.p2p_network.port).encode())
@@ -43,30 +41,25 @@ class SyncManager:
                     log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
                     return
             if conn:
-                with self.p2p_network.node.lock:
-                    conn.send(b"REQUEST_CHAIN")
-                    time.sleep(0.05)
-                response = b""
-                while True:
-                    chunk = conn.recv(4096)
-                    if not chunk:
-                        break
-                    response += chunk
-                    try:
-                        received_chain = json.loads(response.decode())
-                    except:
-                        continue
-                    break
-                # response = conn.recv(4096)
+                conn.send(b"REQUEST_CHAIN")
+                response = conn.recv(4096)
 
                 received_chain = json.loads(response.decode())
 
                 for block in received_chain:
                     for transaction in block["transactions"]:
                         transaction["signature"] = (
-                            base64.b64decode(transaction["signature"])
+                            bytes.fromhex(transaction["signature"])
                             if transaction["signature"]
                             else None
+                        )
+                        transaction["sender"] = (
+                            bytes.fromhex(transaction["sender"].encode())
+                            if transaction["sender"]
+                            else None
+                        )
+                        transaction["recipient"] = bytes.fromhex(
+                            transaction["recipient"].encode()
                         )
                     block["transactions"] = [
                         Transaction(**transaction)
@@ -117,11 +110,9 @@ class SyncManager:
 
         block_bytes = json.dumps(block.to_dict(), ensure_ascii=False).encode()
 
-        for conn in self.p2p_network.node.connections:
+        for conn, _ in self.p2p_network.node.connections:
             try:
-                with self.p2p_network.node.lock:
-                    conn.sendall(b"NEW_BLOCK" + block_bytes)
-                    time.sleep(0.05)
+                conn.sendall(b"NEW_BLOCK" + block_bytes)
             except socket.error as e:
                 log.error(f"Error broadcasting block: {e}")
 
@@ -151,9 +142,17 @@ class SyncManager:
             block_dict = json.loads(block_data.decode())
             for transaction in block_dict["transactions"]:
                 transaction["signature"] = (
-                    base64.b64decode(transaction["signature"])
+                    bytes.fromhex(transaction["signature"])
                     if transaction["signature"]
                     else None
+                )
+                transaction["sender"] = (
+                    bytes.fromhex(transaction["sender"].encode())
+                    if transaction["sender"]
+                    else None
+                )
+                transaction["recipient"] = bytes.fromhex(
+                    transaction["recipient"].encode()
                 )
             block_dict["transactions"] = [
                 Transaction(**transaction) for transaction in block_dict["transactions"]
@@ -181,11 +180,16 @@ class SyncManager:
         try:
             transaction_string = transaction_data.decode()
             transaction_dict = json.loads(transaction_string)
-            transaction_dict["sender_public_key"] = load_pem_public_key(
-                transaction_dict["sender_public_key"].encode()
+            transaction_dict["sender"] = (
+                bytes.fromhex(transaction_dict["sender"].encode())
+                if transaction_dict["sender"]
+                else None
             )
+            transaction_dict["recipient"] = bytes.fromhex(
+                transaction_dict["recipient"].encode()
+            )   
             transaction_dict["signature"] = (
-                base64.b64decode(transaction_dict["signature"])
+                bytes.fromhex(transaction_dict["signature"])
                 if transaction_dict["signature"]
                 else None
             )
