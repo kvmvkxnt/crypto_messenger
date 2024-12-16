@@ -155,8 +155,9 @@ def main():
             balance = blockchain.get_balance(address)
             print(f"Your balance: {balance} MEM")
         elif command == "peers":
+            peers = list(p2p_network.peers)
             for i in range(0, len(p2p_network.peers)):
-                print(f"ID: {i}     HOST: {p2p_network.peers[i][0]}     PORT: {p2p_network.peers[i][1]}     USERNAME: {p2p_network.peers[i][2]}     PUBLIC KEY: {p2p_network.peers[i][3]}")
+                print(f"ID: {i}     HOST: {peers[i][0]}     PORT: {[i][1]}     USERNAME: {peers[i][2]}     PUBLIC KEY: {peers[i][3]}")
         elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
