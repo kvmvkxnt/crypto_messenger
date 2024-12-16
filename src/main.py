@@ -79,6 +79,7 @@ def main():
         broadcast_port,
         username,
         dh_public_key.hex(),
+        signature_manager,
         sync_interval,
         broadcast_interval,
         max_connections

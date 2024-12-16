@@ -173,7 +173,7 @@ class SyncManager:
         except Exception as e:
             log.error(f"Error during block handling: {e}")
 
-    def handle_new_transaction(self, transaction_data: bytes, conn) -> None:
+    def handle_new_transaction(self, transaction_data: bytes, conn, signature_manager) -> None:
         """
         Обрабатывает новую транзакцию, полученную от другого узла.
         """
@@ -198,7 +198,7 @@ class SyncManager:
                 return
 
             log.debug(f"Received transaction {transaction.calculate_hash()}")
-            if self.blockchain.is_transaction_valid(transaction):
+            if self.blockchain.is_transaction_valid(transaction, signature_manager):
                 self.blockchain.pending_transactions.append(transaction)
                 self.p2p_network.broadcast_transaction(transaction, conn)
                 log.info(f"Added new transaction from network")

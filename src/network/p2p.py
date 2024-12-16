@@ -23,6 +23,7 @@ class P2PNetwork:
         broadcast_port: int,
         username: str,
         public_key: str,
+        signature_manager,
         sync_interval: int = 5,
         broadcast_interval: int = 1,
         max_connections: int = 5
@@ -38,7 +39,8 @@ class P2PNetwork:
         self.sync_interval = sync_interval
         self.broadcast_interval = broadcast_interval
         self.sync_manager = sync_manager(self, self.blockchain, self.sync_interval)
-        self.node = node(self.host, self.port, self.blockchain, self.sync_manager, max_connections)
+        self.signature_manager = signature_manager
+        self.node = node(self.host, self.port, self.blockchain, self.sync_manager, self.signature_manager, max_connections)
 
 
     def start(self):

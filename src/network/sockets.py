@@ -7,7 +7,7 @@ log = logger.Logger("sockets")
 
 
 class P2PSocket:
-    def __init__(self, host: str, port: int, blockchain, sync_manager, max_connections: int = 5):
+    def __init__(self, host: str, port: int, blockchain, sync_manager, signature_manager, max_connections: int = 5):
         """Инициализация сокета для P2P соединений."""
         self.host = host
         self.port = port
@@ -16,6 +16,8 @@ class P2PSocket:
         self.connections = []  # Список активных подключений
         self.blockchain = blockchain
         self.sync_manager = sync_manager
+        self.signature_manager = signature_manager
+
 
     def start_server(self):
         """Запуск сервера для приема подключений."""
@@ -73,7 +75,7 @@ class P2PSocket:
 
                     elif data.startswith(b"NEW_TRANSACTION"):
                         transaction_data = data[len(b"NEW_TRANSACTION") :]
-                        self.sync_manager.handle_new_transaction(transaction_data, conn)
+                        self.sync_manager.handle_new_transaction(transaction_data, conn, self.signature_manager)
 
                     elif data.startswith(b"NEW_MESSAGE"):
                         pass
