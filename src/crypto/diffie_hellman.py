@@ -36,11 +36,9 @@ class DiffieHellmanKeyExchange:
             :type parameters: DHParameters or None
         """
 
-        if parameters is None:
-            self.parameters = dh.generate_parameters(generator=2, key_size=2048)
-        else:
-            self.parameters = parameters
-
+        self.parameters = parameters or dh.generate_parameters(
+            generator=2, key_size=2048
+        )
         self.private_key = self.parameters.generate_private_key()
         self.public_key = self.private_key.public_key()
 

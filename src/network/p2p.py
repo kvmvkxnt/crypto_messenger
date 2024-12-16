@@ -23,9 +23,10 @@ class P2PNetwork:
         node: P2PSocket,
         blockchain: Blockchain,
         broadcast_port: int,
+        username: str,
+        public_key: str,
         sync_interval: int = 5,
         broadcast_interval: int = 1,
-        discovery_timeout: int = 5,
     ):
         """Инициализация P2P сети."""
         if not isinstance(node, P2PSocket):
@@ -33,12 +34,13 @@ class P2PNetwork:
         self.blockchain = blockchain
         self.host = node.host
         self.port = node.port
+        self.username = username
+        self.public_key = public_key
         self.broadcast_port = broadcast_port
         self.node = node
         self.peers = set()  # Список известных узлов
         self.sync_interval = sync_interval
         self.broadcast_interval = broadcast_interval
-        self.discovery_timeout = discovery_timeout
         self.signer = None
 
     def start(self):
@@ -80,14 +82,7 @@ class P2PNetwork:
 
     def discover_peers(self):
         """Механизм обнаружения новых узлов."""
-        discover_peers(
-            self.host,
-            self.port,
-            self.broadcast_port,
-            self.broadcast_interval,
-            self.discovery_timeout,
-            self.peers
-        )
+        self.peers = discover_peers(self.host, self.port, self.broadcast_port, self.username, self.public_key, self.broadcast_interval)
         log.info(f"Discovered peers: {list(self.peers)}")
 
     def sync_with_peers(self):

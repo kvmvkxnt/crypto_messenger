@@ -7,12 +7,6 @@ import json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 from typing import Dict
-from cryptography.hazmat.primitives.serialization import (
-    load_pem_public_key,
-    Encoding,
-    PublicFormat,
-)
-import base64
 
 
 class Transaction:
@@ -33,11 +27,10 @@ class Transaction:
 
     def __init__(
         self,
-        sender: str,
-        recipient: str,
-        amount: float,
+        sender: bytes = None,
+        recipient: str = None,
+        amount: float = 0,
         content: any = "",
-        sender_public_key: rsa.RSAPublicKey = None,
         signature: bytes = None,
     ):
         """Initializes transaction"""
@@ -46,14 +39,6 @@ class Transaction:
         self.amount = amount
         self.content = content
         self.signature = signature
-        if sender:
-            self.sender_public_key = (
-                sender_public_key
-                if isinstance(sender_public_key, rsa.RSAPublicKey)
-                else load_pem_public_key(sender_public_key.encode("utf-8"))
-            )
-        else:
-            self.sender_public_key = None
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -63,22 +48,19 @@ class Transaction:
         :rtype: Dict[str, str]
         """
         return {
-            "sender": self.sender,
+            "sender": (
+                self.sender.hex()
+                if self.sender
+                else None
+            ),
             "recipient": self.recipient,
             "amount": self.amount,
             "content": str(self.content),
             "signature": (
-                base64.b64encode(self.signature).decode("utf-8")
+                self.signature.hex()
                 if self.signature
                 else None
-            ),
-            "sender_public_key": (
-                self.sender_public_key.public_bytes(
-                    Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
-                ).decode("utf-8")
-                if self.sender_public_key
-                else None
-            ),
+            )
         }
 
     def calculate_hash(self) -> str:
@@ -93,7 +75,7 @@ class Transaction:
         transaction_string = json.dumps(transaction_dict, sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(transaction_string.encode()).hexdigest()
 
-    def sign_transaction(self, private_key: rsa.RSAPrivateKey) -> None:
+    def sign_transaction(self, signer) -> None:
         """
         Signs transaction with private key
 
@@ -104,15 +86,9 @@ class Transaction:
             raise ValueError("Transaction must include sender and recipient")
 
         hash_bytes = self.calculate_hash().encode()
-        self.signature = private_key.sign(
-            hash_bytes,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256(),
-        )
+        self.signature = signer.sign(hash_bytes)
 
-    def is_valid(self, public_key: rsa.RSAPublicKey) -> bool:
+    def is_valid(self, signer, public_key_pem) -> bool:
         """
         Checks transaction signature
 
@@ -126,15 +102,8 @@ class Transaction:
             return False
 
         try:
-            public_key.verify(
-                self.signature,
-                self.calculate_hash().encode(),
-                padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH,
-                ),
-                hashes.SHA256(),
-            )
+            signer.verify(public_key_pem, self.calculate_hash(),
+                           self.signature)
             return True
         except Exception as e:
             print(f"Signature verification failed: {e}")

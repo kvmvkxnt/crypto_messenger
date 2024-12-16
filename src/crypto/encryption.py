@@ -20,18 +20,13 @@ class SymmetricEncryption:
     :type key: bytes
     """
 
-    def __init__(self, key: bytes, algorithm="AES", mode="GCM"):
+    def __init__(self, key: bytes, algorithm="AES", mode="CBC"):
         """
         Initiates with the given key
 
         :param key: key that will be used to encrypt message
         :type key: bytes
         """
-        if not isinstance(key, bytes):
-            raise TypeError("Key must be bytes")
-        if len(key) != 32:
-            raise ValueError("Key must be 32 bytes long")
-
         self.key = key
         self.algorithm = algorithm
         self.mode = mode
@@ -62,11 +57,6 @@ class SymmetricEncryption:
 
             ciphertext = encryptor.update(padded_data) + encryptor.finalize()
             return iv + ciphertext
-        elif self.algorithm == "AES" and self.mode == "GCM":
-            nonce = os.urandom(12)
-            aesgcm = AESGCM(self.key)
-            ciphertext = aesgcm.encrypt(nonce, plaintext_bytes, None)
-            return nonce + ciphertext
         else:
             print("Unsupported algorithm or mode")
             return None
@@ -103,19 +93,6 @@ class SymmetricEncryption:
                 return plaintext.decode()
             except Exception as e:
                 print(f"Error during decryption in CBC mode: {e}")
-                return None
-        elif self.algorithm == "AES" and self.mode == "GCM":
-            if len(ciphertext) < 12:
-                print("Ciphertext too short for GCM mode")
-                return None
-            nonce = ciphertext[:12]
-            actual_ciphertext = ciphertext[12:]
-            aesgcm = AESGCM(self.key)
-            try:
-                plaintext = aesgcm.decrypt(nonce, actual_ciphertext, None)
-                return plaintext.decode()
-            except Exception as e:
-                print(f"Error during decryption in GCM mode: {e}")
                 return None
         else:
             print("Unsupported algorithm or mode")

@@ -21,21 +21,16 @@ from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.hazmat.primitives import hashes
 from utils.logger import Logger
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from utils.config import DEFAULT_DH_PARAMETERS
 
 
 log = Logger("main")
 
 
-def generate_address(public_key_bytes: bytes) -> str:
-    """Generates address based on public key."""
-    address_hash = hashlib.sha256(public_key_bytes).hexdigest()
-    return address_hash[:32]
-
 def generate_keys():
     """Generates keys for both DH and signature."""
-    dh_key_exchange = DiffieHellmanKeyExchange()
-    public_key_bytes = dh_key_exchange.get_public_key()
-    address = generate_address(public_key_bytes)
+    dh_key_exchange = DiffieHellmanKeyExchange(DEFAULT_DH_PARAMETERS)
+    dh_public_key = dh_key_exchange.get_public_key()
 
     signer = DigitalSignature()
     private_key_pem = signer.get_private_key()
@@ -43,13 +38,14 @@ def generate_keys():
     public_key = signer.public_key
 
 
-    return address, dh_key_exchange, signer, private_key_pem, public_key
+    return dh_key_exchange, signer, private_key_pem, public_key, dh_public_key
 
 def main():
     rv_host = '85.234.107.233'
     rv_port = 5050
     peers_list = []
 
+    username ='Loshara'
     host = "0.0.0.0"
     port = 12345
     broadcast_port = 5000
@@ -59,11 +55,11 @@ def main():
     discovery_timeout = 5
 
     print('Generating keys...')
-    address, dh_key_exchange, signer, private_key_pem, public_key = generate_keys()
+    dh_key_exchange, signer, private_key_pem, public_key, dh_public_key = generate_keys()
 
     node = P2PSocket(host, port, max_connections)
     blockchain = Blockchain()
-    p2p_network = P2PNetwork(node, blockchain, broadcast_port, sync_interval, broadcast_interval, discovery_timeout)
+    p2p_network = P2PNetwork(node, blockchain, broadcast_port, username, dh_public_key.hex(), sync_interval, broadcast_interval)
     sync_manager = p2p_network.sync_with_peers()
     node.sync_manager = sync_manager
     node.node = p2p_network
@@ -74,7 +70,7 @@ def main():
     # p2p_network.discover_peers() # <--- кривовато работает
 
 
-    log.info(f"Your address: {address}")
+    log.info(f"Your public key: {dh_public_key}")
 
     shared_keys = {}
     peers_public_keys = {}
@@ -155,16 +151,16 @@ def main():
         except Exception as e:
             print(f"Error sending invalid peer: {e}")
     
-    peers_list = request_peers()
-    new_peer()
-    for peer in peers_list:
-        conn = p2p_network.connect_to_peer(peer[0], int(peer[1]))
-        if not conn:
-            invalid_peer(peer[0], int(peer[1]))
-            continue
-        with node.lock:
-            conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
-            time.sleep(0.05)
+    # peers_list = request_peers()
+    # new_peer()
+    # for peer in peers_list:
+    #     conn = p2p_network.connect_to_peer(peer[0], int(peer[1]))
+    #     if not conn:
+    #         invalid_peer(peer[0], int(peer[1]))
+    #         continue
+    #     with node.lock:
+    #         conn.send(b"INCOME_PORT" + str(port).encode())  ## Для двустороннего подключения
+    #         time.sleep(0.05)
 
     while True:
         command = input("Enter command (connect, message, send, mine, balance, peers, chain, exit): ")
@@ -197,7 +193,7 @@ def main():
                 encrypted_content = encryptor.encrypt(content)
                 if encrypted_content:
                     log.debug("Creating signed encrypted transaction")
-                    transaction = Transaction(address, recipient, 0, encrypted_content.hex(), public_key)
+                    transaction = Transaction(dh_public_key, recipient, 0, encrypted_content.hex(), public_key)
                     transaction.sign_transaction(signer.private_key)
                     blockchain.add_transaction(transaction, p2p_network)
                 else:
