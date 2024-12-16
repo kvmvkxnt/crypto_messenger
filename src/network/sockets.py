@@ -55,7 +55,7 @@ class P2PSocket:
                     if not data:
                         break
 
-                    data = zlib.decompress(data).decode()
+                    data = zlib.decompress(data)
 
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
