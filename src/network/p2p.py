@@ -27,8 +27,6 @@ class P2PNetwork:
         max_connections: int = 5
     ):
         """Инициализация P2P сети."""
-        if not isinstance(node, P2PSocket):
-            raise TypeError("Node must be an instance of P2PSocket")
         self.blockchain = blockchain
         self.host = host
         self.port = port
