@@ -45,11 +45,8 @@ def discover_peers(
             log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
             while True:
                 try:
-                    data, addr = udp_socket.recvfrom(1024)
+                    data, addr = udp_socket.recvfrom(4096)
                     peer_info = json.loads(data.decode())
-                    if ":" not in peer_info:
-                        log.debug(f"Invalid peer info received: {peer_info}")
-                        continue
 
                     peer_port = peer_info["port"]
                     try:
