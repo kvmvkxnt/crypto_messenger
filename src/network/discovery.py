@@ -30,7 +30,7 @@ def discover_peers(
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
-        with sock as udp_socket:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
             try:
@@ -74,7 +74,7 @@ def discover_peers(
         Отправляет широковещательное сообщение
         для оповещения о своем узле.
         """
-        with sock as udp_socket:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = {"host": local_host, "port": local_port,
