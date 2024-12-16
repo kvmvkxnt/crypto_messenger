@@ -48,11 +48,12 @@ class SyncManager:
 
                 for block in received_chain:
                     for transaction in block["transactions"]:
-                        transaction["signature"] = (
-                            bytes.fromhex(transaction["signature"])
-                            if transaction["signature"]
-                            else None
-                        )
+                        if transaction["signature"]:
+                            transaction["signature"] = (
+                                bytes.fromhex(transaction["signature"])
+                                if transaction["signature"]
+                                else None
+                            )
                         if transaction["sender"]:
                             transaction["sender"] = (
                                 bytes.fromhex(transaction["sender"])
@@ -62,9 +63,10 @@ class SyncManager:
                         transaction["recipient"] = bytes.fromhex(
                             transaction["recipient"]
                         ).encode()
-                        transaction["sign_public_key"] = bytes.fromhex(
-                            transaction["sign_public_key"]
-                        )
+                        if transaction["sign_public_key"]:
+                            transaction["sign_public_key"] = bytes.fromhex(
+                                transaction["sign_public_key"]
+                            )
                     block["transactions"] = [
                         Transaction(**transaction)
                         for transaction in block["transactions"]
@@ -143,11 +145,12 @@ class SyncManager:
         try:
             block_dict = json.loads(block_data.decode())
             for transaction in block_dict["transactions"]:
-                transaction["signature"] = (
-                    bytes.fromhex(transaction["signature"])
-                    if transaction["signature"]
-                    else None
-                )
+                if transaction["signature"]:
+                    transaction["signature"] = (
+                        bytes.fromhex(transaction["signature"])
+                        if transaction["signature"]
+                        else None
+                    )
                 if transaction["sender"]:
                     transaction["sender"] = (
                         bytes.fromhex(transaction["sender"])
@@ -157,9 +160,10 @@ class SyncManager:
                 transaction["recipient"] = bytes.fromhex(
                     transaction["recipient"]
                 )
-                transaction["sign_public_key"] = bytes.fromhex(
-                    transaction["sign_public_key"]
-                )
+                if transaction["sign_public_key"]:
+                    transaction["sign_public_key"] = bytes.fromhex(
+                        transaction["sign_public_key"]
+                    )
             block_dict["transactions"] = [
                 Transaction(**transaction) for transaction in block_dict["transactions"]
             ]
@@ -195,14 +199,16 @@ class SyncManager:
             transaction_dict["recipient"] = bytes.fromhex(
                 transaction_dict["recipient"]
             )
-            transaction_dict["signature"] = (
-                bytes.fromhex(transaction_dict["signature"])
-                if transaction_dict["signature"]
-                else None
-            )
-            transaction_dict["sign_public_key"] = bytes.fromhex(
-                transaction_dict["sign_public_key"]
-            )
+            if transaction_dict["signature"]:
+                transaction_dict["signature"] = (
+                    bytes.fromhex(transaction_dict["signature"])
+                    if transaction_dict["signature"]
+                    else None
+                )
+            if transaction_dict["sign_public_key"]:
+                transaction_dict["sign_public_key"] = bytes.fromhex(
+                    transaction_dict["sign_public_key"]
+                )
             transaction = Transaction(**transaction_dict)
             if transaction in self.blockchain.pending_transactions:
                 return
