@@ -50,8 +50,8 @@ def main():
     rv_port = 5050
     peers_list = []
 
-    host = "62.181.51.106"
-    port = int(input('Enter port: '))
+    host = "0.0.0.0"
+    port = 12345
     broadcast_port = 5000
     sync_interval = 5
     max_connections = 5

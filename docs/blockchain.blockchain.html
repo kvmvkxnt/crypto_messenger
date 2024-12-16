@@ -6,7 +6,7 @@
 
   <head>
     
-    <title>blockchain.blockchain</title>
+    <title>blockchain.Blockchain</title>
     <meta name="generator" content="pydoctor 24.11.1"> 
         
     </meta>
@@ -32,7 +32,7 @@
       
       <div class="navlinks">
         <span class="navbar-brand">
-          blockchain/cryptography <a href="index.html">API Documentation</a>
+          blockchain/diffie_hellman/consensus/transaction/encryption <a href="index.html">API Documentation</a>
         </span>
 
         <a href="moduleIndex.html">
@@ -109,8 +109,123 @@
   <div>
 
       <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="blockchain.Blockchain.html" class="internal-link" title="This class"><wbr></wbr>Blockchain</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="blockchain.Blockchain.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#add_transaction" class="internal-link" title="blockchain.Blockchain.add_transaction">add<wbr></wbr>_transaction</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#create_genesis_block" class="internal-link" title="blockchain.Blockchain.create_genesis_block">create<wbr></wbr>_genesis<wbr></wbr>_block</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get_latest_block" class="internal-link" title="blockchain.Blockchain.get_latest_block">get<wbr></wbr>_latest<wbr></wbr>_block</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#mine_pending_transactions" class="internal-link" title="blockchain.Blockchain.mine_pending_transactions">mine<wbr></wbr>_pending<wbr></wbr>_transactions</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#chain" class="internal-link" title="blockchain.Blockchain.chain">chain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#difficulty" class="internal-link" title="blockchain.Blockchain.difficulty">difficulty</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#pending_transactions" class="internal-link" title="blockchain.Blockchain.pending_transactions">pending<wbr></wbr>_transactions</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
         <span>Module</span>
-        <code class="thisobject"><a href="blockchain.blockchain.html" class="internal-link" title="This module">blockchain</a></code> 
+        <code><a href="blockchain.html" class="internal-link" title="The parent of this class">blockchain</a></code> 
       </div>
       
       <div>
@@ -128,84 +243,22 @@
         
 
         
-            <div class="itemName"><code><a href="blockchain.blockchain.Block.html" class="internal-link" title="blockchain.blockchain.Block"><wbr></wbr>Block</a></code>
+            <div class="itemName"><code><a href="blockchain.Block.html" class="internal-link" title="blockchain.Block"><wbr></wbr>Block</a></code>
             </div>
         
 
-    </li><li class="">
+    </li><li class=" thisobject">
         
         
         
 
         
-            <div class="itemName"><code><a href="blockchain.blockchain.Blockchain.html" class="internal-link" title="blockchain.blockchain.Blockchain"><wbr></wbr>Blockchain</a></code>
+            <div class="itemName"><code><a href="blockchain.Blockchain.html" class="internal-link" title="blockchain.Blockchain"><wbr></wbr>Blockchain</a></code>
             </div>
         
 
     </li>
 </ul>
-
-        
-         
-
-        
-         
-
-        
-         
-
-        
-         
-        
-      </div>
-  </div><div>
-
-      <div class="thingTitle">
-        <span>Package</span>
-        <code><a href="blockchain.html" class="internal-link" title="The parent of this module">blockchain</a></code> 
-      </div>
-      
-      <div>
-        
-
-        <div class="childrenKindTitle">Modules</div>
-        <ul>
-    
-    <li class=" thisobject">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="blockchain.blockchain.html" class="internal-link" title="blockchain.blockchain">blockchain</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="blockchain.consensus.html" class="internal-link" title="blockchain.consensus">consensus</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="blockchain.transaction.html" class="internal-link" title="blockchain.transaction">transaction</a></code>
-            </div>
-        
-
-    </li>
-</ul> 
-
-        
-        
 
         
          
@@ -238,42 +291,69 @@
         
 
         <div class="page-header">
-          <h1 class="module"><code><code><a href="blockchain.html" class="internal-link">blockchain</a></code><wbr></wbr>.<code><a href="blockchain.blockchain.html" class="internal-link" title="blockchain.blockchain">blockchain</a></code></code></h1>
+          <h1 class="class"><code><code><a href="blockchain.html" class="internal-link">blockchain</a></code><wbr></wbr>.<code><a href="blockchain.Blockchain.html" class="internal-link" title="blockchain.Blockchain">Blockchain</a></code></code></h1>
           <div id="showPrivate">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
         </div>
 
         <div class="categoryHeader">
-          module documentation
+          class documentation
         </div>
 
         <div class="extrasDocstring">
-          
-          <p></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Blockchain</span>:</code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="blockchain.Blockchain.__init__">Blockchain(difficulty)</a></code></p>
+          <p><a href="classIndex.html#blockchain.Blockchain">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Blockchain module</p>
-<p>Base of blockchain module which contains most os the basic things sush as
-Block class or Blockchain class with basic functions</p>
-</div>
+          <div><p>The basic blockchain class</p></div>
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id2">
+          <table class="children sortable" id="id3">
   
   
-  <tr class="class">
+  <tr class="method">
     
-    <td>Class</td>
-    <td><code><a href="blockchain.blockchain.Block.html" class="internal-link" title="blockchain.blockchain.Block"><wbr></wbr>Block</a></code></td>
-    <td>Block class</td>
-  </tr><tr class="class">
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="blockchain.Blockchain.__init__">__init__</a></code></td>
+    <td>Initiates the blockchain with its own difficulty</td>
+  </tr><tr class="method">
     
-    <td>Class</td>
-    <td><code><a href="blockchain.blockchain.Blockchain.html" class="internal-link" title="blockchain.blockchain.Blockchain"><wbr></wbr>Blockchain</a></code></td>
-    <td>The basic blockchain class</td>
+    <td>Method</td>
+    <td><code><a href="#add_transaction" class="internal-link" title="blockchain.Blockchain.add_transaction">add<wbr></wbr>_transaction</a></code></td>
+    <td>Adds transaction to pending list, previously signing it</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#create_genesis_block" class="internal-link" title="blockchain.Blockchain.create_genesis_block">create<wbr></wbr>_genesis<wbr></wbr>_block</a></code></td>
+    <td>Creates genesis-block (blockchain's first block)</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#get_latest_block" class="internal-link" title="blockchain.Blockchain.get_latest_block">get<wbr></wbr>_latest<wbr></wbr>_block</a></code></td>
+    <td>Gets the last block from the chain (obvious)</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#mine_pending_transactions" class="internal-link" title="blockchain.Blockchain.mine_pending_transactions">mine<wbr></wbr>_pending<wbr></wbr>_transactions</a></code></td>
+    <td>Creates new block using pending transactions and adds it to chain</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#chain" class="internal-link" title="blockchain.Blockchain.chain">chain</a></code></td>
+    <td>chain of the blocks (obvious)</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#difficulty" class="internal-link" title="blockchain.Blockchain.difficulty">difficulty</a></code></td>
+    <td>difficulty of getting the right hash</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#pending_transactions" class="internal-link" title="blockchain.Blockchain.pending_transactions">pending<wbr></wbr>_transactions</a></code></td>
+    <td>list of pending transactions</td>
   </tr>
 </table>
           
@@ -282,7 +362,199 @@ Block class or Blockchain class with basic functions</p>
         </div>
 
         <div id="childList">
-          
+          <div class="basemethod">
+  
+  
+  <a name="blockchain.Blockchain.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">__init__</span><span class="function-signature">(self, difficulty: <code>float</code> = 4)</span>:
+    
+    <a class="headerLink" href="#__init__" title="blockchain.Blockchain.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initiates the blockchain with its own difficulty</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">difficulty:</span>float</td><td class="fieldArgDesc">difficulty of geting the right hash</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="blockchain.Blockchain.add_transaction">
+    
+  </a>
+  <a name="add_transaction">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">add_transaction</span><span class="function-signature">(self, transaction: <code><a href="transaction.Transaction.html" class="internal-link" title="transaction.Transaction">Transaction</a></code>)</span>:
+    
+    <a class="headerLink" href="#add_transaction" title="blockchain.Blockchain.add_transaction">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Adds transaction to pending list, previously signing it</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">transaction:</span>Transaction</td><td class="fieldArgDesc">transaction that needs to be added to list</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="blockchain.Blockchain.create_genesis_block">
+    
+  </a>
+  <a name="create_genesis_block">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">create_genesis_block</span><span class="function-signature">(self) -&gt; <code><a href="blockchain.Block.html" class="internal-link" title="blockchain.Block">Block</a></code></span>:
+    
+    <a class="headerLink" href="#create_genesis_block" title="blockchain.Blockchain.create_genesis_block">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Creates genesis-block (blockchain's first block)</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">Block</td><td class="fieldArgDesc">absolutely empty block</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="blockchain.Blockchain.get_latest_block">
+    
+  </a>
+  <a name="get_latest_block">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">get_latest_block</span><span class="function-signature">(self) -&gt; <code><a href="blockchain.Block.html" class="internal-link" title="blockchain.Block">Block</a></code></span>:
+    
+    <a class="headerLink" href="#get_latest_block" title="blockchain.Blockchain.get_latest_block">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Gets the last block from the chain (obvious)</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">Block</td><td class="fieldArgDesc">last block of the chain</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="blockchain.Blockchain.mine_pending_transactions">
+    
+  </a>
+  <a name="mine_pending_transactions">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">mine_pending_transactions</span><span class="function-signature">(self, miner_address: <code>str</code>)</span>:
+    
+    <a class="headerLink" href="#mine_pending_transactions" title="blockchain.Blockchain.mine_pending_transactions">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Creates new block using pending transactions and adds it to chain</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">miner<wbr></wbr>_address:</span>str</td><td class="fieldArgDesc">miner's adderss</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">None</td><td class="fieldArgDesc">only if there are no pending transactions</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="blockchain.Blockchain.chain">
+    
+  </a>
+  <a name="chain">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">chain</span>: List[Block] =
+    
+    <a class="headerLink" href="#chain" title="blockchain.Blockchain.chain">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>chain of the blocks (obvious)</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="blockchain.Blockchain.difficulty">
+    
+  </a>
+  <a name="difficulty">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">difficulty</span>: float =
+    
+    <a class="headerLink" href="#difficulty" title="blockchain.Blockchain.difficulty">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>difficulty of getting the right hash</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="blockchain.Blockchain.pending_transactions">
+    
+  </a>
+  <a name="pending_transactions">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">pending_transactions</span>: List[Transaction] =
+    
+    <a class="headerLink" href="#pending_transactions" title="blockchain.Blockchain.pending_transactions">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>list of pending transactions</p></div>
+    
+  </div>
+</div>
         </div>
       
       </div>
@@ -292,9 +564,9 @@ Block class or Blockchain class with basic functions</p>
 
   
   <div class="container-fluid">
-    <a href="index.html">API Documentation</a> for blockchain/cryptography,
+    <a href="index.html">API Documentation</a> for blockchain/diffie_hellman/consensus/transaction/encryption,
   generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-    24.11.1 at 2024-12-12 19:22:32.
+    24.11.1 at 2024-12-12 18:05:26.
   </div>
 
   <!-- Search related scripts needs to be loaded at the end of HTML 
