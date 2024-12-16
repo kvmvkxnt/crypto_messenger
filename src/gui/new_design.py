@@ -5,20 +5,17 @@ from PyQt5.QtCore import Qt
 
 class Ui_BlockChain(object):
     """
-    UI setup class for the BlockChain Messenger application
-    
-    This class defines the user interface components of the messenger
+    App`s class: class of app
     """
 
     def setupUi(self, BlockChain):
         """
-        Set up the user interface for the BlockChain application
-        
-        This method initializes and arranges all the UI components
+        Sets up the user interface for the main window.
 
-        Args:
-            BlockChain (QtWidgets.QMainWindow): The main window of the application
+        :param Blockchain: The main window object where the UI will be loaded.
+        :type Blockchain: QMainWindow
         """
+        
         BlockChain.setObjectName("BlockChain")
         BlockChain.setMinimumSize(800, 600)
         BlockChain.resize(800, 600)
@@ -142,10 +139,10 @@ class Ui_BlockChain(object):
 
     def retranslateUi(self, BlockChain):
         """
-        Set the text for the UI elements
-        
-        Args:
-            BlockChain (QtWidgets.QMainWindow): The main window of the application
+        Translates the UI components of MainWindow.
+
+        :param MainWindow: The main window object to apply translations.
+        :type MainWindow: QMainWindow
         """
         _translate = QtCore.QCoreApplication.translate
         BlockChain.setWindowTitle(_translate("BlockChain", "Blockchain mess"))
