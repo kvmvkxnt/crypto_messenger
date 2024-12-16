@@ -54,7 +54,7 @@ class SyncManager:
                             else None
                         )
                         transaction["sender"] = (
-                            bytes.fromhex(transaction["sender"]).encode()
+                            bytes.fromhex(transaction["sender"])
                             if transaction["sender"]
                             else None
                         )
@@ -63,7 +63,7 @@ class SyncManager:
                         ).encode()
                         transaction["sign_public_key"] = bytes.fromhex(
                             transaction["sign_public_key"]
-                        ).encode()
+                        )
                     block["transactions"] = [
                         Transaction(**transaction)
                         for transaction in block["transactions"]
@@ -100,7 +100,7 @@ class SyncManager:
         else:
             log.debug("Received chain is not longer than the local chain.")
 
-    def broadcast_block(self, block: Block) -> None:
+    def broadcast_block(self, block: Block, conn) -> None:
         """
         Рассылает новый блок всем известным узлам.
 
@@ -113,11 +113,9 @@ class SyncManager:
 
         block_bytes = json.dumps(block.to_dict(), ensure_ascii=False).encode()
 
-        for conn, _ in self.p2p_network.node.connections:
-            try:
-                conn.sendall(b"NEW_BLOCK" + block_bytes)
-            except socket.error as e:
-                log.error(f"Error broadcasting block: {e}")
+        self.p2p_network.broadcast_message(b"NEW_BLOCK" + block_bytes, conn)
+        
+
 
     def start_sync_loop(self) -> None:
         """
@@ -137,7 +135,7 @@ class SyncManager:
 
         threading.Thread(target=sync_loop, daemon=True).start()
 
-    def handle_new_block(self, block_data: bytes) -> None:
+    def handle_new_block(self, block_data: bytes, conn) -> None:
         """
         Обрабатывает новый блок, полученный от другого узла.
         """
@@ -150,16 +148,16 @@ class SyncManager:
                     else None
                 )
                 transaction["sender"] = (
-                    bytes.fromhex(transaction["sender"]).encode()
+                    bytes.fromhex(transaction["sender"])
                     if transaction["sender"]
                     else None
                 )
                 transaction["recipient"] = bytes.fromhex(
                     transaction["recipient"]
-                ).encode()
+                )
                 transaction["sign_public_key"] = bytes.fromhex(
                     transaction["sign_public_key"]
-                ).encode()
+                )
             block_dict["transactions"] = [
                 Transaction(**transaction) for transaction in block_dict["transactions"]
             ]
@@ -169,8 +167,8 @@ class SyncManager:
 
             if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
                 self.blockchain.chain.append(block)
+                self.broadcast_block(block, conn)
                 log.info(f"Added new block with index {block.index}")
-                # self.broadcast_block(block)
             else:
                 log.warning("Invalid block received")
 

@@ -186,6 +186,7 @@ class Blockchain:
         if self.validator.validate_block(new_block, self.chain[-1]):
             self.chain.append(new_block)
             self.pending_transactions = [reward_transaction]
+            return new_block, reward_transaction
         else:
             print("Invalid block. Block was not added to the chain")
 

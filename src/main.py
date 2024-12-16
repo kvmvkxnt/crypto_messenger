@@ -151,17 +151,21 @@ def main():
             else:
                 log.warning("No shared key")
 
-        elif command == "send":
-            recipient = input("Enter recipient address: ")
-            amount = float(input("Enter amount to send (MEM): "))
-            transaction = Transaction(address, recipient, amount, "", public_key)
-            transaction.sender_public_key = public_key
-            transaction.sign_transaction(signer.private_key)
-            blockchain.add_transaction(transaction, p2p_network)
+        # elif command == "send":
+        #     recipient = input("Enter recipient address: ")
+        #     amount = float(input("Enter amount to send (MEM): "))
+        #     transaction = Transaction(address, recipient, amount, "", public_key)
+        #     transaction.sender_public_key = public_key
+        #     transaction.sign_transaction(signer.private_key)
+        #     blockchain.add_transaction(transaction, p2p_network)
         elif command == "mine":
-            blockchain.mine_pending_transactions(ProofOfWork, dh_public_key)
+            new_block, reward_transaction = blockchain.mine_pending_transactions(ProofOfWork, dh_public_key)
+            p2p_network.sync_manager.broadcast_block(new_block, None)
+            p2p_network.broadcast_transaction(reward_transaction, None)
+
+
         elif command == "balance":
-            balance = blockchain.get_balance(address)
+            balance = blockchain.get_balance(dh_public_key)
             print(f"Your balance: {balance} MEM")
         elif command == "peers":
             peers = list(p2p_network.peers)

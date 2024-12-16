@@ -61,7 +61,7 @@ class P2PSocket:
 
                     if data.startswith(b"NEW_BLOCK"):
                         block_data = data[len(b"NEW_BLOCK") :]
-                        self.sync_manager.handle_new_block(block_data)
+                        self.sync_manager.handle_new_block(block_data, conn)
 
                     elif data.startswith(b"REQUEST_CHAIN"):
                         chain_data = json.dumps(
