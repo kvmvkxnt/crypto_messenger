@@ -73,8 +73,8 @@ class SyncManager:
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")
-        except json.JSONDecodeError as e:
-            log.error(f"Error decoding chain data: {e}")
+        # except json.JSONDecodeError as e:
+        #     log.error(f"Error decoding chain data: {e}")
         except Exception as e:
             log.error(f"Error during chain request: {e}")
 
@@ -168,8 +168,8 @@ class SyncManager:
             else:
                 log.warning("Invalid block received")
 
-        except json.JSONDecodeError as e:
-            log.error(f"Error decoding block data: {e}")
+        # except json.JSONDecodeError as e:
+        #     log.error(f"Error decoding block data: {e}")
         except Exception as e:
             log.error(f"Error during block handling: {e}")
 
@@ -204,7 +204,7 @@ class SyncManager:
                 log.info(f"Added new transaction from network")
             else:
                 log.warning("Invalid transaction received")
-        except json.JSONDecodeError as e:
-            log.error(f"Error decoding transaction data: {e}")
+        # except json.JSONDecodeError as e:
+        #     log.error(f"Error decoding transaction data: {e}")
         except Exception as e:
             log.error(f"Error during transaction handling: {e}")
