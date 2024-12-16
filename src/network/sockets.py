@@ -51,10 +51,19 @@ class P2PSocket:
         try:
             while True:
                 try:
-                    data = conn.recv(4096)
-                    if not data:
-                        break
+                    chunks = []
+                    while True:
+                        chunk = conn.recv(4096)
+                        if not chunk:
+                            break  # Соединение закрыто
+                        chunks.append(chunk)
+                        if len(chunk) < 4096:
+                            break # последний чанк
 
+                    if not chunks:
+                        break # Выходим из цикла обработки, если нет данных
+                        
+                    data = b"".join(chunks)
                     data = zlib.decompress(data)
 
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
