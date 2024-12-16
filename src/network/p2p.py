@@ -60,18 +60,18 @@ class P2PNetwork:
             log.error(f"Error connecting to peer: {e}")
             print(traceback.format_exc())
 
-    def broadcast_message(self, message: str):
+    def broadcast_message(self, message: str, conn):
         """Рассылка сообщения всем подключенным узлам."""
         log.debug(f"Broadcasting message: {message}")
-        self.node.broadcast(message)
+        self.node.broadcast(message, conn)
 
-    def broadcast_transaction(self, transaction: Transaction):
+    def broadcast_transaction(self, transaction: Transaction, conn):
         """Рассылает транзакцию всем подключенным узлам."""
         transaction_data = json.dumps(
             transaction.to_dict(), ensure_ascii=False
         ).encode()
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
-        self.broadcast_message(b"NEW_TRANSACTION" + transaction_data)
+        self.broadcast_message(b"NEW_TRANSACTION" + transaction_data, conn)
 
     def discover_peers(self):
         """Механизм обнаружения новых узлов."""

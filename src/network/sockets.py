@@ -73,7 +73,7 @@ class P2PSocket:
 
                     elif data.startswith(b"NEW_TRANSACTION"):
                         transaction_data = data[len(b"NEW_TRANSACTION") :]
-                        self.sync_manager.handle_new_transaction(transaction_data)
+                        self.sync_manager.handle_new_transaction(transaction_data, conn)
                     
                     elif data.startswith(b"NEW_MESSAGE"):
                         pass

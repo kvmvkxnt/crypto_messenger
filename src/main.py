@@ -144,7 +144,7 @@ def main():
                     transaction = Transaction(dh_public_key, recipient, 0, encrypted_content.hex())
                     transaction.sign_transaction(signature_manager)
                     blockchain.add_transaction(transaction, signature_manager)
-                    p2p_network.broadcast_transaction(transaction)
+                    p2p_network.broadcast_transaction(transaction, None)
                 else:
                     log.error("Message was not encrypted")
             else:
