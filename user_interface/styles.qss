@@ -1,0 +1,156 @@
+QPushButton#close_button {
+    border: none;           
+    background: transparent;
+    border-radius: 8px;    
+    width: 32px;            
+    height: 32px;         
+    qproperty-icon: url("./icons/icon_close.png");
+    icon-size: 16px 16px;
+}
+
+QPushButton#close_button:hover {
+    background-color: rgb(91, 21, 95);  
+}
+
+QPushButton#close_button:pressed {
+    background-color: rgb(212, 16, 176); 
+}
+QPushButton#sendMessage_button {
+    border: none;           
+    background: transparent;
+    border-radius: 16px;    
+    width: 38px;            
+    height: 27px;         
+    qproperty-icon: url("./icons/sendMessage_Button.png");
+    icon-size: 38px 27px;
+}
+
+QPushButton#sendMessage_button:hover {
+    background-color: rgb(229, 161, 232);  
+}
+
+QPushButton#sendMessage_button:pressed {
+    background-color: rgb(241, 94, 217); 
+}
+
+QPushButton {
+    color: white;
+    border: none;           
+    background: transparent;
+    border-radius: 8px;    
+    width: 32px;            
+    height: 32px;         
+    icon-size: 16px 16px;
+}
+QPushButton#minimize_button{
+    qproperty-icon: url("./icons/icon_minimize.png");
+}
+
+QPushButton#maximize_button{
+    qproperty-icon: url("./icons/icon_maximize.png");
+}
+
+QPushButton#options_Button{
+    width: 40px;            
+    height: 40px;         
+    icon-size: 20px 20px;
+    qproperty-icon: url("./icons/icon_settings.png");
+}
+
+QPushButton:hover {
+    background-color: rgb(229, 161, 232);  
+}
+
+QPushButton:pressed {
+    background-color: rgb(241, 94, 217); 
+}
+
+QFrame#up_stroke {
+    margin: 0;
+    background-color: rgb(54, 42, 64);
+}
+
+QMainWindow{
+    background-color: rgb(36, 18, 54);
+    border: 5px solid darkslateblue;
+}
+
+QLineEdit{
+    color: rgb(255, 255, 255);
+    background-color: rgb(42, 33, 49);
+    border: none;
+    border-radius: 16px;
+}
+
+QTextBrowser{
+    background-color: rgb(59, 18, 63);
+    border: none;
+    width: 100%;
+}
+
+QListWidget{
+    background-color: rgb(59, 18, 63);
+    border: none;
+}
+
+QListWidget::item {
+    color: #ffffff;
+    padding: 10px;
+}
+
+QListWidget::item:selected {
+    background-color: rgb(100, 26, 107);
+    color: #fff;
+}
+
+QListWidget::item:hover {
+    background-color: rgb(229, 161, 232);
+}
+
+QScrollBar{
+    background: none;
+}
+
+QInputDialog{
+    background-color: rgb(36, 18, 54);
+}
+
+QLabel{
+    color: #ffffff;
+}
+
+QLabel#currentChatLabel{
+   background-color: rgb(54, 42, 64); 
+    font-size: 17px;
+    font-weight: bold;
+    padding: 5px;
+}
+
+QMenu {
+    background-color: darkslateblue;  
+    padding: 2px;           
+    color: #ffffff;            
+}
+
+QMenu::item {
+    padding: 8px 20px;      
+    background-color: transparent; 
+    border: 1px;
+    border-color: #ccc;
+    color: #ffffff;            
+}
+
+QMenu::item:selected {
+    background-color: #0078d7;
+    color: #fff;              
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #ccc;        
+    margin: 5px 0;
+}
+
+QMessageBox{
+    background-color: rgb(59,18,63);
+}
