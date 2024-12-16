@@ -5,6 +5,7 @@ from blockchain.transaction import Transaction
 import json
 from .discovery import discover_peers
 from .sync import SyncManager
+import traceback
 
 from blockchain.blockchain import Blockchain
 
@@ -57,6 +58,7 @@ class P2PNetwork:
             return conn
         except Exception as e:
             log.error(f"Error connecting to peer: {e}")
+            print(traceback.format_exc())
 
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""

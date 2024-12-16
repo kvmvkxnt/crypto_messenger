@@ -104,14 +104,14 @@ class P2PSocket:
     def connect_to_peer(self, peer_host: str, peer_port: int):
         """Подключение к другому узлу."""
         try:
-            conn, addr = socket.create_connection((peer_host, peer_port))
+            conn = socket.create_connection((peer_host, peer_port))
             if len(self.connections) >= self.max_connections:
                 log.warning(
                     f"Maximum connections reached. Connection to {peer_host}:{peer_port} rejected"
                 )
                 conn.close()
                 return None
-            self.connections.append((conn, addr))
+            self.connections.append((conn, (peer_host, peer_port)))
             threading.Thread(
                 target=self.handle_client, args=(conn, (peer_host, peer_port))
             ).start()

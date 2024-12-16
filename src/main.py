@@ -109,12 +109,15 @@ def main():
 
                 try:
                     index = int(index)
-                    p2p_network.connect_to_peer(p2p_network.peers[index][0], p2p_network.peers[index][1])
-                except ValueError:
+                    peers = list(p2p_network.peers)
+                    p2p_network.connect_to_peer(peers[index][0], peers[index][1])
+                    break
+                except (ValueError, IndexError, TypeError):
                     try:
                         for p in p2p_network.peers:
                             if p[2] == index:
                                 p2p_network.connect_to_peer(p[0], p[1])
+                                break
                     except Exception as e:
                         print(f"Error connecting to peer: {e}")
 
@@ -156,8 +159,8 @@ def main():
             print(f"Your balance: {balance} MEM")
         elif command == "peers":
             peers = list(p2p_network.peers)
-            for i in range(0, len(p2p_network.peers)):
-                print(f"ID: {i}     HOST: {peers[i][0]}     PORT: {[i][1]}     USERNAME: {peers[i][2]}     PUBLIC KEY: {peers[i][3]}")
+            for peer in peers:
+                print(f"ID: {peers.index(peer)}     HOST: {peer[0]}     PORT: {peer[1]}     USERNAME: {peer[2]}     PUBLIC KEY: {peer[3]}")
         elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
