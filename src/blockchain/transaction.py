@@ -7,6 +7,12 @@ import json5 as json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 from typing import Dict
+from utils.logger import Logger
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
+
+log = Logger("transaction")
+
+
 
 
 class Transaction:
@@ -32,6 +38,7 @@ class Transaction:
         amount: float = 0,
         content: any = "",
         signature: bytes = None,
+        sign_public_key: bytes = None,
     ):
         """Initializes transaction"""
         self.sender = sender
@@ -39,6 +46,7 @@ class Transaction:
         self.amount = amount
         self.content = content
         self.signature = signature
+        self.sign_public_key = sign_public_key
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -64,7 +72,10 @@ class Transaction:
                 self.signature.hex()
                 if self.signature
                 else None
-            )
+            ),
+            "sign_public_key": self.sign_public_key.hex()
+            if self.sign_public_key
+            else None,
         }
 
     def calculate_hash(self) -> str:
@@ -92,26 +103,35 @@ class Transaction:
         hash_bytes = self.calculate_hash().encode()
         self.signature = signer.sign(hash_bytes)
 
-    def is_valid(self, public_key, signature_manager) -> bool:
+    def is_valid(self, public_key: bytes) -> bool:
         """
         Checks transaction signature
-
-        :param public_key: key needed to validate signature
-        :type public_key: rsa.RSAPublicKey
+        :param public_key_pem: key needed to validate signature
+        :type public_key_pem: bytes
         :return: if signature is valid or not
         :rtype: bool
         """
         if not self.signature:
-            print("No signature in this transaction")
+            log.debug("No signature in this transaction")
+            return False
+        if not public_key:
+            log.debug("No public key provided")
             return False
 
+        public_key = load_pem_public_key(public_key)
         try:
-            signature_manager.verify(public_key, self.calculate_hash(),
-                           self.signature)
+            public_key.verify(
+                self.signature,
+                self.calculate_hash().encode(),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
             return True
         except Exception as e:
-            print(f"Signature verification failed: {e}")
-            return False
+            log.error(f"Signature verification failed: {e}")
 
 
 if __name__ == "__main__":

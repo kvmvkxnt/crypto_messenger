@@ -61,6 +61,9 @@ class SyncManager:
                         transaction["recipient"] = bytes.fromhex(
                             transaction["recipient"]
                         ).encode()
+                        transaction["sign_public_key"] = bytes.fromhex(
+                            transaction["sign_public_key"]
+                        ).encode()
                     block["transactions"] = [
                         Transaction(**transaction)
                         for transaction in block["transactions"]
@@ -154,6 +157,9 @@ class SyncManager:
                 transaction["recipient"] = bytes.fromhex(
                     transaction["recipient"]
                 ).encode()
+                transaction["sign_public_key"] = bytes.fromhex(
+                    transaction["sign_public_key"]
+                ).encode()
             block_dict["transactions"] = [
                 Transaction(**transaction) for transaction in block_dict["transactions"]
             ]
@@ -173,7 +179,7 @@ class SyncManager:
         except Exception as e:
             log.error(f"Error during block handling: {e}")
 
-    def handle_new_transaction(self, transaction_data: bytes, conn, signature_manager) -> None:
+    def handle_new_transaction(self, transaction_data: bytes, conn) -> None:
         """
         Обрабатывает новую транзакцию, полученную от другого узла.
         """
@@ -193,12 +199,15 @@ class SyncManager:
                 if transaction_dict["signature"]
                 else None
             )
+            transaction_dict["sign_public_key"] = bytes.fromhex(
+                transaction_dict["sign_public_key"]
+            ).encode()
             transaction = Transaction(**transaction_dict)
             if transaction in self.blockchain.pending_transactions:
                 return
 
             log.debug(f"Received transaction {transaction.calculate_hash()}")
-            if self.blockchain.is_transaction_valid(transaction, signature_manager):
+            if self.blockchain.is_transaction_valid(transaction):
                 self.blockchain.pending_transactions.append(transaction)
                 self.p2p_network.broadcast_transaction(transaction, conn)
                 log.info(f"Added new transaction from network")
