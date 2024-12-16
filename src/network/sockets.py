@@ -15,7 +15,7 @@ class P2PSocket:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []  # Список активных подключений
         self.blockchain = blockchain
-        self.sync_manager = None
+        self.sync_manager = sync_manager
 
     def start_server(self):
         """Запуск сервера для приема подключений."""
@@ -51,7 +51,7 @@ class P2PSocket:
                     data = conn.recv(4096)
                     if not data:
                         break
-                        
+
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
                     if data.startswith(b"NEW_BLOCK"):
@@ -74,14 +74,14 @@ class P2PSocket:
                     elif data.startswith(b"NEW_TRANSACTION"):
                         transaction_data = data[len(b"NEW_TRANSACTION") :]
                         self.sync_manager.handle_new_transaction(transaction_data, conn)
-                    
+
                     elif data.startswith(b"NEW_MESSAGE"):
                         pass
-                    
+
                     else:  # Простое сообщение
                         self.broadcast(data, conn)
 
-                except ConnectionResetError as e:   
+                except ConnectionResetError as e:
                     break # Выходим из цикла обработки клиента
                 except socket.error as e:
                     log.error(f"Error receiving data from {addr}: {e}")
