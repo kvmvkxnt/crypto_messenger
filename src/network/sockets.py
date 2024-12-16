@@ -90,7 +90,7 @@ class P2PSocket:
         except Exception as e:
             log.error(f"Error with client {addr}: {e}")
         finally:
-            self.connections.remove(conn)
+            self.connections.remove((conn, addr))
             log.info(f"Connection closed with {addr}")
             conn.close()
 
