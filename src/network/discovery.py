@@ -5,6 +5,7 @@ import utils.logger as logger
 from typing import Set, Tuple
 import json
 import os
+import zlib
 
 log = logger.Logger("discovery")
 
@@ -28,6 +29,7 @@ def discover_peers(
     """
     peers = set()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
@@ -46,7 +48,7 @@ def discover_peers(
             while True:
                 try:
                     data, addr = udp_socket.recvfrom(4096)
-                    peer_info = json.loads(data.decode())
+                    peer_info = json.loads(zlib.decompress(data).decode())
 
                     peer_port = peer_info["port"]
                     try:
@@ -80,11 +82,12 @@ def discover_peers(
             message = {"host": local_host, "port": local_port,
                        "public_key": public_key, "username": username}
             broadcast_address = ("<broadcast>", broadcast_port)
+            compressed = zlib.compress(json.dumps(message, ensure_ascii=False)
+                                      .encode())
 
             while True:
                 try:
-                    udp_socket.sendto(json.dumps(message, ensure_ascii=False)
-                                      .encode(), broadcast_address)
+                    udp_socket.sendto(compressed, broadcast_address)
                     log.debug(f"Broadcasting: {message}")
                 except socket.error as e:
                     log.error(f"Error in sending broadcast: {e}")
