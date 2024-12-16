@@ -54,13 +54,13 @@ class SyncManager:
                             else None
                         )
                         transaction["sender"] = (
-                            bytes.fromhex(transaction["sender"].encode())
+                            bytes.fromhex(transaction["sender"]).encode()
                             if transaction["sender"]
                             else None
                         )
                         transaction["recipient"] = bytes.fromhex(
-                            transaction["recipient"].encode()
-                        )
+                            transaction["recipient"]
+                        ).encode()
                     block["transactions"] = [
                         Transaction(**transaction)
                         for transaction in block["transactions"]
@@ -147,13 +147,13 @@ class SyncManager:
                     else None
                 )
                 transaction["sender"] = (
-                    bytes.fromhex(transaction["sender"].encode())
+                    bytes.fromhex(transaction["sender"]).encode()
                     if transaction["sender"]
                     else None
                 )
                 transaction["recipient"] = bytes.fromhex(
-                    transaction["recipient"].encode()
-                )
+                    transaction["recipient"]
+                ).encode()
             block_dict["transactions"] = [
                 Transaction(**transaction) for transaction in block_dict["transactions"]
             ]
@@ -181,13 +181,13 @@ class SyncManager:
             transaction_string = transaction_data.decode()
             transaction_dict = json.loads(transaction_string)
             transaction_dict["sender"] = (
-                bytes.fromhex(transaction_dict["sender"].encode())
+                bytes.fromhex(transaction_dict["sender"]).encode()
                 if transaction_dict["sender"]
                 else None
             )
             transaction_dict["recipient"] = bytes.fromhex(
-                transaction_dict["recipient"].encode()
-            )   
+                transaction_dict["recipient"]
+            ).encode()
             transaction_dict["signature"] = (
                 bytes.fromhex(transaction_dict["signature"])
                 if transaction_dict["signature"]
