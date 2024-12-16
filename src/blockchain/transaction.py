@@ -37,16 +37,16 @@ class Transaction:
         recipient: bytes = None,
         amount: float = 0,
         content: any = "",
-        signature: bytes = None,
         sign_public_key: bytes = None,
+        signature: bytes = None
     ):
         """Initializes transaction"""
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
         self.content = content
-        self.signature = signature
         self.sign_public_key = sign_public_key
+        self.signature = signature
 
     def to_dict(self) -> Dict[str, str]:
         """

@@ -201,7 +201,7 @@ class SyncManager:
             )
             transaction_dict["sign_public_key"] = bytes.fromhex(
                 transaction_dict["sign_public_key"]
-            ).encode()
+            )
             transaction = Transaction(**transaction_dict)
             if transaction in self.blockchain.pending_transactions:
                 return
