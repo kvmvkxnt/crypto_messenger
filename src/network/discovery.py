@@ -3,6 +3,7 @@ import threading
 import time
 import utils.logger as logger
 from typing import Set, Tuple
+import os
 
 log = logger.Logger("discovery")
 
@@ -25,20 +26,20 @@ def discover_peers(
     """
     peers: Set[Tuple[str, int]] = set()
     stop_event = threading.Event()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def listen_for_broadcast():
         """Слушает широковещательные сообщения для обнаружения новых узлов."""
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            try:
+            if os.name == "posix":
+                udp_socket.bind(('', broadcast_port))
+            else:
                 udp_socket.bind((local_host, broadcast_port))
-            except socket.error as e:
-                log.error(f"Could not bind socket: {e}")
-                return
 
             log.debug(f"Listening for broadcasts on {local_host}:{broadcast_port}")
             start_time = time.time()
-            while not stop_event.is_set() and time.time() - start_time < timeout:
+            while True:
                 try:
                     data, addr = udp_socket.recvfrom(1024)
                     peer_info = data.decode()
@@ -67,13 +68,13 @@ def discover_peers(
         Отправляет широковещательное сообщение
         для оповещения о своем узле.
         """
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+        with sock as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             message = f"{local_host}:{local_port}"
             broadcast_address = ("<broadcast>", broadcast_port)
 
-            while not stop_event.is_set():
+            while True:
                 try:
                     udp_socket.sendto(message.encode(), broadcast_address)
                     log.debug(f"Broadcasting: {message}")

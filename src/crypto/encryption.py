@@ -10,6 +10,9 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import os
 from typing import Optional
+from ..utils.logger import Logger
+
+log = Logger("encryption")
 
 
 class SymmetricEncryption:
@@ -20,7 +23,7 @@ class SymmetricEncryption:
     :type key: bytes
     """
 
-    def __init__(self, key: bytes, algorithm="AES", mode="GCM"):
+    def __init__(self, key: bytes, algorithm="AES", mode="CBC"):
         """
         Initiates with the given key
 
@@ -53,7 +56,8 @@ class SymmetricEncryption:
         if self.algorithm == "AES" and self.mode == "CBC":
             iv = os.urandom(16)  # Random initialization vector
             cipher = Cipher(
-                algorithms.AES(self.key), modes.CBC(iv), backend=default_backend()
+                algorithms.AES(self.key), modes.CBC(iv),
+                backend=default_backend()
             )
             encryptor = cipher.encryptor()
 
@@ -70,7 +74,7 @@ class SymmetricEncryption:
             ciphertext = aesgcm.encrypt(nonce, plaintext_bytes, None)
             return nonce + ciphertext
         else:
-            print("Unsupported algorithm or mode")
+            log.error("Unsupported algorithm or mode")
             return None
 
     def decrypt(self, ciphertext: bytes) -> Optional[str]:
@@ -93,13 +97,15 @@ class SymmetricEncryption:
             actual_ciphertext = ciphertext[16:]
 
             cipher = Cipher(
-                algorithms.AES(self.key), modes.CBC(iv), backend=default_backend()
+                algorithms.AES(self.key), modes.CBC(iv),
+                backend=default_backend()
             )
             decryptor = cipher.decryptor()
 
             # Decrypting data
             try:
-                padded_data = decryptor.update(actual_ciphertext) + decryptor.finalize()
+                padded_data = decryptor.update(actual_ciphertext) + \
+                    decryptor.finalize()
 
                 # Deleting padding
                 unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()

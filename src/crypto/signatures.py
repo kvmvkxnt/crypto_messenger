@@ -16,6 +16,7 @@ from utils.logger import Logger
 
 log = Logger("signatures")
 
+
 class DigitalSignature:
     '''
         Class that handles all signature methods
@@ -86,7 +87,8 @@ class DigitalSignature:
             log.error(f"Error during signing: {e}")
             return None
 
-    def verify(self, public_key_pem: bytes, message: str, signature: bytes) -> bool:
+    def verify(self, public_key_pem: bytes, message: str, signature: bytes) \
+            -> bool:
         '''
             Verifys digital signature
 
@@ -106,11 +108,12 @@ class DigitalSignature:
             log.error("Message cannot be None")
             return False
         if not signature:
-           log.error("Signature cannot be None")
-           return False
+            log.error("Signature cannot be None")
+            return False
         try:
-           log.debug(f"Loading public key")
-           public_key = load_pem_public_key(public_key_pem) # loading pub key here
+            log.debug("Loading public key")
+            # loading pub key here
+            public_key = load_pem_public_key(public_key_pem)
         except Exception as e:
             log.error(f"Error loading public key during verification: {e}")
             return False

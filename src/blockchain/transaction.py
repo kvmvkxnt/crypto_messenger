@@ -4,12 +4,10 @@
 
 import hashlib
 import json
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from typing import Dict
-from crypto.signatures import DigitalSignature  # Import DigitalSignature
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
 from utils.logger import Logger
-from cryptography import exceptions
 
 log = Logger("transaction")
 
@@ -32,7 +30,8 @@ class Transaction:
     :type sender_public_key: str
     """
 
-    def __init__(self, sender: str, recipient: str, amount: float, content: str = ""):
+    def __init__(self, sender: str, recipient: str, amount: float,
+                 content: str = ""):
         """Initializes transaction"""
         self.sender = sender
         self.recipient = recipient
@@ -72,7 +71,7 @@ class Transaction:
         transaction_string = json.dumps(self.to_dict(), sort_keys=True)
         return hashlib.sha256(transaction_string.encode()).hexdigest()
 
-    def sign_transaction(self, private_key_pem: bytes) -> None:
+    def sign_transaction(self, private_key: rsa.RSAPrivateKey) -> None:
         """
         Signs transaction with private key
 
@@ -82,17 +81,23 @@ class Transaction:
         # Raise error if no full info
         if not self.sender or not self.recipient:
             raise ValueError("Transaction must include sender and recipient")
-        if self.amount > 0:
-            if self.amount <= 0:
-                raise ValueError("Transaction amount must be positive")
+        if self.amount <= 0:
+            raise ValueError("Transaction amount must be positive")
 
         # Signing using private_key and transaction's hash
-        signer = DigitalSignature()
-        self.signature = signer.sign(self.calculate_hash())
+        hash_bytes = self.calculate_hash().encode()
+        self.signature = private_key.sign(
+            hash_bytes,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
         if not self.signature:
             raise ValueError("Error signing transaction")
 
-    def is_valid(self, public_key_pem: bytes) -> bool:
+    def is_valid(self, public_key: rsa.RSAPublicKey) -> bool:
         """
         Checks transaction signature
         :param public_key_pem: key needed to validate signature
@@ -103,30 +108,37 @@ class Transaction:
         if not self.signature:
             log.debug("No signature in this transaction")
             return False
-        if not public_key_pem:
+        if not public_key:
             log.debug("No public key provided")
             return False
 
-        signer = DigitalSignature()
-        is_valid = signer.verify(public_key_pem, self.calculate_hash(), self.signature)
-
-        if not is_valid:
-            log.error("Signature is invalid")
-            return False
-        return True
-
-
-def generate_keys():
-    """Generates RSA key pair"""
-    signer = DigitalSignature()
-    private_key = signer.get_private_key()
-    public_key = signer.get_public_key()
-    return private_key, public_key
+        try:
+            public_key.verify(
+                self.signature,
+                self.calculate_hash().encode(),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            return True
+        except Exception as e:
+            log.error(f"Signature verification failed: {e}")
 
 
 # Example of generating keys
 if __name__ == "__main__":
     # Creating keys
+    from ..crypto.signatures import DigitalSignature
+
+    def generate_keys():
+        """Generates RSA key pair"""
+        signer = DigitalSignature()
+        private_key = signer.get_private_key()
+        public_key = signer.get_public_key()
+        return private_key, public_key
+
     private_key, public_key = generate_keys()
 
     # Creating trasnaction

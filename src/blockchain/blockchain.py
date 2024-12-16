@@ -1,6 +1,6 @@
 import hashlib
 import time
-from typing import List, Dict
+from typing import List
 from .consensus import ProofOfWork, Validator
 from .transaction import Transaction
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -174,7 +174,8 @@ class Blockchain:
             transactions=self.pending_transactions,
         )
 
-        reward_transaction = Transaction(None, miner_address, 1, "Mining Reward")
+        reward_transaction = Transaction(None, miner_address, 1,
+                                         "Mining Reward")
         new_block.transactions.append(reward_transaction)
 
         # Mining and validating new block
@@ -209,7 +210,6 @@ if __name__ == "__main__":
     )
     public_key = private_key.public_key()
 
-
     # Adding transactions
     transaction1 = Transaction("Alice", "Bob", 50, "test transaction 1")
     transaction1.sender_public_key = public_key
@@ -218,7 +218,6 @@ if __name__ == "__main__":
     transaction2 = Transaction("Bob", "Alice", 25, "test transaction 2")
     transaction2.sender_public_key = public_key
     transaction2.sign_transaction(private_key)
-
 
     blockchain.add_transaction(transaction1)
     blockchain.add_transaction(transaction2)

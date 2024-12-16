@@ -90,7 +90,10 @@ class Validator:
         return True
 
     def adjust_difficulty(self, blockchain, last_block):
-        """Adjust difficulty based on the time it took to mine the previous block"""
+        """
+        Adjust difficulty based on the time
+        it took to mine the previous block
+        """
         if len(blockchain.chain) < 2:
             return blockchain.difficulty
 

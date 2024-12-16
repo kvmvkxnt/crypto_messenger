@@ -12,7 +12,12 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat,
 )
 from cryptography.exceptions import InvalidKey
+from cryptography.hazmat.backends import default_backend
 from typing import Optional
+from ..utils.config import DH_PARAMETER_NUMBERS
+from ..utils.logger import Logger
+
+log = Logger("dh")
 
 
 class DiffieHellmanKeyExchange:
@@ -37,7 +42,8 @@ class DiffieHellmanKeyExchange:
         """
         # Getting parameters for DH or generating them
         if parameters is None:
-            self.parameters = dh.generate_parameters(generator=2, key_size=2048)
+            self.parameters = dh.DHParameterNumbers(*DH_PARAMETER_NUMBERS) \
+                .parameters(default_backend())
         else:
             self.parameters = parameters
 
@@ -55,7 +61,8 @@ class DiffieHellmanKeyExchange:
             Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
         )
 
-    def generate_shared_key(self, peer_public_key_bytes: bytes) -> Optional[bytes]:
+    def generate_shared_key(self, peer_public_key_bytes: bytes) \
+            -> Optional[bytes]:
         """
         Generates shared key based on other peer's public key
 
@@ -65,30 +72,33 @@ class DiffieHellmanKeyExchange:
         :rtype: None or bytes
         """
         if peer_public_key_bytes is None:
-            print("Error: Peer public key cannot be None.")
+            log.error("Error: Peer public key cannot be None.")
             return None
 
         try:
             peer_public_key = load_pem_public_key(peer_public_key_bytes)
         except InvalidKey as e:
-            print(f"Error: Invalid Public Key Format: {e}")
+            log.error(f"Error: Invalid Public Key Format: {e}")
             return None
         except Exception as e:
-            print(f"Error during key loading: {e}")
+            log.error(f"Error during key loading: {e}")
             return None
 
-        print("Received public key:", peer_public_key_bytes.decode())
+        log.debug("Recieved public key:", peer_public_key_bytes.decode())
         try:
             shared_key = self.private_key.exchange(peer_public_key)
 
             # Using KDF to strenghten key
             derived_key = HKDF(
-                algorithm=hashes.SHA256(), length=32, salt=None, info=b"dh key exchange"
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=None,
+                info=b"dh key exchange"
             ).derive(shared_key)
 
             return derived_key
         except Exception as e:
-            print(f"Error during key exchange: {e}")
+            log.error(f"Error during key exchange: {e}")
             return None
 
 
