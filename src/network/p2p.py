@@ -2,7 +2,7 @@ import threading
 import utils.logger as logger
 from .sockets import P2PSocket
 from blockchain.transaction import Transaction
-import json
+import json5 as json
 from .discovery import discover_peers
 from .sync import SyncManager
 import traceback

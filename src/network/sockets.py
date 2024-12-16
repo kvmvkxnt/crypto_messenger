@@ -1,7 +1,7 @@
 import socket
 import threading
 from utils import logger
-import json
+import json5 as json
 
 log = logger.Logger("sockets")
 

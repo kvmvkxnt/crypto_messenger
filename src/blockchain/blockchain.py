@@ -4,7 +4,7 @@ from typing import List, Dict
 from .consensus import ProofOfWork, Validator
 from .transaction import Transaction
 from cryptography.hazmat.primitives.asymmetric import rsa
-import json
+import json5 as json
 
 
 class Block:

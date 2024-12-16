@@ -1,4 +1,4 @@
-import json
+import json5 as json
 import threading
 import time
 from utils.logger import Logger

@@ -3,7 +3,7 @@
 """
 
 import hashlib
-import json
+import json5 as json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 from typing import Dict

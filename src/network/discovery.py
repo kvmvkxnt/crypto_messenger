@@ -3,7 +3,7 @@ import threading
 import time
 import utils.logger as logger
 from typing import Set, Tuple
-import json
+import json5 as json
 import os
 import zlib
 

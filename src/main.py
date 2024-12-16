@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import hashlib
-import json
+import json5 as json
 import socket
 
 from network.p2p import P2PNetwork
