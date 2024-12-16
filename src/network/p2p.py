@@ -69,7 +69,7 @@ class P2PNetwork:
         """Рассылает транзакцию всем подключенным узлам."""
         transaction_data = json.dumps(
             transaction.to_dict(), ensure_ascii=False
-        ).encode()
+        )
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
         self.broadcast_message(b"NEW_TRANSACTION" + transaction_data)
 
