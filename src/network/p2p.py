@@ -63,13 +63,13 @@ class P2PNetwork:
     def broadcast_message(self, message: str):
         """Рассылка сообщения всем подключенным узлам."""
         log.debug(f"Broadcasting message: {message}")
-        self.node.broadcast(message.encode())
+        self.node.broadcast(message)
 
     def broadcast_transaction(self, transaction: Transaction):
         """Рассылает транзакцию всем подключенным узлам."""
         transaction_data = json.dumps(
             transaction.to_dict(), ensure_ascii=False
-        )
+        ).encode()
         log.debug(f"Broadcasting transaction: {transaction.calculate_hash()}")
         self.broadcast_message(b"NEW_TRANSACTION" + transaction_data)
 
