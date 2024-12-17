@@ -37,49 +37,8 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
-                log.warning(f"No connection to peer {peer_host}:{peer_port}")  # More informative log
                 return
-
             conn.sendall(b"REQUEST_CHAIN")  # Ensure all data is sent
-
-            # Receive data in chunks
-            chunks = []
-            while True:
-                chunk = conn.recv(4096)
-                if not chunk:
-                    break  # Connection closed
-                chunks.append(chunk)
-                if len(chunk) < 4096:
-                    break  # Last chunk
-
-            data = b"".join(chunks)
-
-            if not data:
-                log.warning(f"Received empty data from {peer_host}:{peer_port}") # Check for no data
-                return
-
-            received_chain_data = json.loads(data.decode())
-
-
-            received_chain = []
-            for block_data in received_chain_data:
-                transactions = []
-                for transaction_data in block_data["transactions"]:
-                    if transaction_data["signature"]:
-                        transaction_data["signature"] = bytes.fromhex(transaction_data["signature"])
-                    if transaction_data["sender"]:
-                        transaction_data["sender"] = bytes.fromhex(transaction_data["sender"])
-                    if transaction_data["recipient"]:
-                        transaction_data["recipient"] = bytes.fromhex(transaction_data["recipient"])
-                    if transaction_data["sign_public_key"]:
-                        transaction_data["sign_public_key"] = bytes.fromhex(transaction_data["sign_public_key"])
-
-                    transactions.append(Transaction(**transaction_data))
-                block_data["transactions"] = transactions  # update dict with transaction objs
-                received_chain.append(Block(**block_data))
-
-            log.info(f"Received chain from {peer_host}:{peer_port}")
-            self.merge_chain(received_chain)
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")
@@ -273,3 +232,23 @@ class SyncManager:
         #     log.error(f"Error decoding block data: {e}")
         except Exception as e:
             log.error(f"Error during block handling: {e}")
+
+    def handle_blockchain(self, blockchain):
+        blockchain = json.loads(blockchain.decode())
+
+        chain = []
+        for block_data in blockchain:
+            transactions = []
+            for transaction_data in block_data["transactions"]:
+                if transaction_data["signature"]:
+                    transaction_data["signature"] = bytes.fromhex(transaction_data["signature"])
+                if transaction_data["sender"]:
+                    transaction_data["sender"] = bytes.fromhex(transaction_data["sender"])
+                if transaction_data["recipient"]:
+                    transaction_data["recipient"] = bytes.fromhex(transaction_data["recipient"])
+                if transaction_data["sign_public_key"]:
+                    transaction_data["sign_public_key"] = bytes.fromhex(transaction_data["sign_public_key"])
+                transactions.append(Transaction(**transaction_data))
+            block_data["transactions"] = transactions
+            chain.append(Block(**block_data))
+        self.merge_chain(chain)
