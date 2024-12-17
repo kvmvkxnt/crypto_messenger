@@ -154,9 +154,7 @@ class Blockchain:
                     balance += transaction.amount
         return balance
 
-    def mine_pending_transactions(
-        self, miner, miner_address: str
-    ) -> None:
+    def mine_pending_transactions(self, miner, miner_address: str) -> None:
         """
         Creates new block using pending transactions and adds it to chain
 
@@ -198,14 +196,13 @@ class Blockchain:
         :rtype: bool
         """
         return self.validator.validate_blockchain(self)
-    
+
     def contains_block(self, target_block: Block) -> bool:
         """Checks if the blockchain already contains the given block."""
         for block in self.chain:
             if block.hash == target_block.hash:
                 return True
         return False
-
 
 
 if __name__ == "__main__":

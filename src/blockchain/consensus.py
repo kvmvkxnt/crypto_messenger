@@ -95,7 +95,7 @@ class Validator:
             return blockchain.difficulty
 
         time_diff = time.time() - last_block.timestamp
-        expected_time = 10  # Ожидаемое время майнинга
+        expected_time = 10
 
         if time_diff < expected_time / 2:
             blockchain.difficulty += 1

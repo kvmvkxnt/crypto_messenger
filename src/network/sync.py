@@ -235,8 +235,8 @@ class SyncManager:
 
     def handle_blockchain(self, blockchain):
         blockchain = json.loads(blockchain.decode())
-
         chain = []
+
         for block_data in blockchain:
             transactions = []
             for transaction_data in block_data["transactions"]:
