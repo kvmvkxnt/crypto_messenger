@@ -89,18 +89,13 @@ class SyncManager:
         Цикл автоматической синхронизации с известными узлами.
         """
 
-        def sync_loop():
-            while True:
-                log.debug("Starting synchronization loop...")
-                for peer in self.p2p_network.peers:
-                    try:
-                        self.request_chain(peer[0], peer[1])
-                    except Exception as e:
-                        log.error(f"Error syncing with peer {peer}: {e}")
+        log.debug("Starting synchronization loop...")
+        for peer in self.p2p_network.peers:
+            try:
+                self.request_chain(peer[0], peer[1])
+            except Exception as e:
+                log.error(f"Error syncing with peer {peer}: {e}")
 
-                time.sleep(self.sync_interval)  # Интервал синхронизации
-
-        threading.Thread(target=sync_loop, daemon=True).start()
 
     def handle_new_block(self, block_data: bytes, conn) -> None:
         """
