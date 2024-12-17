@@ -48,8 +48,8 @@ class SyncManager:
                     chunks.append(chunk)
                     if len(chunk) < 4096:
                         break
-                    # if not chunks:
-                    #     break
+                    if not chunks:
+                        break
                 
                 data = b"".join(chunks)
                 block_data = json.loads(data.decode())
@@ -79,7 +79,7 @@ class SyncManager:
                         for transaction in block["transactions"]
                     ]
                 received_chain = [Block(**block) for block in received_chain]
-                log.debug(f"Received chain from {peer_host}:{peer_port}")
+                log.info(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(received_chain)
             else:
                 log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
