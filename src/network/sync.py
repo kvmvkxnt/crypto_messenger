@@ -1,12 +1,8 @@
 import json5 as json
-import threading
-import time
 from utils.logger import Logger
-from typing import Optional
 from blockchain.transaction import Transaction
 from blockchain.blockchain import Block
 import socket
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
 import zlib
 
 
@@ -82,7 +78,15 @@ class SyncManager:
 
         self.p2p_network.broadcast_message(b"NEW_BLOCK" + block_bytes, conn)
 
+    def broadcast_chain(self, conn) -> None:
+        if not self.blockchain.chain:
+            log.debug("Cannot broadcast empty chain")
+            return
+        log.debug("Broadcasting chain...")
 
+        chain_bytes = json.dumps([block.to_dict() for block in self.blockchain.chain],
+                                 ensure_ascii=False).encode()
+        self.p2p_network.broadcast_message(b"BLOCKCHAIN" + chain_bytes, conn)
 
     def start_sync_loop(self) -> None:
         """
@@ -185,51 +189,6 @@ class SyncManager:
         #     log.error(f"Error decoding transaction data: {e}")
         except Exception as e:
             log.error(f"Error during transaction handling: {e}")
-
-
-    def handle_block_sync(self, block_data: bytes) -> None:
-        """
-        Обрабатывает новый блок, полученный от другого узла.
-        """
-        try:
-            block_dict = json.loads(block_data.decode())
-            for transaction in block_dict["transactions"]:
-                if transaction["signature"]:
-                    transaction["signature"] = (
-                        bytes.fromhex(transaction["signature"])
-                        if transaction["signature"]
-                        else None
-                    )
-                if transaction["sender"]:
-                    transaction["sender"] = (
-                        bytes.fromhex(transaction["sender"])
-                        if transaction["sender"]
-                        else None
-                    )
-                transaction["recipient"] = bytes.fromhex(
-                    transaction["recipient"]
-                )
-                if transaction["sign_public_key"]:
-                    transaction["sign_public_key"] = bytes.fromhex(
-                        transaction["sign_public_key"]
-                    )
-            block_dict["transactions"] = [
-                Transaction(**transaction) for transaction in block_dict["transactions"]
-            ]
-            block = Block(**block_dict)
-            if self.blockchain.contains_block(block):
-                return
-
-            if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
-                self.blockchain.chain.append(block)
-                log.info(f"Added new block with index {block.index}")
-            else:
-                log.warning("Invalid block received")
-
-        # except json.JSONDecodeError as e:
-        #     log.error(f"Error decoding block data: {e}")
-        except Exception as e:
-            log.error(f"Error during block handling: {e}")
 
     def handle_blockchain(self, blockchain):
         blockchain = json.loads(blockchain.decode())
