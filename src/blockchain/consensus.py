@@ -6,6 +6,12 @@
 
 import time
 from typing import List
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_public_key,
+    Encoding,
+    PublicFormat,
+)
 
 
 class ProofOfWork:
@@ -137,11 +143,20 @@ if __name__ == "__main__":
     from transaction import Transaction
     from blockchain import Blockchain, Block
 
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    public_key = private_key.public_key().public_bytes(
+            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+        )
+
+
     blockchain = Blockchain(difficulty=4)
     pow = ProofOfWork(difficulty=4)
 
-    transaction1 = Transaction("Alice", "Bob", 10, "Hi")
-    transaction2 = Transaction("Charlie", "Dave", 20, "Hello")
+    transaction1 = Transaction(b"Alice", b"Bob", 0, "Hi", sign_public_key=public_key)
+    transaction1.sign_transaction(private_key)
+
+    transaction2 = Transaction(b"Charlie", b"Dave", 0, "Hello", sign_public_key=public_key)
+    transaction2.sign_transaction(private_key)
 
     blockchain.add_transaction(transaction1)
     blockchain.add_transaction(transaction2)

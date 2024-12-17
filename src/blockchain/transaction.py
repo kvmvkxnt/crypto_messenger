@@ -8,7 +8,11 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 from typing import Dict, Any
 from utils.logger import Logger
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_public_key,
+    Encoding,
+    PublicFormat,
+)
 
 log = Logger("transaction")
 
@@ -146,13 +150,15 @@ class Transaction:
 
 if __name__ == "__main__":
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_key = private_key.public_key()
+    public_key = private_key.public_key().public_bytes(
+            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+        )
 
-    transaction = Transaction(sender=b"Alice", recipient=b"Bob", amount=100)
+    transaction = Transaction(sender=b"Alice", recipient=b"Bob", amount=100, sign_public_key=public_key)
     print("Transaction hash before signing:", transaction.calculate_hash())
 
     transaction.sign_transaction(private_key)
     print("Transaction signed.")
 
-    is_valid = transaction.is_valid(public_key.public_bytes())
+    is_valid = transaction.is_valid(public_key)
     print("Is transaction valid?:", is_valid)

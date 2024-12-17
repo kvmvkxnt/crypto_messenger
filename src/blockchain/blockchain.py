@@ -5,6 +5,12 @@ from .consensus import ProofOfWork, Validator
 from .transaction import Transaction
 from cryptography.hazmat.primitives.asymmetric import rsa
 import json5 as json
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_public_key,
+    Encoding,
+    PublicFormat,
+)
 
 
 class Block:
@@ -229,27 +235,23 @@ class Blockchain:
         return False
 
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     blockchain = Blockchain(difficulty=4)
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_key = private_key.public_key()
+    public_key = private_key.public_key().public_bytes(
+            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+        )
 
-    transaction1 = Transaction("Alice", "Bob", 50, "test transaction 1")
-    transaction1.sender = public_key
-    transaction1.sign_transaction(private_key)
+    transaction = Transaction(b"Alice", b"Bob", 0, "", public_key)
+    print("Transaction hash before signing:", transaction.calculate_hash())
 
-    transaction2 = Transaction("Bob", "Alice", 25, "test transaction 2")
-    transaction2.sender = public_key
-    transaction2.sign_transaction(private_key)
+    transaction.sign_transaction(private_key)
+    print("Transaction signed.")
 
-    blockchain.add_transaction(transaction1)
-    blockchain.add_transaction(transaction2)
-
-    blockchain.mine_pending_transactions(ProofOfWork, miner_address="Miner1")
+    blockchain.add_transaction(transaction)
     blockchain.mine_pending_transactions(ProofOfWork, miner_address="Miner1")
 
     print("Blockchain valid:", blockchain.is_chain_valid())
-
     for block in blockchain.chain:
-        print(block)
+        print(block.to_dict())
