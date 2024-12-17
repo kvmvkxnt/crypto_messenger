@@ -115,29 +115,6 @@ class Validator:
 
         return True
 
-    def adjust_difficulty(self, blockchain, last_block):
-        """
-        Adjusts the difficulty of mining based on the time it took to mine the previous block.
-
-        :param Blockchain blockchain: The blockchain to adjust difficulty for.
-        :param Block last_block: The last block of the chain.
-        :return: The adjusted difficulty level.
-        :rtype: int
-        """
-        if len(blockchain.chain) < 2:
-            return blockchain.difficulty
-
-        time_diff = time.time() - last_block.timestamp
-        expected_time = 10
-
-        if time_diff < expected_time / 2:
-            blockchain.difficulty += 1
-        elif time_diff > expected_time * 2 and blockchain.difficulty > 1:
-            blockchain.difficulty -= 1
-
-        print(f"Difficulty adjusted to: {blockchain.difficulty}")
-        return blockchain.difficulty
-
 
 if __name__ == "__main__":
     from transaction import Transaction
