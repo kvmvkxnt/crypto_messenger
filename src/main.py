@@ -103,7 +103,7 @@ def main():
 
     while True:
         command = input(
-            "Enter command (connect, message, send, mine, balance, peers, chain, exit): "
+            "Enter command (connect, message, send, mine, balance, peers, chain, sync, exit): "
         )
         if command == "connect":
             while True:
@@ -185,6 +185,8 @@ def main():
         elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
+        elif command == "sync":
+            p2p_network.sync_with_peers()
         elif command == "exit":
             print("Exiting...")
             sys.exit()
