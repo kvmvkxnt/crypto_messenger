@@ -46,7 +46,7 @@ class SyncManager:
             if conn:
                 with self.p2p_network.node.lock:
                     conn.send(b"REQUEST_CHAIN")
-                    time.sleep(0.05)
+                    time.sleep(1)
                 chunks = []
                 while True:
                     chunk = conn.recv(4096)

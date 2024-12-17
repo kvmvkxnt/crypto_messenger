@@ -117,7 +117,7 @@ class P2PSocket:
                 try:
                     with self.lock:
                         conn.sendall(zlib.compress(message))
-                        time.sleep(0.05)
+                        time.sleep(1)
                 except socket.error as e:
                     log.error(f"Error broadcasting to a connection: {e}")
 
