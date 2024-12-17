@@ -32,7 +32,7 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
-                return
+                conn = None
             self.p2p_network.broadcast_message(b"REQUEST_CHAIN", conn)  # Ensure all data is sent
             log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
             return
@@ -94,13 +94,12 @@ class SyncManager:
         """
 
         log.debug("Starting synchronization loop...")
-        while len(list(self.p2p_network.peers)) > 0:
+        if len(self.p2p_network.peers):
             for peer in self.p2p_network.peers:
                 try:
                     self.request_chain(peer[0], peer[1])
                 except Exception as e:
                     log.error(f"Error syncing with peer {peer}: {e}")
-            break
 
 
     def handle_new_block(self, block_data: bytes, conn) -> None:
@@ -207,6 +206,6 @@ class SyncManager:
                 if transaction_data["sign_public_key"]:
                     transaction_data["sign_public_key"] = bytes.fromhex(transaction_data["sign_public_key"])
                 transactions.append(Transaction(**transaction_data))
-            block_data["transactions"] = transactions
+            block_data["transacti, connons"] = transactions
             chain.append(Block(**block_data))
         self.merge_chain(chain)
