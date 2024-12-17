@@ -37,31 +37,30 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
-                conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
-                # conn.send(b"INCOME_PORT" + str(self.p2p_network.port).encode())
-                if not conn:
-                    log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
-                    return
+                return
             if conn:
-                conn.send(b"REQUEST_CHAIN")
-                recieved_chain = []
-                while True:
+                conn.send(b"REQUEST_CHAIN_LENGTH")
+                length = int(conn.recv(4096).decode())
+                if not (len(self.blockchain.chain) <= length):
+                    return
+
+                for block_id in range(length):
+                    conn.send(b"REQUEST_BLOCK" + str(block_id).encode())
                     chunks = []
                     while True:
                         chunk = conn.recv(4096)
                         if not chunk:
-                            break  # Соединение закрыто
+                            break
                         chunks.append(chunk)
                         if len(chunk) < 4096:
                             break
+                        if not chunks:
+                            break
+                    
                     data = b"".join(chunks)
                     data = zlib.decompress(data)
-                    recieved_chain.append(data)
-                    if not chunks:
-                        break
-                 # Выходим из цикла обработки, если нет данных
+                    block = json.loads(data.decode())
 
-                for block in received_chain:
                     for transaction in block["transactions"]:
                         if transaction["signature"]:
                             transaction["signature"] = (
@@ -86,6 +85,7 @@ class SyncManager:
                         Transaction(**transaction)
                         for transaction in block["transactions"]
                     ]
+                    received_chain.append(block)
                 received_chain = [Block(**block) for block in received_chain]
                 log.debug(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(received_chain)

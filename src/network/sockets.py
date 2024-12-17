@@ -74,16 +74,18 @@ class P2PSocket:
                         block_data = data[len(b"NEW_BLOCK") :]
                         self.sync_manager.handle_new_block(block_data, conn)
 
-                    elif data.startswith(b"REQUEST_CHAIN"):
+                    elif data.startswith(b"REQUEST_CHAIN_LENGTH"):
+                        length = str(len(self.blockchain.chain)).encode()
+                        self.broadcast(length, conn)
 
-                        chain_data = [block.to_dict() for block in self.blockchain.chain],
-                        for block in chain_data:
-                            json.dumps(block, ensure_ascii=False).encode()
-                            try:
-                                self.broadcast(block, conn)
-                            except socket.error as e:
-                                log.error(f"Error sending blockchain to {addr}: {e}")
-                                break
+                    elif data.startswith(b"REQUEST_BLOCK"):
+                        block_id = int(data[len(b"REQUEST_BLOCK") :].decode())
+                        block = json.dumps(self.blockchain.chain[block_id].to_dict(), ensure_ascii=False).encode()
+                        try:
+                            self.broadcast(block, conn)
+                        except socket.error as e:
+                            log.error(f"Error sending blockchain to {addr}: {e}")
+                            break
                         log.debug(f"Sent blockchain to {addr}")
 
                     elif data.startswith(b"NEW_TRANSACTION"):
