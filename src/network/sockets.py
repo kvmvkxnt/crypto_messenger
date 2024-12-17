@@ -81,7 +81,7 @@ class P2PSocket:
                             [block.to_dict() for block in self.blockchain.chain]
                         ).encode()
                         try:
-                            self.broadcast(chain_data, conn)
+                            conn.sendall(chain_data, conn)
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
                             break
