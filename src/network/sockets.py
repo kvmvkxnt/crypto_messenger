@@ -3,6 +3,7 @@ import threading
 from utils import logger
 import json5 as json
 import zlib
+import time
 
 log = logger.Logger("sockets")
 
@@ -18,6 +19,8 @@ class P2PSocket:
         self.blockchain = blockchain
         self.sync_manager = sync_manager
         self.signature_manager = signature_manager
+        self.lock = threading.Lock()
+
 
 
     def start_server(self):
@@ -112,7 +115,9 @@ class P2PSocket:
         for conn, _ in self.connections:
             if conn != sender_conn:
                 try:
-                    conn.sendall(zlib.compress(message))
+                    with self.lock:
+                        conn.sendall(zlib.compress(message))
+                        time.sleep(0.05)
                 except socket.error as e:
                     log.error(f"Error broadcasting to a connection: {e}")
 

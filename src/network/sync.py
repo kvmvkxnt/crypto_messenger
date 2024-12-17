@@ -43,7 +43,9 @@ class SyncManager:
                     log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
                     return
             if conn:
-                conn.send(b"REQUEST_CHAIN")
+                with self.p2p_network.node.lock:
+                    conn.send(b"REQUEST_CHAIN")
+                    time.sleep(0.05)
                 chunks = []
                 while True:
                     chunk = conn.recv(4096)
