@@ -36,7 +36,7 @@ class Transaction:
         amount: float = 0,
         content: Any = "",
         sign_public_key: bytes = None,
-        signature: bytes = None
+        signature: bytes = None,
     ):
         """
         Initializes a new Transaction instance.
@@ -63,26 +63,14 @@ class Transaction:
         :rtype: Dict[str, str]
         """
         return {
-            "sender": (
-                self.sender.hex()
-                if self.sender
-                else None
-            ),
-            "recipient": (
-                self.recipient.hex()
-                if self.recipient
-                else None
-            ),
+            "sender": (self.sender.hex() if self.sender else None),
+            "recipient": (self.recipient.hex() if self.recipient else None),
             "amount": self.amount,
             "content": str(self.content),
-            "signature": (
-                self.signature.hex()
-                if self.signature
-                else None
+            "signature": (self.signature.hex() if self.signature else None),
+            "sign_public_key": (
+                self.sign_public_key.hex() if self.sign_public_key else None
             ),
-            "sign_public_key": self.sign_public_key.hex()
-            if self.sign_public_key
-            else None,
         }
 
     def calculate_hash(self) -> str:
@@ -96,7 +84,9 @@ class Transaction:
         """
         transaction_dict = self.to_dict()
         transaction_dict.pop("signature", None)
-        transaction_string = json.dumps(transaction_dict, sort_keys=True, ensure_ascii=False)
+        transaction_string = json.dumps(
+            transaction_dict, sort_keys=True, ensure_ascii=False
+        )
         return hashlib.sha256(transaction_string.encode()).hexdigest()
 
     def sign_transaction(self, signer: rsa.RSAPrivateKey) -> None:
@@ -110,11 +100,13 @@ class Transaction:
             raise ValueError("Transaction must include sender and recipient")
 
         hash_bytes = self.calculate_hash().encode()
-        self.signature = signer.sign(hash_bytes, padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
-                ),
-                hashes.SHA256() )
+        self.signature = signer.sign(
+            hash_bytes,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256(),
+        )
 
     def is_valid(self, public_key: bytes) -> bool:
         """
@@ -138,9 +130,9 @@ class Transaction:
                 self.calculate_hash().encode(),
                 padding.PSS(
                     mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
+                    salt_length=padding.PSS.MAX_LENGTH,
                 ),
-                hashes.SHA256()
+                hashes.SHA256(),
             )
             return True
         except Exception as e:
@@ -151,10 +143,12 @@ class Transaction:
 if __name__ == "__main__":
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key().public_bytes(
-            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
-        )
+        encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+    )
 
-    transaction = Transaction(sender=b"Alice", recipient=b"Bob", amount=100, sign_public_key=public_key)
+    transaction = Transaction(
+        sender=b"Alice", recipient=b"Bob", amount=100, sign_public_key=public_key
+    )
     print("Transaction hash before signing:", transaction.calculate_hash())
 
     transaction.sign_transaction(private_key)

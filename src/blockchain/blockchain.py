@@ -1,3 +1,7 @@
+"""
+    Blockchain module represents all of the things related to storing info (in blocks) and it's processing.
+"""
+
 import hashlib
 import time
 from typing import List, Dict
@@ -107,12 +111,12 @@ class Blockchain:
         self.validator = Validator()
 
     def __len__(self):
-         """
-         Gets length of the chain
-         :return: length of the chain
-         :rtype: int
-         """
-         return len(self.chain)
+        """
+        Gets length of the chain
+        :return: length of the chain
+        :rtype: int
+        """
+        return len(self.chain)
 
     def create_genesis_block(self) -> Block:
         """
@@ -179,7 +183,9 @@ class Blockchain:
                     balance += transaction.amount
         return balance
 
-    def mine_pending_transactions(self, miner, miner_address: str) -> tuple[Block, Transaction] | tuple[None, None]:
+    def mine_pending_transactions(
+        self, miner, miner_address: str
+    ) -> tuple[Block, Transaction] | tuple[None, None]:
         """
         Mines a new block using pending transactions and adds it to the chain.
 
@@ -235,13 +241,12 @@ class Blockchain:
         return False
 
 
-
 if __name__ == "__main__":
     blockchain = Blockchain(difficulty=4)
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key().public_bytes(
-            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
-        )
+        encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+    )
 
     transaction = Transaction(b"Alice", b"Bob", 0, "", public_key)
     print("Transaction hash before signing:", transaction.calculate_hash())

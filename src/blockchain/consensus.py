@@ -1,7 +1,5 @@
 """
-    Consensus module
-
-    Base of PoW algorithm and validations
+    Consensus module represents base of PoW algorithm and validations.
 """
 
 import time
@@ -122,9 +120,8 @@ if __name__ == "__main__":
 
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key().public_bytes(
-            encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
-        )
-
+        encoding=Encoding.PEM, format=PublicFormat.SubjectPublicKeyInfo
+    )
 
     blockchain = Blockchain(difficulty=4)
     pow = ProofOfWork(difficulty=4)
@@ -132,7 +129,9 @@ if __name__ == "__main__":
     transaction1 = Transaction(b"Alice", b"Bob", 0, "Hi", sign_public_key=public_key)
     transaction1.sign_transaction(private_key)
 
-    transaction2 = Transaction(b"Charlie", b"Dave", 0, "Hello", sign_public_key=public_key)
+    transaction2 = Transaction(
+        b"Charlie", b"Dave", 0, "Hello", sign_public_key=public_key
+    )
     transaction2.sign_transaction(private_key)
 
     blockchain.add_transaction(transaction1)
