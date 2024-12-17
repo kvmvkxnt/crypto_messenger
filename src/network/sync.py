@@ -37,7 +37,7 @@ class SyncManager:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
                 return
-            conn.sendall(b"REQUEST_CHAIN")  # Ensure all data is sent
+            conn.sendall(zlib.compress(b"REQUEST_CHAIN"))  # Ensure all data is sent
             log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
 
         except socket.error as e:
