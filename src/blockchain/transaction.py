@@ -1,34 +1,28 @@
 """
-    Transaction module represents all of the thing with transactions
+    Transaction module represents all of the things related to transactions.
 """
 
 import hashlib
 import json5 as json
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
-from typing import Dict
+from typing import Dict, Any
 from utils.logger import Logger
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
 log = Logger("transaction")
 
 
-
-
 class Transaction:
     """
-    Defines transaction and its content
+    Defines a transaction and its content.
 
-    :ivar sender: initiator of the transaction
-    :type sender: str
-    :ivar recipient: recipient of the transaction
-    :type recipient: str
-    :ivar amount: amount of coins recipient gets
-    :type amount: float
-    :ivar content: content (comment) sender sends !?
-    :type content: any
-    :ivar signature: encrypted signature to secure the transaction
-    :type signature: idk
+    :ivar bytes sender: The initiator of the transaction.
+    :ivar bytes recipient: The recipient of the transaction.
+    :ivar float amount: The amount of coins to be transferred.
+    :ivar Any content: Additional content or comment associated with the transaction.
+    :ivar bytes sign_public_key: The public key of the sender for verification.
+    :ivar bytes signature: The encrypted signature to secure the transaction.
     """
 
     def __init__(
@@ -36,11 +30,20 @@ class Transaction:
         sender: bytes = None,
         recipient: bytes = None,
         amount: float = 0,
-        content: any = "",
+        content: Any = "",
         sign_public_key: bytes = None,
         signature: bytes = None
     ):
-        """Initializes transaction"""
+        """
+        Initializes a new Transaction instance.
+
+        :param bytes sender: The initiator of the transaction.
+        :param bytes recipient: The recipient of the transaction.
+        :param float amount: The amount of coins to be transferred.
+        :param Any content: Additional content or comment associated with the transaction.
+        :param bytes sign_public_key: The public key of the sender for verification.
+        :param bytes signature: The encrypted signature to secure the transaction.
+        """
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
@@ -50,9 +53,9 @@ class Transaction:
 
     def to_dict(self) -> Dict[str, str]:
         """
-        Returns transaction content as a dictionary
+        Returns a dictionary representation of the transaction's data.
 
-        :return: transaction content
+        :return: A dictionary containing the transaction's data.
         :rtype: Dict[str, str]
         """
         return {
@@ -80,9 +83,11 @@ class Transaction:
 
     def calculate_hash(self) -> str:
         """
-        Returns transaction hash
+        Calculates the SHA-256 hash of the transaction's content.
 
-        :return: transaction hash
+        The signature is excluded from the hash calculation.
+
+        :return: The hash of the transaction.
         :rtype: str
         """
         transaction_dict = self.to_dict()
@@ -90,25 +95,29 @@ class Transaction:
         transaction_string = json.dumps(transaction_dict, sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(transaction_string.encode()).hexdigest()
 
-    def sign_transaction(self, signer) -> None:
+    def sign_transaction(self, signer: rsa.RSAPrivateKey) -> None:
         """
-        Signs transaction with private key
+        Signs the transaction using the sender's private key.
 
-        :param private_key: private_key needed to sign transaction
-        :type private_key: rsa.RSAPrivateKey
+        :param rsa.RSAPrivateKey signer: The private key used to sign the transaction.
+        :raises ValueError: If the transaction does not have a sender or recipient.
         """
         if not self.sender or not self.recipient:
             raise ValueError("Transaction must include sender and recipient")
 
         hash_bytes = self.calculate_hash().encode()
-        self.signature = signer.sign(hash_bytes)
+        self.signature = signer.sign(hash_bytes, padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256() )
 
     def is_valid(self, public_key: bytes) -> bool:
         """
-        Checks transaction signature
-        :param public_key_pem: key needed to validate signature
-        :type public_key_pem: bytes
-        :return: if signature is valid or not
+        Checks if the transaction's signature is valid using the sender's public key.
+
+        :param bytes public_key: The public key to verify the signature.
+        :return: True if the signature is valid, False otherwise.
         :rtype: bool
         """
         if not self.signature:
@@ -132,17 +141,18 @@ class Transaction:
             return True
         except Exception as e:
             log.error(f"Signature verification failed: {e}")
+            return False
 
 
 if __name__ == "__main__":
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key()
 
-    transaction = Transaction(sender="Alice", recipient="Bob", amount=100)
+    transaction = Transaction(sender=b"Alice", recipient=b"Bob", amount=100)
     print("Transaction hash before signing:", transaction.calculate_hash())
 
     transaction.sign_transaction(private_key)
     print("Transaction signed.")
 
-    is_valid = transaction.is_valid(public_key)
+    is_valid = transaction.is_valid(public_key.public_bytes())
     print("Is transaction valid?:", is_valid)
