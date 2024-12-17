@@ -56,7 +56,7 @@ class SyncManager:
                     if not chunks:
                         break # Выходим из цикла обработки, если нет данных
                 response = b"".join(chunks)
-                data = zlib.decompress(data)
+                response = zlib.decompress(response)
 
                 received_chain = json.loads(response.decode())
 
