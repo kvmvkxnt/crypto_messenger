@@ -61,8 +61,8 @@ class P2PSocket:
                         chunks.append(chunk)
                         if len(chunk) < 4096:
                             break # последний чанк
-                        if not chunks:
-                            break # Выходим из цикла обработки, если нет данных
+                    if not chunks:
+                        break # Выходим из цикла обработки, если нет данных
                         
                     data = b"".join(chunks)
 
@@ -76,11 +76,12 @@ class P2PSocket:
                         length = str(len(self.blockchain.chain)).encode()
                         self.broadcast(length, conn)
 
-                    elif data.startswith(b"REQUEST_BLOCK"):
-                        block_id = int(data[len(b"REQUEST_BLOCK") :].decode())
-                        block = json.dumps(self.blockchain.chain[block_id].to_dict(), ensure_ascii=False).encode()
+                    elif data.startswith(b"REQUEST_CHAIN"):
+                        chain_data = json.dumps(
+                            [block.to_dict() for block in self.blockchain.chain]
+                        ).encode()
                         try:
-                            self.broadcast(block, conn)
+                            self.broadcast(chain_data, conn)
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
                             break

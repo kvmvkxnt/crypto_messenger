@@ -39,30 +39,21 @@ class SyncManager:
             if not conn:
                 return
             if conn:
-                conn.send(b"REQUEST_CHAIN_LENGTH")
-                length = int(conn.recv(4096).decode())
-                print(length)
-                if not (len(self.blockchain.chain) <= length):
-                    return
-
-                for block_id in range(length):
-                    conn.send(b"REQUEST_BLOCK" + str(block_id).encode())
-                    chunks = []
-                    while True:
-                        chunk = conn.recv(4096)
-                        if not chunk:
-                            break
-                        chunks.append(chunk)
-                        if len(chunk) < 4096:
-                            break
-                        if not chunks:
-                            break
-                    
-                    data = b"".join(chunks)
-                    if data.startswith(b"CHAIN_BLOCK"):
-                        block = data[len(b"CHAIN_BLOCK") :]
-                    block = json.loads(data.decode())
-
+                conn.send(b"REQUEST_CHAIN")
+                chunks = []
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                    if len(chunk) < 4096:
+                        break
+                    # if not chunks:
+                    #     break
+                
+                data = b"".join(chunks)
+                block_data = json.loads(data.decode())
+                for block in block_data:
                     for transaction in block["transactions"]:
                         if transaction["signature"]:
                             transaction["signature"] = (
@@ -87,7 +78,6 @@ class SyncManager:
                         Transaction(**transaction)
                         for transaction in block["transactions"]
                     ]
-                    received_chain.append(block)
                 received_chain = [Block(**block) for block in received_chain]
                 log.debug(f"Received chain from {peer_host}:{peer_port}")
                 self.merge_chain(received_chain)
