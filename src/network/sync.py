@@ -40,7 +40,8 @@ class SyncManager:
                 return
             if conn:
                 conn.send(b"REQUEST_CHAIN_LENGTH")
-                length = int(conn.recv(4096).decode())
+                length = int(zlib.decompress(conn.recv(4096)).decode())
+                print(length)
                 if not (len(self.blockchain.chain) <= length):
                     return
 
