@@ -40,7 +40,7 @@ class SyncManager:
                 return
             if conn:
                 conn.send(b"REQUEST_CHAIN_LENGTH")
-                length = int(zlib.decompress(conn.recv(4096)).decode())
+                length = int(conn.recv(4096).decode())
                 print(length)
                 if not (len(self.blockchain.chain) <= length):
                     return
@@ -59,7 +59,8 @@ class SyncManager:
                             break
                     
                     data = b"".join(chunks)
-                    data = zlib.decompress(data)
+                    if data.startswith(b"CHAIN_BLOCK"):
+                        block = data[len(b"CHAIN_BLOCK") :]
                     block = json.loads(data.decode())
 
                     for transaction in block["transactions"]:
@@ -240,3 +241,48 @@ class SyncManager:
         #     log.error(f"Error decoding transaction data: {e}")
         except Exception as e:
             log.error(f"Error during transaction handling: {e}")
+
+
+    def handle_block_sync(self, block_data: bytes) -> None:
+        """
+        Обрабатывает новый блок, полученный от другого узла.
+        """
+        try:
+            block_dict = json.loads(block_data.decode())
+            for transaction in block_dict["transactions"]:
+                if transaction["signature"]:
+                    transaction["signature"] = (
+                        bytes.fromhex(transaction["signature"])
+                        if transaction["signature"]
+                        else None
+                    )
+                if transaction["sender"]:
+                    transaction["sender"] = (
+                        bytes.fromhex(transaction["sender"])
+                        if transaction["sender"]
+                        else None
+                    )
+                transaction["recipient"] = bytes.fromhex(
+                    transaction["recipient"]
+                )
+                if transaction["sign_public_key"]:
+                    transaction["sign_public_key"] = bytes.fromhex(
+                        transaction["sign_public_key"]
+                    )
+            block_dict["transactions"] = [
+                Transaction(**transaction) for transaction in block_dict["transactions"]
+            ]
+            block = Block(**block_dict)
+            if self.blockchain.contains_block(block):
+                return
+
+            if self.blockchain.validator.validate_block(block, self.blockchain.get_latest_block()):
+                self.blockchain.chain.append(block)
+                log.info(f"Added new block with index {block.index}")
+            else:
+                log.warning("Invalid block received")
+
+        # except json.JSONDecodeError as e:
+        #     log.error(f"Error decoding block data: {e}")
+        except Exception as e:
+            log.error(f"Error during block handling: {e}")

@@ -2,7 +2,6 @@ import socket
 import threading
 from utils import logger
 import json5 as json
-import zlib
 import time
 
 log = logger.Logger("sockets")
@@ -66,7 +65,6 @@ class P2PSocket:
                             break # Выходим из цикла обработки, если нет данных
                         
                     data = b"".join(chunks)
-                    data = zlib.decompress(data)
 
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
@@ -87,6 +85,11 @@ class P2PSocket:
                             log.error(f"Error sending blockchain to {addr}: {e}")
                             break
                         log.debug(f"Sent blockchain to {addr}")
+
+                    elif data.startswith(b"CHAIN_BLOCK"):
+                        block_data = data[len(b"CHAIN_BLOCK") :]
+                        self.sync_manager.handle_block_sync(block_data, conn)
+
 
                     elif data.startswith(b"NEW_TRANSACTION"):
                         transaction_data = data[len(b"NEW_TRANSACTION") :]
@@ -116,7 +119,7 @@ class P2PSocket:
         for conn, _ in self.connections:
             if conn != sender_conn:
                 try:
-                    conn.sendall(zlib.compress(message))
+                    conn.sendall(message)
                 except socket.error as e:
                     log.error(f"Error broadcasting to a connection: {e}")
 
