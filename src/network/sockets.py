@@ -2,7 +2,6 @@ import socket
 import threading
 from utils import logger
 import json5 as json
-import time
 import zlib
 
 log = logger.Logger("sockets")
@@ -77,20 +76,13 @@ class P2PSocket:
                         self.sync_manager.handle_new_block(block_data, conn)
 
                     elif data.startswith(b"REQUEST_CHAIN"):
-                        chain_data = json.dumps(
-                            [block.to_dict() for block in self.blockchain.chain]
-                        ).encode()
-                        try:
-                            log.info("Sending blockchain")
-                            self.broadcast(b"BLOCKCHAIN" + chain_data, conn)
-                        except socket.error as e:
-                            log.error(f"Error sending blockchain to {addr}: {e}")
-                            break
+                        log.info("Sending blockchain")
+                        self.sync_manager.broadcast_chain()
                         log.debug(f"Sent blockchain to {addr}")
 
                     elif data.startswith(b"BLOCKCHAIN"):
                         blockchain = data[len(b"BLOCKCHAIN") :]
-                        self.sync_manager.handle_blockchain(blockchain)
+                        self.sync_manager.handle_blockchain(blockchain, conn)
 
 
                     elif data.startswith(b"NEW_TRANSACTION"):
