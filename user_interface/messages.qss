@@ -1,0 +1,23 @@
+/* Общие стили для всех пузырей */
+.message_bubble {
+    display: inline-block;
+    padding: 10px;
+    margin: 5px;
+    max-width: 70%; /* Максимальная ширина пузыря */
+    text-align: left; /* Выравнивание текста */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Стиль для сообщений отправителя */
+.sender {
+    background-color: rgb(229, 161, 232);
+    border-radius: 15px 15px 0px 15px;
+    align-self: flex-end; /* Выравнивание справа */
+}
+
+/* Стиль для сообщений получателя */
+.receiver {
+    background-color: rgb(161, 203, 232);
+    border-radius: 15px 15px 15px 0px;
+    align-self: flex-start; /* Выравнивание слева */
+}
