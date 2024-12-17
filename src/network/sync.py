@@ -33,56 +33,53 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
-        log.debug(f"Requesting blockchain from {peer_host}:{peer_port}")
+        log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
+                log.warning(f"No connection to peer {peer_host}:{peer_port}")  # More informative log
                 return
-            if conn:
-                conn.send(b"REQUEST_CHAIN")
-                chunks = []
-                while True:
-                    chunk = conn.recv(4096)
-                    if not chunk:
-                        break
-                    chunks.append(chunk)
-                    if len(chunk) < 4096:
-                        break
-                    if not chunks:
-                        break
-                
-                data = b"".join(chunks)
-                block_data = json.loads(data.decode())
-                for block in block_data:
-                    for transaction in block["transactions"]:
-                        if transaction["signature"]:
-                            transaction["signature"] = (
-                                bytes.fromhex(transaction["signature"])
-                                if transaction["signature"]
-                                else None
-                            )
-                        if transaction["sender"]:
-                            transaction["sender"] = (
-                                bytes.fromhex(transaction["sender"])
-                                if transaction["sender"]
-                                else None
-                            )
-                        transaction["recipient"] = bytes.fromhex(
-                            transaction["recipient"]
-                        ).encode()
-                        if transaction["sign_public_key"]:
-                            transaction["sign_public_key"] = bytes.fromhex(
-                                transaction["sign_public_key"]
-                            )
-                    block["transactions"] = [
-                        Transaction(**transaction)
-                        for transaction in block["transactions"]
-                    ]
-                received_chain = [Block(**block) for block in received_chain]
-                log.info(f"Received chain from {peer_host}:{peer_port}")
-                self.merge_chain(received_chain)
-            else:
-                log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
+
+            conn.sendall(b"REQUEST_CHAIN")  # Ensure all data is sent
+
+            # Receive data in chunks
+            chunks = []
+            while True:
+                chunk = conn.recv(4096)
+                if not chunk:
+                    break  # Connection closed
+                chunks.append(chunk)
+                if len(chunk) < 4096:
+                    break  # Last chunk
+
+            data = b"".join(chunks)
+
+            if not data:
+                log.warning(f"Received empty data from {peer_host}:{peer_port}") # Check for no data
+                return
+
+            received_chain_data = json.loads(data.decode())
+
+
+            received_chain = []
+            for block_data in received_chain_data:
+                transactions = []
+                for transaction_data in block_data["transactions"]:
+                    if transaction_data["signature"]:
+                        transaction_data["signature"] = bytes.fromhex(transaction_data["signature"])
+                    if transaction_data["sender"]:
+                        transaction_data["sender"] = bytes.fromhex(transaction_data["sender"])
+                    if transaction_data["recipient"]:
+                        transaction_data["recipient"] = bytes.fromhex(transaction_data["recipient"])
+                    if transaction_data["sign_public_key"]:
+                        transaction_data["sign_public_key"] = bytes.fromhex(transaction_data["sign_public_key"])
+
+                    transactions.append(Transaction(**transaction_data))
+                block_data["transactions"] = transactions  # update dict with transaction objs
+                received_chain.append(Block(**block_data))
+
+            log.info(f"Received chain from {peer_host}:{peer_port}")
+            self.merge_chain(received_chain)
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")
