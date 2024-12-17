@@ -37,31 +37,29 @@ class SyncManager:
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
-                return
-            # if not conn:
-            #     conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
-            #     if not conn:
-            #         log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
-            #         return
+                conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
+                # conn.send(b"INCOME_PORT" + str(self.p2p_network.port).encode())
+                if not conn:
+                    log.error(f"Failed to connect to peer {peer_host}:{peer_port}")
+                    return
             if conn:
-                with self.p2p_network.node.lock:
-                    conn.send(b"REQUEST_CHAIN")
-                    time.sleep(1)
-                chunks = []
+                conn.send(b"REQUEST_CHAIN")
+                recieved_chain = []
                 while True:
-                    chunk = conn.recv(4096)
-                    if not chunk:
-                        break  # Соединение закрыто
-                    chunks.append(chunk)
-                    if len(chunk) < 4096:
-                        break # последний чанк
-
+                    chunks = []
+                    while True:
+                        chunk = conn.recv(4096)
+                        if not chunk:
+                            break  # Соединение закрыто
+                        chunks.append(chunk)
+                        if len(chunk) < 4096:
+                            break
+                    data = b"".join(chunks)
+                    data = zlib.decompress(data)
+                    recieved_chain.append(data)
                     if not chunks:
-                        break # Выходим из цикла обработки, если нет данных
-                response = b"".join(chunks)
-                response = zlib.decompress(response)
-
-                received_chain = json.loads(response.decode())
+                        break
+                 # Выходим из цикла обработки, если нет данных
 
                 for block in received_chain:
                     for transaction in block["transactions"]:
