@@ -5,27 +5,32 @@
 """
 
 import time
+from typing import List
 
 
 class ProofOfWork:
     """
-    ProofOfWork class used to mine and find hash
+    ProofOfWork class used to mine and find hash.
 
-    :ivar difficulty: difficulty of finding hash
-    :type difficulty: int
+    :ivar int difficulty: The difficulty of finding a valid hash.
     """
 
     def __init__(self, difficulty: int):
-        """Initializes the PoW class"""
+        """
+        Initializes the ProofOfWork class.
+
+        :param int difficulty: The mining difficulty level.
+        """
         self.difficulty = difficulty
 
     def mine(self, block) -> str:
         """
-        Proccesses block mining.
+        Processes block mining by finding a hash that meets the difficulty criteria.
 
-        :param block: block that should be mined
-        :type block: Block
-        :return: found hash of the block
+        It modifies the block.nonce and block.hash attribute.
+
+        :param Block block: The block to be mined.
+        :return: The hash of the mined block.
         :rtype: str
         """
         target = self.get_target()
@@ -38,32 +43,39 @@ class ProofOfWork:
 
     def validate(self, block) -> bool:
         """
-        Validates that block corresponds to difficulty
+        Validates that a block's hash meets the difficulty criteria.
 
-        :param block: block that should be validated
-        :type block: Block
-        :return: if correct hash was found or not
+        :param Block block: The block to be validated.
+        :return: True if the block's hash is valid, False otherwise.
         :rtype: bool
         """
         target = self.get_target()
         return block.hash.startswith(target)
 
-    def get_target(self):
+    def get_target(self) -> str:
+        """
+        Returns the target string based on the difficulty.
+
+        The target is a string of zeros equal to the difficulty.
+
+        :return: A string of zeros representing the mining target.
+        :rtype: str
+        """
         return "0" * self.difficulty
 
 
 class Validator:
     """
-    Validator class checks the chain and validates its integrity
+    Validator class to check the integrity of the blockchain.
     """
 
     def validate_blockchain(self, blockchain) -> bool:
         """
-        Checks integrity of the whole chain
+        Checks the integrity of the entire blockchain.
 
-        :param blockchain: chain that should be checked
+        :param blockchain: The blockchain to be validated.
         :type blockchain: Blockchain or List[Block]
-        :return: if blockchain is corrupted or not
+        :return: True if the blockchain is valid, False otherwise.
         :rtype: bool
         """
         for i in range(1, len(blockchain.chain)):
@@ -75,6 +87,14 @@ class Validator:
         return True
 
     def validate_block(self, current_block, previous_block) -> bool:
+        """
+        Validates a single block in relation to the previous block.
+
+        :param Block current_block: The block to be validated.
+        :param Block previous_block: The previous block in the chain.
+        :return: True if the block is valid, False otherwise.
+        :rtype: bool
+        """
         if current_block.hash != current_block.calculate_hash():
             print(f"Block {current_block.index} has invalid hash.")
             return False
@@ -90,7 +110,14 @@ class Validator:
         return True
 
     def adjust_difficulty(self, blockchain, last_block):
-        """Adjust difficulty based on the time it took to mine the previous block"""
+        """
+        Adjusts the difficulty of mining based on the time it took to mine the previous block.
+
+        :param Blockchain blockchain: The blockchain to adjust difficulty for.
+        :param Block last_block: The last block of the chain.
+        :return: The adjusted difficulty level.
+        :rtype: int
+        """
         if len(blockchain.chain) < 2:
             return blockchain.difficulty
 
