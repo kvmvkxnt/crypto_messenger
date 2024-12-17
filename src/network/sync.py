@@ -3,7 +3,6 @@ from utils.logger import Logger
 from blockchain.transaction import Transaction
 from blockchain.blockchain import Block
 import socket
-import zlib
 
 
 

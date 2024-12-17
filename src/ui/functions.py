@@ -35,7 +35,7 @@ class MessengerApp(QMainWindow, Ui_BlockChain):
         self.smsg = smsg
         self.rmvcn = rmvcn
         self.connections = connections
-        self.chat_names = self.connections
+        self.chat_names = [peer[2] for peer in self.peers]
         self.load_chats()
 
         self.chatList.itemClicked.connect(self.select_chat)

@@ -166,7 +166,7 @@ SyncManager,
 
     window = MessengerApp(username, connect_by_username, send_message,
                           remove_connection, peers=p2p_network.peers,
-                          connections=p2p_network.node.connections)
+                          connections=p2p_network.peers)
     window.show()
     sys.exit(app.exec_())
 
