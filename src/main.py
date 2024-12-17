@@ -161,6 +161,8 @@ def main():
         #     blockchain.add_transaction(transaction, p2p_network)
         elif command == "mine":
             new_block, reward_transaction = blockchain.mine_pending_transactions(ProofOfWork, dh_public_key)
+            if new_block is None or reward_transaction is None:
+                continue
             p2p_network.sync_manager.broadcast_block(new_block, None)
             p2p_network.broadcast_transaction(reward_transaction, None)
 

@@ -187,6 +187,7 @@ class Blockchain:
             return new_block, reward_transaction
         else:
             print("Invalid block. Block was not added to the chain")
+            return None, None
 
     def is_chain_valid(self):
         """
