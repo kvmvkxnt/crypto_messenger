@@ -36,6 +36,8 @@ class SyncManager:
         log.debug(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
+            if not conn:
+                return
             # if not conn:
             #     conn = self.p2p_network.connect_to_peer(peer_host, peer_port)
             #     if not conn:
