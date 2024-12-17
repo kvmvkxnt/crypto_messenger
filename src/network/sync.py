@@ -90,11 +90,13 @@ class SyncManager:
         """
 
         log.debug("Starting synchronization loop...")
-        for peer in self.p2p_network.peers:
-            try:
-                self.request_chain(peer[0], peer[1])
-            except Exception as e:
-                log.error(f"Error syncing with peer {peer}: {e}")
+        while len(list(self.p2p_network.peers)) > 0:
+            for peer in self.p2p_network.peers:
+                try:
+                    self.request_chain(peer[0], peer[1])
+                except Exception as e:
+                    log.error(f"Error syncing with peer {peer}: {e}")
+            break
 
 
     def handle_new_block(self, block_data: bytes, conn) -> None:
