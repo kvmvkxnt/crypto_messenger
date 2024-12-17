@@ -33,12 +33,12 @@ class SyncManager:
         :param peer_host: Хост узла
         :param peer_port: Порт узла
         """
-        log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
                 return
             conn.sendall(b"REQUEST_CHAIN")  # Ensure all data is sent
+            log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")

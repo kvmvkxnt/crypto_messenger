@@ -85,7 +85,7 @@ def main():
         max_connections
     )
     p2p_network.start()
-    p2p_network.sync_with_peers()
+    # p2p_network.sync_with_peers()
     p2p_network.discover_peers() # <--- кривовато работает
 
     log.info(f"Your public key: {dh_public_key}")

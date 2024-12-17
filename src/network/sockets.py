@@ -3,6 +3,7 @@ import threading
 from utils import logger
 import json5 as json
 import time
+import zlib
 
 log = logger.Logger("sockets")
 
@@ -60,11 +61,13 @@ class P2PSocket:
                             break  # Соединение закрыто
                         chunks.append(chunk)
                         if len(chunk) < 4096:
-                            break # последний чанк
+                            break # последний чанк+m
                     if not chunks:
                         break # Выходим из цикла обработки, если нет данных
                         
                     data = b"".join(chunks)
+
+                    data = zlib.decompress(data)
 
                     log.debug(f"Received from {addr}: {data[:100].decode()}")
 
@@ -120,7 +123,7 @@ class P2PSocket:
         for conn, _ in self.connections:
             if conn != sender_conn:
                 try:
-                    conn.sendall(message)
+                    conn.sendall(zlib.compress(message))
                 except socket.error as e:
                     log.error(f"Error broadcasting to a connection: {e}")
 
