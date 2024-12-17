@@ -187,6 +187,7 @@ def main():
                 print(block.to_dict())
         elif command == "sync":
             p2p_network.sync_with_peers()
+            print("Syncing...")
         elif command == "exit":
             print("Exiting...")
             sys.exit()

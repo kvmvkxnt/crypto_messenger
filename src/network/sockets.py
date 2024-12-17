@@ -66,6 +66,7 @@ class P2PSocket:
                         break # Выходим из цикла обработки, если нет данных
 
                     data = b"".join(chunks)
+                    print(data)
 
                     data = zlib.decompress(data)
 
@@ -80,6 +81,7 @@ class P2PSocket:
                             [block.to_dict() for block in self.blockchain.chain]
                         ).encode()
                         try:
+                            log.info("Sending blockchain")
                             self.broadcast(b"BLOCKCHAIN" + chain_data, conn)
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
