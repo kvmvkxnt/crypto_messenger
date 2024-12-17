@@ -31,6 +31,7 @@ class SyncManager:
         """
         try:
             conn = self.p2p_network.node.get_connection(peer_host)
+            print(conn)
             if not conn:
                 conn = None
             self.p2p_network.broadcast_message(b"REQUEST_CHAIN", conn)  # Ensure all data is sent
@@ -87,6 +88,7 @@ class SyncManager:
         chain_bytes = json.dumps([block.to_dict() for block in self.blockchain.chain],
                                  ensure_ascii=False).encode()
         self.p2p_network.broadcast_message(b"BLOCKCHAIN" + chain_bytes, conn)
+        print("broadcasted")
 
     def start_sync_loop(self) -> None:
         """
