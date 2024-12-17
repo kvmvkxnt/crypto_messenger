@@ -152,13 +152,21 @@ def main():
             else:
                 log.warning("No shared key")
 
-        # elif command == "send":
-        #     recipient = input("Enter recipient address: ")
-        #     amount = float(input("Enter amount to send (MEM): "))
-        #     transaction = Transaction(address, recipient, amount, "", public_key)
-        #     transaction.sender_public_key = public_key
-        #     transaction.sign_transaction(signer.private_key)
-        #     blockchain.add_transaction(transaction, p2p_network)
+        elif command == "send":
+            recipient_username = input("Enter recipient username: ")
+            recipient = None
+            for peer in list(p2p_network.peers):
+                if peer[2] == recipient_username:
+                    recipient = peer[3]
+                    break
+            if recipient is None:
+                print(f"User {recipient_username} not found")
+                continue
+            amount = float(input("Enter amount to send (MEM): "))
+            transaction = Transaction(dh_public_key, recipient, amount, "", signature_manager.get_public_key())
+            transaction.sign_transaction(signature_manager)
+            blockchain.add_transaction(transaction)
+            p2p_network.broadcast_transaction(transaction, None)
         elif command == "mine":
             new_block, reward_transaction = blockchain.mine_pending_transactions(ProofOfWork, dh_public_key)
             if new_block is None or reward_transaction is None:
