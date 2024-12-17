@@ -36,7 +36,6 @@ class SyncManager:
                 conn = None
             self.p2p_network.broadcast_message(b"REQUEST_CHAIN", conn)  # Ensure all data is sent
             log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
-            return
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")

@@ -64,6 +64,7 @@ class P2PNetwork:
     def broadcast_message(self, message: str, conn):
         """Рассылка сообщения всем подключенным узлам."""
         log.debug(f"Broadcasting message: {message}")
+        print(message)
         self.node.broadcast(message, conn)
 
     def broadcast_transaction(self, transaction: Transaction, conn):

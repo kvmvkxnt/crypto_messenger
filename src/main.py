@@ -185,8 +185,8 @@ def main():
         elif command == "chain":
             for block in blockchain.chain:
                 print(block.to_dict())
-        elif command == "sync":
-            p2p_network.sync_with_peers()
+#         elif command == "sync":
+#             p2p_network.sync_with_peers()
             print("Syncing...")
         elif command == "exit":
             print("Exiting...")

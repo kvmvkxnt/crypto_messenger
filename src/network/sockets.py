@@ -111,6 +111,7 @@ class P2PSocket:
     def broadcast(self, message: bytes, sender_conn):
         """Отправка сообщения всем подключенным клиентам, кроме отправителя."""
         for conn, _ in self.connections:
+            print(conn)
             if conn != sender_conn:
                 try:
                     conn.sendall(zlib.compress(message))
