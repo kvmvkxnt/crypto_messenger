@@ -37,8 +37,9 @@ class SyncManager:
             conn = self.p2p_network.node.get_connection(peer_host)
             if not conn:
                 return
-            conn.sendall(zlib.compress(b"REQUEST_CHAIN"))  # Ensure all data is sent
+            self.p2p_network.broadcast_message(b"REQUEST_CHAIN", conn)  # Ensure all data is sent
             log.info(f"Requesting blockchain from {peer_host}:{peer_port}")
+            return
 
         except socket.error as e:
             log.error(f"Error requesting chain: {e}")
@@ -80,7 +81,7 @@ class SyncManager:
         block_bytes = json.dumps(block.to_dict(), ensure_ascii=False).encode()
 
         self.p2p_network.broadcast_message(b"NEW_BLOCK" + block_bytes, conn)
-        
+
 
 
     def start_sync_loop(self) -> None:

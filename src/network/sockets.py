@@ -64,7 +64,7 @@ class P2PSocket:
                             break # последний чанк+m
                     if not chunks:
                         break # Выходим из цикла обработки, если нет данных
-                        
+
                     data = b"".join(chunks)
 
                     data = zlib.decompress(data)
@@ -80,11 +80,14 @@ class P2PSocket:
                         self.broadcast(length, conn)
 
                     elif data.startswith(b"REQUEST_CHAIN"):
+                        print("break1")
                         chain_data = json.dumps(
                             [block.to_dict() for block in self.blockchain.chain]
                         ).encode()
+                        print("break2")
                         try:
                             self.broadcast(b"BLOCKCHAIN" + chain_data, conn)
+                            print("break3")
                         except socket.error as e:
                             log.error(f"Error sending blockchain to {addr}: {e}")
                             break
